@@ -5,29 +5,61 @@ export interface AiResponse {
     text: string;
 }
 
+export interface PlotCritique {
+    summary: string;
+    details: string;
+    revised_plot: string;
+}
+
 export const aiService = {
     expandPlot: async (currentPlot: string): Promise<string> => {
         return await makeAiCall("Expand this plot slightly:", currentPlot, "Expand Plot");
     },
 
     analyzePlot: async (plot: string): Promise<string> => {
-        const prompt = `Analyze the following plot summary and extract:
-1. Characters (Name, Role, Brief Description)
-2. Locations (Name, Description)
-3. Key Events (Title, Description)
+        const prompt = `You are an expert Story Editor analyzing a narrative.
+## Context
+A user has provided a raw plot summary.
 
-Return the result as valid JSON with keys: "characters", "locations", "events". Do not wrap in markdown code blocks.`;
+## Objective
+Extract the key structural elements from the text into a strict JSON format.
+
+## Instructions
+1. Identify all named or implied Characters. (Include Name, Role, Brief Description).
+2. Identify all Locations mentioned. (Include Name, Description).
+3. Identify all Key Events in chronological order. (Include Title, Description).
+
+## Output Format
+Return ONLY valid JSON matching this structure. Do NOT wrap it in markdown codeblocks like \`\`\`json.
+{
+  "characters": [{ "name": "...", "role": "...", "description": "..." }],
+  "locations": [{ "name": "...", "description": "..." }],
+  "events": [{ "title": "...", "description": "..." }]
+}`;
         return await makeAiCall(prompt, plot, "Analyze Plot");
     },
 
     generatePlotOptions: async (plot: string): Promise<string[]> => {
-        const prompt = `You are a master plotter. Generate 3 distinct, tight plot continuations or variations for the following story idea.
-        
-Rules:
-1. Each option should be a sequence of 3-5 concrete events.
-2. No dialogue, just action and cause-and-effect.
-3. Make them distinct (e.g., one action-heavy, one character-focused, one twisty).
-4. Return ONLY a valid JSON array of strings, where each string is a full option. Example: ["Option 1 text...", "Option 2 text...", "Option 3 text..."]. Do not wrap in markdown.`;
+        const prompt = `You are a Master Storyteller and Plotting Consultant.
+## Context
+The user has a story idea and needs creative directions to expand it.
+
+## Objective
+Generate 3 distinct, compelling plot continuations or variations that push the story forward.
+
+## Instructions
+1. Write 3 distinct options (e.g., action-heavy, character-focused, twist-driven).
+2. Each option must be a concrete sequence of 3-5 events.
+3. Show, don't tell. Focus on cause-and-effect action. No dialogue.
+4. Keep the pacing tight.
+
+## Output Format
+Return ONLY a valid JSON array of strings. Each string is one full option. Do NOT wrap it in markdown codeblocks. Example:
+[
+  "Option 1 description...",
+  "Option 2 description...",
+  "Option 3 description..."
+]`;
 
         const response = await makeAiCall(prompt, plot, "Generate Plot Options");
         try {
@@ -42,17 +74,63 @@ Rules:
     },
 
     streamlinePlot: async (fragmentedPlot: string): Promise<string> => {
-        const prompt = "The following is a rough sequence of plot points combined from different ideas. Smooth it out into a cohesive, flowing narrative summary. Fix any logical inconsistencies or tonal clashes.";
+        const prompt = `You are an expert Fiction Editor.
+## Objective
+Transform a rough, fragmented sequence of plot points into a cohesive, flowing narrative summary.
+
+## Instructions
+1. Smooth out the transitions between ideas.
+2. Fix any logical inconsistencies or tonal clashes.
+3. Maintain the original core events but make them read like a professional back-cover blurb or treatment.
+4. Output ONLY the improved text. Do not add conversational filler.`;
         return await makeAiCall(prompt, fragmentedPlot, "Streamline Plot");
     },
 
-    critiqueStory: async (context: string): Promise<string> => {
-        const prompt = "Act as a critical editor. Review the following story bible (plot, characters, events) and identify plot holes, inconsistencies, and pacing issues. Be constructive but sharp.";
-        return await makeAiCall(prompt, context, "Critique Story");
+    generateCritiques: async (context: string): Promise<PlotCritique[]> => {
+        const prompt = `You are a brilliant Developmental Editor and Story Fixer.
+## Context
+The user has provided their story bible, including plot, characters, events, and locations.
+
+## Objective
+Identify the 3 biggest weaknesses in the story (e.g., plot holes, weak motivation, pacing issues) and provide 3 distinct critique options. For each critique, provide a fully rewritten version of the Plot Summary that implements your specific fix.
+
+## Instructions
+1. Analyze the narrative for structural flaws.
+2. Generate exactly 3 critiques.
+3. For each critique, provide a short 'summary' of the issue.
+4. Provide 'details' explaining why it's a problem and how to fix it.
+5. Create a 'revised_plot' which is the full plot text completely rewritten to integrate your solution seamlessly.
+
+## Output Format
+Return ONLY valid JSON containing an array of exactly 3 objects. Do NOT wrap in markdown codeblocks like \`\`\`json.
+[
+  {
+    "summary": "Pacing sags in the middle...",
+    "details": "To fix this, the protagonist needs...",
+    "revised_plot": "(The entire plot text rewritten with this fix applied...)"
+  }
+]`;
+        const response = await makeAiCall(prompt, context, "Generate Critiques");
+        try {
+            const jsonMatch = response.match(/\[[\s\S]*\]/);
+            const jsonStr = jsonMatch ? jsonMatch[0] : response;
+            return JSON.parse(jsonStr) as PlotCritique[];
+        } catch (e) {
+            console.error("Failed to parse critique options", e);
+            throw new Error("Failed to parse AI critique options into actionable data.");
+        }
     },
 
     suggestCharacter: async (context: string): Promise<string> => {
-        const prompt = "Suggest a new interesting character that would fit into this story. Provide Name, Role, and a brief Description and Quirk.";
+        const prompt = `You are a Character Design Expert for novelists.
+## Objective
+Suggest a compelling new character that would fit perfectly into the provided story context but create interesting new dynamics.
+
+## Instructions
+1. Analyze the current story context.
+2. Identify a gap in the character roster (e.g. a foil, a mentor, an antagonist, a wild card).
+3. Generate a character with: Name, Role, a brief Description, and a unique Quirk or flaw.
+4. Output ONLY the character details as a readable paragraph or bullet points. Do not add conversational filler.`;
         return await makeAiCall(prompt, context, "Suggest Character");
     }
 };
@@ -62,7 +140,7 @@ async function makeAiCall(systemPrompt: string, userContent: string, actionName:
     const logStore = useAiLogStore.getState();
     const apiKey = settings.llmProvider === 'gemini' ? settings.geminiKey : settings.openaiKey;
     const provider = settings.llmProvider;
-    const model = provider === 'gemini' ? 'gemini-3-flash-preview' : 'gpt-4o';
+    const model = provider === 'gemini' ? (settings.geminiModel || 'gemini-3-flash-preview') : 'gpt-4o';
 
     if (!apiKey) {
         const error = `Please configure your ${provider} API Key in Settings.`;
@@ -90,7 +168,7 @@ async function makeAiCall(systemPrompt: string, userContent: string, actionName:
 
     try {
         if (provider === 'gemini') {
-            responseText = await callGemini(apiKey, systemPrompt, userContent);
+            responseText = await callGemini(apiKey, model, systemPrompt, userContent);
         } else {
             responseText = await callOpenAI(apiKey, systemPrompt, userContent);
         }
@@ -125,8 +203,8 @@ async function makeAiCall(systemPrompt: string, userContent: string, actionName:
     }
 }
 
-async function callGemini(apiKey: string, systemPrompt: string, userContent: string): Promise<string> {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+async function callGemini(apiKey: string, model: string, systemPrompt: string, userContent: string): Promise<string> {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
     const body = {
         contents: [{

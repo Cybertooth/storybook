@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import { useStoryStore } from '@/store/useStoryStore';
-import { aiService } from '@/lib/ai';
+import { aiService, PlotCritique } from '@/lib/ai';
 import { Wand2, Loader2, FileSearch, Sparkles, Check, X } from 'lucide-react';
 import clsx from 'clsx';
 import { useAnalysis } from '@/hooks/useAnalysis';
@@ -16,7 +16,7 @@ export const PlotGerminator = () => {
     const [isDirty, setIsDirty] = useState(false);
     const [isAiLoading, setIsAiLoading] = useState(false);
     const [aiError, setAiError] = useState<string | null>(null);
-    const [critique, setCritique] = useState<string | null>(null);
+    const [critique, setCritique] = useState<PlotCritique[] | null>(null);
     const [showExpander, setShowExpander] = useState(false);
 
     // Analysis Hook
@@ -80,8 +80,8 @@ export const PlotGerminator = () => {
             ${locations.map(l => `- ${l.name}: ${l.description}`).join('\n')}
             `;
 
-            const result = await aiService.critiqueStory(context);
-            setCritique(result);
+            const results = await aiService.generateCritiques(context);
+            setCritique(results);
         } catch (err) {
             setAiError((err as Error).message);
         } finally {
@@ -284,19 +284,35 @@ export const PlotGerminator = () => {
                     </div>
                 </div>
 
-                {critique && (
-                    <div className="lg:col-span-1 glass-panel bg-amber-50/50 rounded-xl p-6 border-amber-100/50 overflow-y-auto max-h-[600px] shadow-lg animate-in slide-in-from-right-4 duration-500">
-                        <div className="flex justify-between items-start mb-6 sticky top-0 bg-amber-50/90 backdrop-blur-sm -mx-6 -mt-6 p-6 border-b border-amber-100 z-10">
-                            <h3 className="font-bold text-amber-900 flex items-center gap-2">
-                                <FileSearch className="w-5 h-5" />
+                {critique && critique.length > 0 && (
+                    <div className="lg:col-span-1 glass-panel bg-amber-50/50 dark:bg-amber-900/10 rounded-xl p-0 border-amber-100/50 dark:border-amber-900/30 overflow-hidden flex flex-col shadow-lg animate-in slide-in-from-right-4 duration-500 max-h-[600px]">
+                        <div className="flex justify-between items-start sticky top-0 p-4 border-b border-amber-100/50 dark:border-amber-900/30 z-10 bg-amber-50/90 dark:bg-amber-900/20 backdrop-blur-sm">
+                            <h3 className="font-bold text-amber-900 dark:text-amber-500 flex items-center gap-2">
+                                <FileSearch className="w-4 h-4" />
                                 Critical Analysis
                             </h3>
-                            <button onClick={() => setCritique(null)} className="text-amber-400 hover:text-amber-600 transition-colors p-1 hover:bg-amber-100 rounded-md">
+                            <button onClick={() => setCritique(null)} className="text-amber-500 dark:text-amber-600 hover:text-amber-700 dark:hover:text-amber-400 transition-colors p-1 rounded-md">
                                 <X className="w-4 h-4" />
                             </button>
                         </div>
-                        <div className="prose prose-sm prose-amber whitespace-pre-wrap font-serif leading-relaxed">
-                            {critique}
+                        <div className="overflow-y-auto p-4 space-y-4">
+                            {critique.map((c, idx) => (
+                                <div key={idx} className="bg-white/60 dark:bg-stone-900/40 p-4 rounded-lg border border-amber-200/50 dark:border-amber-800/30 space-y-3">
+                                    <h4 className="font-bold text-amber-900 dark:text-amber-400 text-sm leading-tight">{c.summary}</h4>
+                                    <p className="text-stone-700 dark:text-stone-300 text-xs leading-relaxed">{c.details}</p>
+                                    <button
+                                        onClick={() => {
+                                            setPlotText(c.revised_plot);
+                                            setIsDirty(true);
+                                            setCritique(null);
+                                        }}
+                                        className="w-full mt-2 py-1.5 px-3 bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/40 dark:hover:bg-amber-900/60 text-amber-800 dark:text-amber-200 text-xs font-bold rounded-md transition-colors flex items-center justify-center gap-2"
+                                    >
+                                        <Check className="w-3 h-3" />
+                                        Apply Revision
+                                    </button>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 )}

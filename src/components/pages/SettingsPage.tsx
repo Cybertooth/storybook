@@ -66,11 +66,20 @@ export const SettingsPage = () => {
                                     placeholder="Enter Gemini API Key"
                                     value={localGeminiKey}
                                     onChange={(e) => setLocalGeminiKey(e.target.value)}
-                                    className="w-full p-2.5 glass-input rounded-lg text-sm"
+                                    className="w-full p-2.5 glass-input rounded-lg text-sm mb-3"
                                 />
-                                <p className="text-xs text-stone-400 mt-1.5">
-                                    Uses Gemini 3 Flash Preview by default.
-                                </p>
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-semibold text-stone-500 uppercase tracking-wider">Model</label>
+                                    <select
+                                        value={settings.geminiModel || 'gemini-3-flash-preview'}
+                                        onChange={(e) => settings.updateSettings({ geminiModel: e.target.value })}
+                                        className="w-full p-2 glass-input rounded-lg text-sm text-stone-700 font-medium"
+                                    >
+                                        <option value="gemini-3-flash-preview">Gemini 3 Flash Preview (Fast/Default)</option>
+                                        <option value="gemini-3-pro">Gemini 3 Pro (High Quality)</option>
+                                        <option value="gemini-3.1-pro">Gemini 3.1 Pro (Latest)</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
 

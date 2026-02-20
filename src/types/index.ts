@@ -71,6 +71,7 @@ export interface Chapter {
 export interface AppSettings {
     llmProvider: 'gemini' | 'openai';
     geminiKey?: string;
+    geminiModel?: string;
     openaiKey?: string;
     theme: 'light' | 'dark' | 'system';
 }

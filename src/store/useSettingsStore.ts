@@ -11,6 +11,7 @@ export const useSettingsStore = create<SettingsState>()(
         (set) => ({
             llmProvider: 'gemini',
             geminiKey: '',
+            geminiModel: 'gemini-3-flash-preview',
             openaiKey: '',
             theme: 'system',
             updateSettings: (newSettings) => set((state) => ({ ...state, ...newSettings })),
