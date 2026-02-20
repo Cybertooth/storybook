@@ -65,3 +65,14 @@ export interface AppSettings {
     openaiKey?: string;
     theme: 'light' | 'dark' | 'system';
 }
+
+export interface ProjectBundle {
+    version: number;
+    appName: 'storybook';
+    savedAt: number;
+    story: Story;
+    characters: Character[];
+    locations: Location[];
+    events: PlotEvent[];
+    chapters: Chapter[];
+}

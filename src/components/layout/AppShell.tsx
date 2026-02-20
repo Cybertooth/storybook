@@ -1,8 +1,9 @@
 import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { BookOpen, Users, Map, GitGraph, Edit3, Settings, Check, Loader2 } from 'lucide-react';
+import { BookOpen, Users, Map, GitGraph, Edit3, Settings, Check, Loader2, Save, FolderOpen, FilePlus } from 'lucide-react';
 import clsx from 'clsx';
 import { useStoryStore } from '@/store/useStoryStore';
+import { useToastStore } from '@/hooks/useToast';
 
 import { AiConsole } from '../ui/AiConsole';
 
@@ -26,6 +27,33 @@ const NavItem = ({ to, icon: Icon, label }: { to: string; icon: React.ElementTyp
 );
 
 export const AppShell = () => {
+    const toast = useToastStore(s => s.toast);
+    const storyTitle = useStoryStore(s => s.currentStory?.title);
+    const projectFileName = useStoryStore(s => s.projectFileName);
+    const saveProjectToFile = useStoryStore(s => s.saveProjectToFile);
+    const loadProjectFromFile = useStoryStore(s => s.loadProjectFromFile);
+    const newProject = useStoryStore(s => s.newProject);
+
+    React.useEffect(() => {
+        useStoryStore.getState().init();
+    }, []);
+
+    const handleSave = async () => {
+        await saveProjectToFile();
+        toast('Project saved!', 'success');
+    };
+
+    const handleLoad = async () => {
+        await loadProjectFromFile();
+        toast('Project loaded!', 'success');
+    };
+
+    const handleNew = async () => {
+        if (!window.confirm('Create a new project? Make sure to save your current work first.')) return;
+        await newProject();
+        toast('New project created!', 'info');
+    };
+
     return (
         <div className="flex h-screen font-sans text-stone-900 overflow-hidden">
             {/* Sidebar - Floating Glass */}
@@ -38,6 +66,44 @@ export const AppShell = () => {
                             </div>
                             Storybook
                         </h1>
+
+                        {/* Project info */}
+                        <div className="mt-3 space-y-2">
+                            <p className="text-sm text-stone-700 font-medium truncate">
+                                {storyTitle || 'No project'}
+                            </p>
+                            {projectFileName && (
+                                <p className="text-[10px] text-stone-400 font-mono truncate" title={projectFileName}>
+                                    📁 {projectFileName}
+                                </p>
+                            )}
+                            <div className="flex gap-1.5">
+                                <button
+                                    onClick={handleSave}
+                                    title="Save Project"
+                                    className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-stone-600 hover:text-stone-900 bg-white/30 hover:bg-white/60 rounded-lg transition-all border border-white/20"
+                                >
+                                    <Save className="w-3 h-3" />
+                                    Save
+                                </button>
+                                <button
+                                    onClick={handleLoad}
+                                    title="Load Project"
+                                    className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-stone-600 hover:text-stone-900 bg-white/30 hover:bg-white/60 rounded-lg transition-all border border-white/20"
+                                >
+                                    <FolderOpen className="w-3 h-3" />
+                                    Load
+                                </button>
+                                <button
+                                    onClick={handleNew}
+                                    title="New Project"
+                                    className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-stone-600 hover:text-stone-900 bg-white/30 hover:bg-white/60 rounded-lg transition-all border border-white/20"
+                                >
+                                    <FilePlus className="w-3 h-3" />
+                                    New
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
                     <nav className="flex-1 p-4 space-y-2 overflow-y-auto">

@@ -17,7 +17,8 @@ export const SettingsPage = () => {
         setLocalOpenAIKey(settings.openaiKey || '');
     }, [settings.geminiKey, settings.openaiKey]);
 
-    const handleSave = () => {
+    const handleSave = (e?: React.FormEvent) => {
+        if (e) e.preventDefault();
         settings.updateSettings({
             geminiKey: localGeminiKey,
             openaiKey: localOpenAIKey
@@ -26,7 +27,7 @@ export const SettingsPage = () => {
     };
 
     return (
-        <div className="max-w-2xl mx-auto space-y-8">
+        <form onSubmit={handleSave} className="max-w-2xl mx-auto space-y-8">
             <div className="border-b border-stone-200/50 pb-4">
                 <div className="flex items-center gap-3">
                     <div className="p-2 bg-stone-100/50 rounded-lg text-stone-700">
@@ -151,7 +152,7 @@ export const SettingsPage = () => {
 
                 <div className="flex justify-end pt-4">
                     <button
-                        onClick={handleSave}
+                        type="submit"
                         className="flex items-center gap-2 px-6 py-2.5 bg-stone-900 text-white rounded-lg hover:bg-stone-800 transition-all shadow-lg shadow-stone-900/20 hover:-translate-y-0.5 hover:shadow-xl"
                     >
                         <Save className="w-4 h-4" />
@@ -159,6 +160,6 @@ export const SettingsPage = () => {
                     </button>
                 </div>
             </div>
-        </div>
+        </form>
     );
 };

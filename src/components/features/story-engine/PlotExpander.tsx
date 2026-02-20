@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { aiService } from '@/lib/ai';
 import { Wand2, Check, RefreshCw, X, Sparkles, Plus, ArrowUp, ArrowDown, Trash2 } from 'lucide-react';
+import { useToastStore } from '@/hooks/useToast';
 
 interface PlotExpanderProps {
     currentPlot: string;
@@ -9,6 +10,7 @@ interface PlotExpanderProps {
 }
 
 export const PlotExpander = ({ currentPlot, onApply, onCancel }: PlotExpanderProps) => {
+    const toast = useToastStore(s => s.toast);
     const [options, setOptions] = useState<string[]>([]);
 
     // We now track composed fragments as an array of strings (sentences)
@@ -23,6 +25,7 @@ export const PlotExpander = ({ currentPlot, onApply, onCancel }: PlotExpanderPro
             setOptions(opts);
         } catch (e) {
             console.error(e);
+            toast((e as Error).message, 'error');
         } finally {
             setIsLoading(false);
         }
@@ -63,6 +66,7 @@ export const PlotExpander = ({ currentPlot, onApply, onCancel }: PlotExpanderPro
             setComposedFragments([streamlined]); // Replace with streamlined version
         } catch (e) {
             console.error(e);
+            toast((e as Error).message, 'error');
         } finally {
             setIsLoading(false);
         }

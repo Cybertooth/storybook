@@ -1,5 +1,5 @@
 import localforage from 'localforage';
-import { Story, Character, PlotEvent, Location, Chapter } from '@/types';
+import { Story, Character, PlotEvent, Location, Chapter, ProjectBundle } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 
 // Default initial data for a new story
@@ -195,6 +195,55 @@ class StorageService implements IStorageService {
         } catch (error) {
             console.error("Import failed:", error);
             throw new Error(`Import failed: ${(error as Error).message}`);
+        }
+    }
+
+    // --- Project File Save/Load ---
+    async exportProjectForStory(storyId: string): Promise<string> {
+        const story = await this.getStory(storyId);
+        if (!story) throw new Error('No story found to export');
+
+        const bundle: ProjectBundle = {
+            version: 1,
+            appName: 'storybook',
+            savedAt: Date.now(),
+            story,
+            characters: await this.getCharacters(storyId),
+            locations: await this.getLocations(storyId),
+            events: await this.getEvents(storyId),
+            chapters: await this.getChapters(storyId),
+        };
+
+        return JSON.stringify(bundle, null, 2);
+    }
+
+    async importProject(jsonString: string): Promise<string> {
+        try {
+            const data = JSON.parse(jsonString) as ProjectBundle;
+
+            // Validate format
+            if (data.appName !== 'storybook' || !data.story) {
+                throw new Error('Invalid .storybook file format');
+            }
+
+            // Clear current data
+            await storyStore.clear();
+            await characterStore.clear();
+            await locationStore.clear();
+            await eventStore.clear();
+            await chapterStore.clear();
+
+            // Import project data
+            await storyStore.setItem(data.story.id, data.story);
+            for (const item of data.characters) await characterStore.setItem(item.id, item);
+            for (const item of data.locations) await locationStore.setItem(item.id, item);
+            for (const item of data.events) await eventStore.setItem(item.id, item);
+            for (const item of data.chapters) await chapterStore.setItem(item.id, item);
+
+            return data.story.id;
+        } catch (error) {
+            console.error("Project import failed:", error);
+            throw new Error(`Project import failed: ${(error as Error).message}`);
         }
     }
 }

@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { aiService } from '@/lib/ai';
 import { useStoryStore } from '@/store/useStoryStore';
+import { useToastStore } from '@/hooks/useToast';
 
 export const useAnalysis = () => {
+    const toast = useToastStore(s => s.toast);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [analysisResult, setAnalysisResult] = useState<any>(null);
     const { createCharacter, createLocation, createEvent } = useStoryStore();
@@ -18,7 +20,7 @@ export const useAnalysis = () => {
             setAnalysisResult(parsed);
         } catch (error) {
             console.error("Analysis failed", error);
-            // In a real app, we'd set an error state here
+            toast((error as Error).message, 'error');
         } finally {
             setIsAnalyzing(false);
         }

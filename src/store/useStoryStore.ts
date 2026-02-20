@@ -12,6 +12,8 @@ interface StoryState {
     isLoading: boolean;
     isSaving: boolean;
     error: string | null;
+    projectFileHandle: FileSystemFileHandle | null;
+    projectFileName: string | null;
 
     // Story Actions
     loadStory: (id: string) => Promise<void>;
@@ -38,6 +40,11 @@ interface StoryState {
     createChapter: (title: string) => Promise<void>;
     updateChapter: (id: string, updates: Partial<Chapter>) => Promise<void>;
     deleteChapter: (id: string) => Promise<void>;
+
+    saveProjectToFile: () => Promise<void>;
+    loadProjectFromFile: () => Promise<void>;
+    newProject: () => Promise<void>;
+    init: () => Promise<void>;
 }
 
 export const useStoryStore = create<StoryState>((set, get) => ({
@@ -49,6 +56,8 @@ export const useStoryStore = create<StoryState>((set, get) => ({
     isLoading: false,
     isSaving: false,
     error: null,
+    projectFileHandle: null,
+    projectFileName: null,
 
     loadStory: async (id: string) => {
         set({ isLoading: true, error: null });
@@ -69,6 +78,20 @@ export const useStoryStore = create<StoryState>((set, get) => ({
         try {
             const story = await storage.createStory(title);
             set({ currentStory: story, characters: [], locations: [], events: [], chapters: [], isLoading: false });
+        } catch (err) {
+            set({ error: (err as Error).message, isLoading: false });
+        }
+    },
+
+    init: async () => {
+        set({ isLoading: true, error: null });
+        try {
+            const allStories = await storage.getAllStories();
+            if (allStories.length > 0) {
+                await get().loadStory(allStories[0].id);
+            } else {
+                await get().newProject();
+            }
         } catch (err) {
             set({ error: (err as Error).message, isLoading: false });
         }
@@ -308,5 +331,141 @@ export const useStoryStore = create<StoryState>((set, get) => ({
         } catch (err) {
             set({ chapters, error: (err as Error).message, isSaving: false });
         }
-    }
+    },
+
+    // --- Project File Management ---
+    saveProjectToFile: async () => {
+        const { currentStory } = get();
+        if (!currentStory) return;
+
+        try {
+            set({ isSaving: true });
+            const json = await storage.exportProjectForStory(currentStory.id);
+            const blob = new Blob([json], { type: 'application/json' });
+
+            // Try File System Access API first (Chrome, Edge, Brave)
+            if ('showSaveFilePicker' in window) {
+                try {
+                    let handle = get().projectFileHandle;
+                    if (!handle) {
+                        handle = await (window as any).showSaveFilePicker({
+                            suggestedName: `${currentStory.title.replace(/[^a-zA-Z0-9 ]/g, '')}.storybook`,
+                            types: [{
+                                description: 'Storybook Project',
+                                accept: { 'application/json': ['.storybook'] },
+                            }],
+                        });
+                    }
+                    if (handle) {
+                        const writable = await handle.createWritable();
+                        await writable.write(blob);
+                        await writable.close();
+                        set({ projectFileHandle: handle, projectFileName: handle.name, isSaving: false });
+                        return;
+                    }
+                } catch (err: any) {
+                    // User cancelled the picker — that's fine
+                    if (err?.name === 'AbortError') {
+                        set({ isSaving: false });
+                        return;
+                    }
+                    // API not supported or other error, fall through
+                }
+            }
+
+            // Fallback: download          
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${currentStory.title.replace(/[^a-zA-Z0-9 ]/g, '')}.storybook`;
+            a.click();
+            URL.revokeObjectURL(url);
+            set({ projectFileName: a.download, isSaving: false });
+        } catch (err) {
+            set({ error: (err as Error).message, isSaving: false });
+        }
+    },
+
+    loadProjectFromFile: async () => {
+        try {
+            let text: string;
+            let fileName: string;
+            let handle: FileSystemFileHandle | null = null;
+
+            // Try File System Access API first
+            if ('showOpenFilePicker' in window) {
+                try {
+                    const [fileHandle] = await (window as any).showOpenFilePicker({
+                        types: [{
+                            description: 'Storybook Project',
+                            accept: { 'application/json': ['.storybook'] },
+                        }],
+                        multiple: false,
+                    });
+                    handle = fileHandle;
+                    const file = await fileHandle.getFile();
+                    text = await file.text();
+                    fileName = file.name;
+                } catch (err: any) {
+                    if (err?.name === 'AbortError') return; // User cancelled
+                    throw err;
+                }
+            } else {
+                // Fallback: file input
+                const result = await new Promise<{ text: string; name: string } | null>((resolve) => {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = '.storybook,.json';
+                    input.onchange = async () => {
+                        const file = input.files?.[0];
+                        if (!file) { resolve(null); return; }
+                        resolve({ text: await file.text(), name: file.name });
+                    };
+                    input.click();
+                });
+                if (!result) return;
+                text = result.text;
+                fileName = result.name;
+            }
+
+            set({ isLoading: true, error: null });
+            const storyId = await storage.importProject(text!);
+            const story = await storage.getStory(storyId);
+            const characters = await storage.getCharacters(storyId);
+            const locations = await storage.getLocations(storyId);
+            const events = await storage.getEvents(storyId);
+            const chapters = await storage.getChapters(storyId);
+            set({
+                currentStory: story,
+                characters,
+                locations,
+                events,
+                chapters,
+                isLoading: false,
+                projectFileHandle: handle,
+                projectFileName: fileName!,
+            });
+        } catch (err) {
+            set({ error: (err as Error).message, isLoading: false });
+        }
+    },
+
+    newProject: async () => {
+        set({ isLoading: true, error: null });
+        try {
+            const story = await storage.createStory('Untitled Project');
+            set({
+                currentStory: story,
+                characters: [],
+                locations: [],
+                events: [],
+                chapters: [],
+                isLoading: false,
+                projectFileHandle: null,
+                projectFileName: null,
+            });
+        } catch (err) {
+            set({ error: (err as Error).message, isLoading: false });
+        }
+    },
 }));
