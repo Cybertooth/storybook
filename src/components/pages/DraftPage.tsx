@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { useStoryStore } from '@/store/useStoryStore';
 import { ChapterList } from '../features/editor/ChapterList';
 import { MarkdownEditor } from '../features/editor/MarkdownEditor';
-import { Edit3, LayoutPanelLeft, Focus, Target } from 'lucide-react';
+import { Edit3, LayoutPanelLeft, Focus, Target, Pin } from 'lucide-react';
 import clsx from 'clsx';
 
 export const DraftPage = () => {
-    const { chapters, createChapter, updateChapter, deleteChapter, characters, locations, events } = useStoryStore();
+    const { chapters, createChapter, updateChapter, deleteChapter, characters, locations, events, pinnedRefs, togglePin } = useStoryStore();
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [isFocusMode, setIsFocusMode] = useState(false);
     const [showSidebar, setShowSidebar] = useState(false);
@@ -122,35 +122,113 @@ export const DraftPage = () => {
                             </button>
                         </div>
                     </div>
-                    <div className="p-4 space-y-4">
-                        {referenceType === 'characters' && characters.map(c => (
-                            <div key={c.id} className="bg-white dark:bg-stone-800 p-3 rounded-xl border border-stone-200 dark:border-stone-700 hover:border-indigo-200 dark:hover:border-indigo-500/50 transition-colors shadow-sm">
-                                <h4 className="font-bold text-stone-800 dark:text-stone-200 text-sm flex justify-between items-start">
-                                    {c.name}
-                                    <span className="text-[10px] font-normal uppercase bg-stone-100 dark:bg-stone-900 px-1.5 py-0.5 rounded text-stone-500 dark:text-stone-400">{c.role}</span>
-                                </h4>
-                                <p className="text-xs text-stone-600 dark:text-stone-400 mt-2 line-clamp-4">{c.description}</p>
-                                {(c.arcLie || c.arcTruth) && (
-                                    <div className="mt-2 pt-2 border-t border-stone-100 dark:border-stone-700 flex flex-col gap-1 text-[10px]">
-                                        {c.arcLie && <span className="text-red-600/80 dark:text-red-400/80 line-clamp-1"><span className="font-semibold text-stone-500 dark:text-stone-400">Lie:</span> {c.arcLie}</span>}
-                                        {c.arcTruth && <span className="text-emerald-600/80 dark:text-emerald-400/80 line-clamp-1"><span className="font-semibold text-stone-500 dark:text-stone-400">Truth:</span> {c.arcTruth}</span>}
+                    <div className="p-4 space-y-6">
+                        {/* Pinned Items Section */}
+                        {pinnedRefs.length > 0 && (
+                            <div className="space-y-4">
+                                <h3 className="text-xs font-bold text-stone-400 uppercase tracking-widest flex items-center gap-2">
+                                    <Pin className="w-3 h-3" />
+                                    Pinned Reference
+                                </h3>
+                                <div className="space-y-3">
+                                    {pinnedRefs.map(ref => {
+                                        if (ref.type === 'character') {
+                                            const c = characters.find(c => c.id === ref.id);
+                                            if (!c) return null;
+                                            return (
+                                                <div key={`pin-${c.id}`} className="bg-stone-800 p-3 rounded-xl border border-stone-700 shadow-sm relative group">
+                                                    <button onClick={() => togglePin(c.id, 'character')} className="absolute top-2 right-2 p-1 text-indigo-400 hover:text-indigo-300 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <Pin className="w-3 h-3 fill-current" />
+                                                    </button>
+                                                    <h4 className="font-bold text-stone-100 text-sm flex justify-between items-start pr-6">
+                                                        {c.name}
+                                                    </h4>
+                                                    <p className="text-xs text-stone-300 mt-2 line-clamp-3">{c.description}</p>
+                                                </div>
+                                            );
+                                        }
+                                        if (ref.type === 'location') {
+                                            const l = locations.find(l => l.id === ref.id);
+                                            if (!l) return null;
+                                            return (
+                                                <div key={`pin-${l.id}`} className="bg-stone-800 p-3 rounded-xl border border-stone-700 shadow-sm relative group">
+                                                    <button onClick={() => togglePin(l.id, 'location')} className="absolute top-2 right-2 p-1 text-indigo-400 hover:text-indigo-300 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <Pin className="w-3 h-3 fill-current" />
+                                                    </button>
+                                                    <h4 className="font-bold text-stone-100 text-sm pr-6">{l.name}</h4>
+                                                    <p className="text-xs text-stone-300 mt-2 line-clamp-3">{l.description}</p>
+                                                </div>
+                                            );
+                                        }
+                                        if (ref.type === 'event') {
+                                            const e = events.find(e => e.id === ref.id);
+                                            if (!e) return null;
+                                            return (
+                                                <div key={`pin-${e.id}`} className="bg-stone-800 p-3 rounded-xl border border-stone-700 shadow-sm relative group">
+                                                    <button onClick={() => togglePin(e.id, 'event')} className="absolute top-2 right-2 p-1 text-indigo-400 hover:text-indigo-300 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <Pin className="w-3 h-3 fill-current" />
+                                                    </button>
+                                                    <h4 className="font-bold text-stone-100 text-sm pr-6">{e.title}</h4>
+                                                    <p className="text-xs text-stone-300 mt-2 line-clamp-3">{e.description}</p>
+                                                </div>
+                                            );
+                                        }
+                                        return null;
+                                    })}
+                                </div>
+                                <hr className="border-stone-200 dark:border-stone-800" />
+                            </div>
+                        )}
+
+                        {/* Standard Tabbed Items */}
+                        <div className="space-y-4">
+                            {referenceType === 'characters' && characters.map(c => {
+                                const isPinned = pinnedRefs.some(p => p.id === c.id);
+                                return (
+                                    <div key={c.id} className={clsx("p-3 rounded-xl border transition-colors shadow-sm relative group", isPinned ? "bg-indigo-50 dark:bg-indigo-900/10 border-indigo-200 dark:border-indigo-800/50" : "bg-white dark:bg-stone-800 border-stone-200 dark:border-stone-700 hover:border-indigo-200 dark:hover:border-indigo-500/50")}>
+                                        <button onClick={() => togglePin(c.id, 'character')} className={clsx("absolute top-2 right-2 p-1 transition-opacity", isPinned ? "text-indigo-500 opacity-100" : "text-stone-400 opacity-0 group-hover:opacity-100 hover:text-indigo-500")}>
+                                            <Pin className={clsx("w-3 h-3", isPinned && "fill-current")} />
+                                        </button>
+                                        <h4 className={clsx("font-bold text-sm flex justify-between items-start pr-6", isPinned ? "text-indigo-900 dark:text-indigo-300" : "text-stone-800 dark:text-stone-200")}>
+                                            {c.name}
+                                            <span className="text-[10px] font-normal uppercase bg-stone-100 dark:bg-stone-900 px-1.5 py-0.5 rounded text-stone-500 dark:text-stone-400">{c.role}</span>
+                                        </h4>
+                                        <p className="text-xs text-stone-600 dark:text-stone-400 mt-2 line-clamp-4">{c.description}</p>
+                                        {(c.arcLie || c.arcTruth) && (
+                                            <div className="mt-2 pt-2 border-t border-stone-100 dark:border-stone-700 flex flex-col gap-1 text-[10px]">
+                                                {c.arcLie && <span className="text-red-600/80 dark:text-red-400/80 line-clamp-1"><span className="font-semibold text-stone-500 dark:text-stone-400">Lie:</span> {c.arcLie}</span>}
+                                                {c.arcTruth && <span className="text-emerald-600/80 dark:text-emerald-400/80 line-clamp-1"><span className="font-semibold text-stone-500 dark:text-stone-400">Truth:</span> {c.arcTruth}</span>}
+                                            </div>
+                                        )}
                                     </div>
-                                )}
-                            </div>
-                        ))}
-                        {referenceType === 'locations' && locations.map(l => (
-                            <div key={l.id} className="bg-white dark:bg-stone-800 p-3 rounded-xl border border-stone-200 dark:border-stone-700 hover:border-emerald-200 dark:hover:border-emerald-500/50 transition-colors shadow-sm">
-                                <h4 className="font-bold text-stone-800 dark:text-stone-200 text-sm">{l.name}</h4>
-                                <p className="text-xs text-stone-600 dark:text-stone-400 mt-2">{l.description}</p>
-                            </div>
-                        ))}
-                        {referenceType === 'events' && events.map(e => (
-                            <div key={e.id} className="bg-white dark:bg-stone-800 p-3 rounded-xl border border-stone-200 dark:border-stone-700 hover:border-amber-200 dark:hover:border-amber-500/50 transition-colors shadow-sm relative pl-4">
-                                <div className="absolute left-0 top-0 bottom-0 w-1 bg-amber-400 rounded-l-xl"></div>
-                                <h4 className="font-bold text-stone-800 dark:text-stone-200 text-sm">{e.title}</h4>
-                                <p className="text-xs text-stone-600 mt-1">{e.description}</p>
-                            </div>
-                        ))}
+                                )
+                            })}
+                            {referenceType === 'locations' && locations.map(l => {
+                                const isPinned = pinnedRefs.some(p => p.id === l.id);
+                                return (
+                                    <div key={l.id} className={clsx("p-3 rounded-xl border transition-colors shadow-sm relative group", isPinned ? "bg-emerald-50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800/50" : "bg-white dark:bg-stone-800 border-stone-200 dark:border-stone-700 hover:border-emerald-200 dark:hover:border-emerald-500/50")}>
+                                        <button onClick={() => togglePin(l.id, 'location')} className={clsx("absolute top-2 right-2 p-1 transition-opacity", isPinned ? "text-emerald-500 opacity-100" : "text-stone-400 opacity-0 group-hover:opacity-100 hover:text-emerald-500")}>
+                                            <Pin className={clsx("w-3 h-3", isPinned && "fill-current")} />
+                                        </button>
+                                        <h4 className={clsx("font-bold text-sm pr-6", isPinned ? "text-emerald-900 dark:text-emerald-300" : "text-stone-800 dark:text-stone-200")}>{l.name}</h4>
+                                        <p className="text-xs text-stone-600 dark:text-stone-400 mt-2">{l.description}</p>
+                                    </div>
+                                )
+                            })}
+                            {referenceType === 'events' && events.map(e => {
+                                const isPinned = pinnedRefs.some(p => p.id === e.id);
+                                return (
+                                    <div key={e.id} className={clsx("p-3 rounded-xl border transition-colors shadow-sm relative pl-4 group", isPinned ? "bg-amber-50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800/50" : "bg-white dark:bg-stone-800 border-stone-200 dark:border-stone-700 hover:border-amber-200 dark:hover:border-amber-500/50")}>
+                                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-amber-400 rounded-l-xl"></div>
+                                        <button onClick={() => togglePin(e.id, 'event')} className={clsx("absolute top-2 right-2 p-1 transition-opacity", isPinned ? "text-amber-500 opacity-100" : "text-stone-400 opacity-0 group-hover:opacity-100 hover:text-amber-500")}>
+                                            <Pin className={clsx("w-3 h-3", isPinned && "fill-current")} />
+                                        </button>
+                                        <h4 className={clsx("font-bold text-sm pr-6", isPinned ? "text-amber-900 dark:text-amber-300" : "text-stone-800 dark:text-stone-200")}>{e.title}</h4>
+                                        <p className="text-xs text-stone-600 mt-1">{e.description}</p>
+                                    </div>
+                                )
+                            })}
+                        </div>
                     </div>
                 </div>
             )}

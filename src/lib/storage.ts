@@ -1,5 +1,5 @@
 import localforage from 'localforage';
-import { Story, Character, PlotEvent, Location, Chapter, ProjectBundle, Note } from '@/types';
+import { Story, Character, PlotEvent, Location, Chapter, ProjectBundle, Note, UnresolvedQuestion } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 
 // Default initial data for a new story
@@ -18,6 +18,7 @@ const locationStore = localforage.createInstance({ name: 'storybook', storeName:
 const eventStore = localforage.createInstance({ name: 'storybook', storeName: 'events' });
 const chapterStore = localforage.createInstance({ name: 'storybook', storeName: 'chapters' });
 const noteStore = localforage.createInstance({ name: 'storybook', storeName: 'notes' });
+const unresolvedQuestionStore = localforage.createInstance({ name: 'storybook', storeName: 'unresolvedQuestions' });
 
 export interface IStorageService {
     // Stories
@@ -52,6 +53,11 @@ export interface IStorageService {
     getNotes(storyId: string): Promise<Note[]>;
     saveNote(note: Note): Promise<void>;
     deleteNote(id: string): Promise<void>;
+
+    // Unresolved Questions
+    getUnresolvedQuestions(storyId: string): Promise<UnresolvedQuestion[]>;
+    saveUnresolvedQuestion(question: UnresolvedQuestion): Promise<void>;
+    deleteUnresolvedQuestion(id: string): Promise<void>;
 }
 
 class StorageService implements IStorageService {
@@ -173,6 +179,23 @@ class StorageService implements IStorageService {
         await noteStore.removeItem(id);
     }
 
+    // --- Unresolved Questions ---
+    async getUnresolvedQuestions(storyId: string): Promise<UnresolvedQuestion[]> {
+        const items: UnresolvedQuestion[] = [];
+        await unresolvedQuestionStore.iterate<UnresolvedQuestion, void>((item) => {
+            if (item.storyId === storyId) items.push(item);
+        });
+        return items.sort((a, b) => a.createdAt - b.createdAt);
+    }
+
+    async saveUnresolvedQuestion(item: UnresolvedQuestion): Promise<void> {
+        await unresolvedQuestionStore.setItem(item.id, item);
+    }
+
+    async deleteUnresolvedQuestion(id: string): Promise<void> {
+        await unresolvedQuestionStore.removeItem(id);
+    }
+
     // --- Backup & Restore ---
     async exportDatabase(): Promise<string> {
         const backup = {
@@ -183,7 +206,8 @@ class StorageService implements IStorageService {
             locations: [] as Location[],
             events: [] as PlotEvent[],
             chapters: [] as Chapter[],
-            notes: [] as Note[]
+            notes: [] as Note[],
+            unresolvedQuestions: [] as UnresolvedQuestion[]
         };
 
         await storyStore.iterate<Story, void>((value) => backup.stories.push(value));
@@ -192,6 +216,7 @@ class StorageService implements IStorageService {
         await eventStore.iterate<PlotEvent, void>((value) => backup.events.push(value));
         await chapterStore.iterate<Chapter, void>((value) => backup.chapters.push(value));
         await noteStore.iterate<Note, void>((value) => backup.notes.push(value));
+        await unresolvedQuestionStore.iterate<UnresolvedQuestion, void>((value) => backup.unresolvedQuestions.push(value));
 
         return JSON.stringify(backup, null, 2);
     }
@@ -210,6 +235,7 @@ class StorageService implements IStorageService {
             await eventStore.clear();
             await chapterStore.clear();
             await noteStore.clear();
+            await unresolvedQuestionStore.clear();
 
             // Import new data
             for (const item of data.stories) await storyStore.setItem(item.id, item);
@@ -218,6 +244,7 @@ class StorageService implements IStorageService {
             for (const item of data.events) await eventStore.setItem(item.id, item);
             for (const item of data.chapters) await chapterStore.setItem(item.id, item);
             if (data.notes) for (const item of data.notes) await noteStore.setItem(item.id, item);
+            if (data.unresolvedQuestions) for (const item of data.unresolvedQuestions) await unresolvedQuestionStore.setItem(item.id, item);
 
         } catch (error) {
             console.error("Import failed:", error);
@@ -240,6 +267,7 @@ class StorageService implements IStorageService {
             events: await this.getEvents(storyId),
             chapters: await this.getChapters(storyId),
             notes: await this.getNotes(storyId),
+            unresolvedQuestions: await this.getUnresolvedQuestions(storyId),
         };
 
         return JSON.stringify(bundle, null, 2);
@@ -261,6 +289,7 @@ class StorageService implements IStorageService {
             await eventStore.clear();
             await chapterStore.clear();
             await noteStore.clear();
+            await unresolvedQuestionStore.clear();
 
             // Import project data
             await storyStore.setItem(data.story.id, data.story);
@@ -269,6 +298,7 @@ class StorageService implements IStorageService {
             for (const item of data.events) await eventStore.setItem(item.id, item);
             for (const item of data.chapters) await chapterStore.setItem(item.id, item);
             if (data.notes) for (const item of data.notes) await noteStore.setItem(item.id, item);
+            if (data.unresolvedQuestions) for (const item of data.unresolvedQuestions) await unresolvedQuestionStore.setItem(item.id, item);
 
             return data.story.id;
         } catch (error) {

@@ -171,6 +171,47 @@ Return ONLY a valid JSON array of 3 strings. Each string is a full plot rewrite.
             console.error("Failed to parse revision options", e);
             throw new Error("Failed to parse AI revision options into actionable data.");
         }
+    },
+
+    brainstormNext: async (currentText: string, plotContext?: string): Promise<string[]> => {
+        const context = `
+CURRENT CHAPTER DRAFT (OR END OF DRAFT):
+${currentText.slice(-2000)} // Only look at the most recent ~500 words for context to maintain narrative flow.
+
+${plotContext ? `OVERALL PLOT CONTEXT:\n${plotContext}` : ''}
+`;
+        const prompt = `You are an AI Co-Writer and Brainstorming Partner.
+## Context
+The user is writing a chapter and is stuck on what should happen next.
+
+## Objective
+Generate 3 distinct, short continuations (1-3 sentences each) that seamlessly pick up right where the current draft leaves off.
+
+## Instructions
+1. Analyze the tone, style, and immediate situation of the recent draft text.
+2. Provide 3 different directions the scene could take right now.
+3. Option 1: The Logical Next Step.
+4. Option 2: The Unexpected Obstacle/Complication.
+5. Option 3: A Shift in Focus (e.g., an interruption, a sensory detail, an internal realization).
+6. Write in the same tense and POV as the provided draft text.
+7. Do NOT provide meta-commentary. Output ONLY the actual story text continuations.
+
+## Output Format
+Return ONLY a valid JSON array of 3 strings. Do NOT wrap it in markdown codeblocks like \`\`\`json. Example:
+[
+  "He reached for the handle, but a sudden loud bang echoed...",
+  "The door swung open to reveal an empty room...",
+  "Before he could turn the knob, he noticed a strange smell..."
+]`;
+        const response = await makeAiCall(prompt, context, "Brainstorm Next");
+        try {
+            const jsonMatch = response.match(/\[[\s\S]*\]/);
+            const jsonStr = jsonMatch ? jsonMatch[0] : response;
+            return JSON.parse(jsonStr) as string[];
+        } catch (e) {
+            console.error("Failed to parse brainstorm options", e);
+            throw new Error("Failed to parse AI brainstorm options.");
+        }
     }
 };
 

@@ -11,10 +11,10 @@ This list synthesizes the feature requests from existing roadmaps and the compet
 2.  **[DONE] Kanban Timeline & Drag-and-Drop:** True 2D timeline (X for time, Y for plots/characters).
 3.  **[DONE] Brainstorming Scratchpad / Random Notes:** A frictionless capture area for unformed ideas, thoughts, and research before the formal outlining stage.
 4.  **[DONE] The "Seed Expander":** A dedicated ideation workspace for building early premises and "what ifs."
-5.  **Split-Pane Reference Sidebar:** Ability to "pin" a character or location next to the active rich-text editor.
+5.  **[DONE] Split-Pane Reference Sidebar:** Ability to "pin" a character or location next to the active rich-text editor.
 5.  **Manual Control / Override Architecture:** A robust UI flow where every AI suggestion requires explicit approval, diff-checking, or manual typing (no auto-overwrite).
-6.  **AI Brainstorming Partner ("What happens next?"):** Contextual AI prompts integrated directly seamlessly into the timeline/draft views.
-7.  **Auto-Save & Basic Undo/Redo:** Absolute table stakes to prevent data loss.
+6.  **[DONE] AI Brainstorming Partner ("What happens next?"):** Contextual AI prompts integrated directly seamlessly into the timeline/draft views.
+7.  **[DONE] Auto-Save & Basic Undo/Redo:** Absolute table stakes to prevent data loss.
 
 ---
 

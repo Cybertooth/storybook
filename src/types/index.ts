@@ -83,6 +83,16 @@ export interface Note {
     storyId: EntityId;
 }
 
+export interface UnresolvedQuestion {
+    id: EntityId;
+    question: string;
+    details: string;
+    isResolved: boolean;
+    answer?: string;
+    storyId: EntityId;
+    createdAt: number;
+}
+
 export interface ProjectBundle {
     version: number;
     appName: 'storybook';
@@ -93,4 +103,5 @@ export interface ProjectBundle {
     events: PlotEvent[];
     chapters: Chapter[];
     notes?: Note[]; // Optional for backwards compatibility
+    unresolvedQuestions?: UnresolvedQuestion[]; // Optional for backwards compatibility
 }
