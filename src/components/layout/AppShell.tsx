@@ -4,7 +4,7 @@ import { BookOpen, Users, Map, GitGraph, Edit3, Settings, Check, Loader2, Save, 
 import clsx from 'clsx';
 import { useStoryStore } from '@/store/useStoryStore';
 import { useToastStore } from '@/hooks/useToast';
-
+import { ThemeToggle } from '../ThemeToggle';
 import { AiConsole } from '../ui/AiConsole';
 
 const NavItem = ({ to, icon: Icon, label }: { to: string; icon: React.ElementType; label: string }) => (
@@ -59,13 +59,16 @@ export const AppShell = () => {
             {/* Sidebar - Floating Glass */}
             <aside className="w-72 p-4 flex flex-col z-20">
                 <div className="flex-1 glass-panel rounded-2xl flex flex-col overflow-hidden">
-                    <div className="p-6 border-b border-white/20">
-                        <h1 className="text-2xl font-serif font-bold tracking-tight flex items-center gap-3 text-stone-800">
-                            <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
-                                <BookOpen className="w-5 h-5" />
-                            </div>
-                            Storybook
-                        </h1>
+                    <div className="p-6 border-b border-white/20 dark:border-stone-800/50">
+                        <div className="flex items-center justify-between">
+                            <h1 className="text-2xl font-serif font-bold tracking-tight flex items-center gap-3 text-stone-800 dark:text-stone-100">
+                                <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
+                                    <BookOpen className="w-5 h-5" />
+                                </div>
+                                Storybook
+                            </h1>
+                            <ThemeToggle />
+                        </div>
 
                         {/* Project info */}
                         <div className="mt-3 space-y-2">
@@ -135,7 +138,7 @@ export const AppShell = () => {
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 overflow-auto relative z-10">
+            <main className="flex-1 overflow-auto relative z-10 bg-stone-50/50 dark:bg-stone-900/50 text-stone-900 dark:text-stone-100">
                 <div className="max-w-6xl mx-auto p-8 lg:p-12">
                     <Outlet />
                 </div>

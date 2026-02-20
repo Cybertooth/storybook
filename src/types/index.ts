@@ -4,6 +4,8 @@ export interface Story {
     id: EntityId;
     title: string;
     summary: string; // The "Seed"
+    theme?: string;
+    coreQuestion?: string;
     createdAt: number;
     updatedAt: number;
     // potentially more metadata
@@ -15,6 +17,9 @@ export interface Character {
     role: 'protagonist' | 'antagonist' | 'supporting' | 'other';
     description: string;
     traits: string[]; // Quirks
+    arcLie?: string;
+    arcTruth?: string;
+    arcGhost?: string;
     avatarUrl?: string;
     storyId: EntityId;
 }
@@ -32,7 +37,11 @@ export interface Location {
     id: EntityId;
     name: string;
     description: string;
-    sensoryDetails?: string;
+    sensorySight?: string;
+    sensorySound?: string;
+    sensorySmell?: string;
+    sensoryTouch?: string;
+    sensoryTaste?: string;
     storyId: EntityId;
 }
 

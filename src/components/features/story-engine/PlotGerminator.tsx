@@ -2,14 +2,17 @@ import { useState, useEffect } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import { useStoryStore } from '@/store/useStoryStore';
 import { aiService } from '@/lib/ai';
-import { Wand2, Save, Loader2, FileSearch, Sparkles, Check, X } from 'lucide-react';
+import { Wand2, Loader2, FileSearch, Sparkles, Check, X } from 'lucide-react';
 import clsx from 'clsx';
 import { useAnalysis } from '@/hooks/useAnalysis';
 import { PlotExpander } from './PlotExpander';
+import { useDebounce } from '@/hooks/useDebounce';
 
 export const PlotGerminator = () => {
-    const { currentStory, characters, events, locations, createStory, updatePlot, isLoading: isStoreLoading, error: storeError } = useStoryStore();
+    const { currentStory, characters, events, locations, createStory, isLoading: isStoreLoading, error: storeError, isSaving } = useStoryStore();
     const [plotText, setPlotText] = useState('');
+    const [themeText, setThemeText] = useState('');
+    const [coreQuestionText, setCoreQuestionText] = useState('');
     const [isDirty, setIsDirty] = useState(false);
     const [isAiLoading, setIsAiLoading] = useState(false);
     const [aiError, setAiError] = useState<string | null>(null);
@@ -21,17 +24,34 @@ export const PlotGerminator = () => {
 
     useEffect(() => {
         if (currentStory) {
-            setPlotText(currentStory.summary);
+            setPlotText(currentStory.summary || '');
+            setThemeText(currentStory.theme || '');
+            setCoreQuestionText(currentStory.coreQuestion || '');
+            // Reset dirty state when loading a new story to prevent immediate auto-save
+            setIsDirty(false);
         }
-    }, [currentStory]);
+    }, [currentStory?.id]); // Only trigger on story ID change to avoid cursor jumps
 
-    const handleSave = async () => {
-        if (!currentStory) {
-            await createStory("New Novel");
-        }
-        await updatePlot(plotText);
-        setIsDirty(false);
-    };
+    const debouncedPlot = useDebounce(plotText, 1500);
+    const debouncedTheme = useDebounce(themeText, 1500);
+    const debouncedCoreQuestion = useDebounce(coreQuestionText, 1500);
+
+    useEffect(() => {
+        if (!isDirty) return;
+
+        const performSave = async () => {
+            if (!currentStory) {
+                await createStory("New Novel");
+            }
+            // The store might have been updated by createStory, so wait a tick
+            setTimeout(async () => {
+                await useStoryStore.getState().updatePlot(debouncedPlot, debouncedTheme, debouncedCoreQuestion);
+                setIsDirty(false);
+            }, 0);
+        };
+
+        performSave();
+    }, [debouncedPlot, debouncedTheme, debouncedCoreQuestion]);
 
     const handleExpand = () => {
         if (!plotText.trim()) return;
@@ -71,6 +91,11 @@ export const PlotGerminator = () => {
 
     const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setPlotText(e.target.value);
+        setIsDirty(true);
+    };
+
+    const handleDetailsChange = (setter: React.Dispatch<React.SetStateAction<string>>) => (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+        setter(e.target.value);
         setIsDirty(true);
     };
 
@@ -119,19 +144,18 @@ export const PlotGerminator = () => {
                         <Wand2 className="w-3 h-3" />
                         <span>Expand</span>
                     </button>
-                    <button
-                        onClick={handleSave}
-                        disabled={!isDirty || isLoading}
+                    {/* Manual Save button removed in favor of autosave, but we keep the visual indicator */}
+                    <div
                         className={clsx(
-                            "flex items-center gap-2 px-4 py-1.5 rounded-md transition-all font-medium text-xs shadow-sm",
-                            isDirty
-                                ? "bg-stone-900 text-white hover:bg-black hover:shadow-md hover:-translate-y-0.5"
-                                : "bg-stone-200 text-stone-400 cursor-not-allowed"
+                            "flex items-center gap-2 px-3 py-1.5 rounded-md transition-all font-medium text-xs",
+                            isDirty || isSaving
+                                ? "text-amber-600 bg-amber-50"
+                                : "text-emerald-600 bg-emerald-50"
                         )}
                     >
-                        {isStoreLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />}
-                        <span>Save</span>
-                    </button>
+                        {(isDirty || isSaving || isStoreLoading) ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
+                        <span>{(isDirty || isSaving || isStoreLoading) ? 'Saving...' : 'Saved'}</span>
+                    </div>
                 </div>
             </div>
 
@@ -168,7 +192,7 @@ export const PlotGerminator = () => {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                        <div className="bg-white/50 p-4 rounded-xl border border-indigo-100 hover:border-indigo-200 transition-colors">
+                        <div className="bg-white/50 dark:bg-stone-800/50 p-4 rounded-xl border border-indigo-100 dark:border-indigo-900/50 hover:border-indigo-200 dark:hover:border-indigo-500/50 transition-colors">
                             <h4 className="font-bold text-stone-700 mb-3 flex items-center gap-2">
                                 <span className="w-2 h-2 rounded-full bg-indigo-400"></span>
                                 Characters
@@ -183,7 +207,7 @@ export const PlotGerminator = () => {
                                 ))}
                             </ul>
                         </div>
-                        <div className="bg-white/50 p-4 rounded-xl border border-indigo-100 hover:border-indigo-200 transition-colors">
+                        <div className="bg-white/50 dark:bg-stone-800/50 p-4 rounded-xl border border-indigo-100 dark:border-indigo-900/50 hover:border-indigo-200 dark:hover:border-indigo-500/50 transition-colors">
                             <h4 className="font-bold text-stone-700 mb-3 flex items-center gap-2">
                                 <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
                                 Locations
@@ -195,7 +219,7 @@ export const PlotGerminator = () => {
                                 ))}
                             </ul>
                         </div>
-                        <div className="bg-white/50 p-4 rounded-xl border border-indigo-100 hover:border-indigo-200 transition-colors">
+                        <div className="bg-white/50 dark:bg-stone-800/50 p-4 rounded-xl border border-indigo-100 dark:border-indigo-900/50 hover:border-indigo-200 dark:hover:border-indigo-500/50 transition-colors">
                             <h4 className="font-bold text-stone-700 mb-3 flex items-center gap-2">
                                 <span className="w-2 h-2 rounded-full bg-amber-400"></span>
                                 Events
@@ -212,14 +236,48 @@ export const PlotGerminator = () => {
             )}
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-                <div className={clsx("glass-panel rounded-xl p-8 min-h-[600px] relative transition-all duration-500", critique ? "lg:col-span-2" : "lg:col-span-3")}>
-                    <TextareaAutosize
-                        value={plotText}
-                        onChange={handleChange}
-                        placeholder="Once upon a time..."
-                        className="w-full h-full resize-none border-none focus:ring-0 text-lg leading-relaxed font-serif text-stone-800 placeholder:text-stone-300 bg-transparent"
-                        minRows={20}
-                    />
+                <div className={clsx("glass-panel rounded-xl flex flex-col relative transition-all duration-500", critique ? "lg:col-span-2" : "lg:col-span-3")}>
+
+                    {/* Thematic Elements Bar */}
+                    <div className="flex flex-col sm:flex-row divide-y sm:divide-y-0 sm:divide-x divide-stone-200 dark:divide-stone-700/50 border-b border-stone-200 dark:border-stone-700/50">
+                        <div className="flex-1 p-4 bg-white/50 dark:bg-stone-900/40 space-y-2">
+                            <label className="text-xs font-bold text-indigo-700 dark:text-indigo-400 uppercase tracking-wider flex items-center gap-2">
+                                Core Question
+                                <span className="text-stone-400 font-normal lowercase" title="What is the story trying to answer? (e.g., Will the detective catch the killer?)">?</span>
+                            </label>
+                            <input
+                                type="text"
+                                value={coreQuestionText}
+                                onChange={handleDetailsChange(setCoreQuestionText)}
+                                placeholder="e.g., Will the protagonist find their way home?"
+                                className="w-full bg-transparent border-none focus:ring-0 text-stone-800 placeholder:text-stone-300 font-medium p-0"
+                            />
+                        </div>
+                        <div className="flex-1 p-4 bg-white/50 space-y-2">
+                            <label className="text-xs font-bold text-emerald-700 uppercase tracking-wider flex items-center gap-2">
+                                Theme
+                                <span className="text-stone-400 font-normal lowercase" title="What is the underlying message? (e.g., Revenge costs everything)">?</span>
+                            </label>
+                            <input
+                                type="text"
+                                value={themeText}
+                                onChange={handleDetailsChange(setThemeText)}
+                                placeholder="e.g., The enduring power of friendship"
+                                className="w-full bg-transparent border-none focus:ring-0 text-stone-800 placeholder:text-stone-300 font-medium p-0"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="p-8 min-h-[500px]">
+                        <TextareaAutosize
+                            value={plotText}
+                            onChange={handleChange}
+                            placeholder="Once upon a time..."
+                            className="w-full h-full resize-none border-none focus:ring-0 text-lg leading-relaxed font-serif text-stone-800 placeholder:text-stone-300 bg-transparent"
+                            minRows={16}
+                        />
+                    </div>
+
                     <div className="absolute bottom-4 right-6 text-xs font-mono text-stone-400 pointer-events-none flex gap-3">
                         <span>{plotText.trim() ? plotText.trim().split(/\s+/).length : 0} words</span>
                         <span>{plotText.length} chars</span>

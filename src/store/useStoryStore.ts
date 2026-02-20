@@ -18,7 +18,7 @@ interface StoryState {
     // Story Actions
     loadStory: (id: string) => Promise<void>;
     createStory: (title: string) => Promise<void>;
-    updatePlot: (summary: string) => Promise<void>;
+    updatePlot: (summary: string, theme?: string, coreQuestion?: string) => Promise<void>;
 
     // Character Actions
     createCharacter: (name: string, role: Character['role']) => Promise<void>;
@@ -97,15 +97,15 @@ export const useStoryStore = create<StoryState>((set, get) => ({
         }
     },
 
-    updatePlot: async (summary: string) => {
+    updatePlot: async (summary: string, theme?: string, coreQuestion?: string) => {
         const { currentStory } = get();
         if (!currentStory) return;
 
-        const updatedStory = { ...currentStory, summary, updatedAt: Date.now() };
+        const updatedStory = { ...currentStory, summary, theme, coreQuestion, updatedAt: Date.now() };
         set({ currentStory: updatedStory, isSaving: true });
 
         try {
-            await storage.updateStory(currentStory.id, { summary });
+            await storage.updateStory(currentStory.id, { summary, theme, coreQuestion });
             set({ isSaving: false });
         } catch (err) {
             set({ currentStory, error: (err as Error).message, isSaving: false });

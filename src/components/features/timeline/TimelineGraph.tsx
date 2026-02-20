@@ -67,12 +67,12 @@ export const TimelineGraph = () => {
     return (
         <div className="h-full flex flex-col bg-stone-50 overflow-hidden relative">
             {/* Toolbar / Legend */}
-            <div className="absolute top-4 right-4 z-20 flex gap-2 bg-white/80 backdrop-blur p-2 rounded-lg shadow-sm border border-stone-200">
-                <div className="flex items-center gap-2 text-xs text-stone-500 px-2">
+            <div className="absolute top-4 right-4 z-20 flex gap-2 bg-white/80 dark:bg-stone-900/80 backdrop-blur p-2 rounded-lg shadow-sm border border-stone-200 dark:border-stone-700">
+                <div className="flex items-center gap-2 text-xs text-stone-500 dark:text-stone-400 px-2">
                     <span className="w-3 h-3 rounded-full bg-indigo-500"></span> Character Paths
                 </div>
-                <div className="flex items-center gap-2 text-xs text-stone-500 px-2">
-                    <span className="w-3 h-3 border border-stone-400 bg-white"></span> Event Nodes
+                <div className="flex items-center gap-2 text-xs text-stone-500 dark:text-stone-400 px-2">
+                    <span className="w-3 h-3 border border-stone-400 dark:border-stone-500 bg-white dark:bg-stone-800"></span> Event Nodes
                 </div>
             </div>
 
@@ -163,8 +163,8 @@ export const TimelineGraph = () => {
                                     marginTop: -(NODE_HEIGHT / 2)
                                 }}
                                 className={clsx(
-                                    "absolute p-3 rounded-xl border bg-white shadow-sm transition-all duration-200 cursor-pointer group flex flex-col justify-between",
-                                    isHovered ? "border-indigo-400 shadow-lg scale-105 z-10" : "border-stone-200 hover:border-indigo-300"
+                                    "absolute p-3 rounded-xl border bg-white dark:bg-stone-800 shadow-sm transition-all duration-200 cursor-pointer group flex flex-col justify-between",
+                                    isHovered ? "border-indigo-400 shadow-lg scale-105 z-10" : "border-stone-200 dark:border-stone-700 hover:border-indigo-300 dark:hover:border-indigo-500"
                                 )}
                                 onMouseEnter={() => setHoveredEvent(node.event.id)}
                                 onMouseLeave={() => setHoveredEvent(null)}
@@ -174,7 +174,7 @@ export const TimelineGraph = () => {
                                         <span className="text-[10px] font-mono text-stone-400">#{node.event.order}</span>
                                         {node.event.locationId && <MapPin className="w-3 h-3 text-stone-400" />}
                                     </div>
-                                    <h4 className="font-bold text-sm text-stone-800 leading-tight line-clamp-2" title={node.event.title}>
+                                    <h4 className="font-bold text-sm text-stone-800 dark:text-stone-100 leading-tight line-clamp-2" title={node.event.title}>
                                         {node.event.title}
                                     </h4>
                                 </div>
@@ -182,7 +182,7 @@ export const TimelineGraph = () => {
                                 {/* Character Avatars (Mini) */}
                                 <div className="flex -space-x-1 mt-2">
                                     {characters.filter(c => node.event.characterIds?.includes(c.id)).slice(0, 4).map((c) => (
-                                        <div key={c.id} className="w-4 h-4 rounded-full ring-2 ring-white bg-stone-100 flex items-center justify-center text-[8px]" style={{ backgroundColor: `hsl(${characters.indexOf(c) * 137.5 % 360}, 70%, 90%)`, color: `hsl(${characters.indexOf(c) * 137.5 % 360}, 70%, 30%)` }}>
+                                        <div key={c.id} className="w-4 h-4 rounded-full ring-2 ring-white flex items-center justify-center text-[8px] font-bold shadow-sm" style={{ backgroundColor: `hsl(${characters.indexOf(c) * 137.5 % 360}, 70%, 90%)`, color: `hsl(${characters.indexOf(c) * 137.5 % 360}, 70%, 30%)` }}>
                                             {c.name[0]}
                                         </div>
                                     ))}
@@ -235,9 +235,8 @@ export const TimelineGraph = () => {
                             >
                                 <Plus className="w-5 h-5 group-hover:scale-110 transition-transform" />
                             </button>
-                        )
+                        );
                     })}
-
                 </div>
             </div>
         </div>

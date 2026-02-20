@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import { Chapter } from '@/types';
-import { Save, Loader2 } from 'lucide-react';
+import { Loader2, Check, Eye, Edit2 } from 'lucide-react';
+import { useDebounce } from '@/hooks/useDebounce';
+import clsx from 'clsx';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface MarkdownEditorProps {
     chapter: Chapter;
@@ -13,54 +17,94 @@ export const MarkdownEditor = ({ chapter, onUpdate }: MarkdownEditorProps) => {
     const [title, setTitle] = useState(chapter.title);
     const [isDirty, setIsDirty] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    const [isPreview, setIsPreview] = useState(false);
 
     useEffect(() => {
         setContent(chapter.content);
         setTitle(chapter.title);
+        // Do not immediately trigger an auto-save upon switching chapters
         setIsDirty(false);
-    }, [chapter.id]); // Reset when chapter changes
+    }, [chapter.id]);
 
-    const handleSave = async () => {
-        setIsSaving(true);
-        await onUpdate(chapter.id, { title, content });
-        setIsSaving(false);
-        setIsDirty(false);
-    };
+    const debouncedContent = useDebounce(content, 1500);
+    const debouncedTitle = useDebounce(title, 1500);
 
-    // Auto-save debounce effect could be added here, 
-    // but explicit save is safer for MVP.
+    useEffect(() => {
+        if (!isDirty) return;
+
+        const performSave = async () => {
+            setIsSaving(true);
+            await onUpdate(chapter.id, { title: debouncedTitle, content: debouncedContent });
+            setIsSaving(false);
+            setIsDirty(false);
+        };
+
+        performSave();
+    }, [debouncedContent, debouncedTitle]);
 
     return (
-        <div className="flex flex-col h-full bg-white">
-            <div className="border-b border-stone-200 px-8 py-4 flex justify-between items-center bg-white sticky top-0 z-10">
+        <div className="flex flex-col h-full bg-white dark:bg-stone-950">
+            <div className="border-b border-stone-200 dark:border-stone-800 px-8 py-4 flex justify-between items-center bg-white dark:bg-stone-900 sticky top-0 z-10">
                 <input
                     type="text"
                     value={title}
                     onChange={(e) => { setTitle(e.target.value); setIsDirty(true); }}
-                    className="text-2xl font-serif font-bold text-stone-900 border-none focus:ring-0 px-0 w-full placeholder:text-stone-300"
+                    className="text-2xl font-serif font-bold text-stone-900 dark:text-stone-100 border-none focus:ring-0 px-0 w-full placeholder:text-stone-300 dark:placeholder:text-stone-600 bg-transparent"
                     placeholder="Chapter Title"
                 />
-                <button
-                    onClick={handleSave}
-                    disabled={!isDirty || isSaving}
-                    className="flex items-center gap-2 px-4 py-2 bg-stone-900 text-white rounded-md hover:bg-stone-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                >
-                    {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                    <span>Save</span>
-                </button>
+
+                <div className="flex items-center gap-4">
+                    <button
+                        onClick={() => setIsPreview(!isPreview)}
+                        className={clsx(
+                            "flex items-center gap-2 px-3 py-1.5 rounded-md transition-all font-medium text-xs border",
+                            isPreview
+                                ? "bg-indigo-50 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-400"
+                                : "bg-white dark:bg-stone-800 border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-700"
+                        )}
+                        title="Toggle Preview"
+                    >
+                        {isPreview ? <Edit2 className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                        <span>{isPreview ? 'Edit' : 'Preview'}</span>
+                    </button>
+
+                    <div
+                        className={clsx(
+                            "flex items-center gap-2 px-3 py-1.5 rounded-md transition-all font-medium text-xs",
+                            isDirty || isSaving
+                                ? "text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-900/20"
+                                : "text-emerald-600 dark:text-emerald-500 bg-emerald-50 dark:bg-emerald-900/20"
+                        )}
+                    >
+                        {(isDirty || isSaving) ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
+                        <span>{(isDirty || isSaving) ? 'Saving...' : 'Saved'}</span>
+                    </div>
+                </div>
             </div>
 
             <div className="flex-1 overflow-y-auto px-8 py-6">
                 <div className="max-w-3xl mx-auto">
-                    <TextareaAutosize
-                        value={content}
-                        onChange={(e) => { setContent(e.target.value); setIsDirty(true); }}
-                        placeholder="Start writing..."
-                        className="w-full resize-none border-none focus:ring-0 text-lg leading-loose font-serif text-stone-800 placeholder:text-stone-300 min-h-[500px]"
-                        minRows={20}
-                    />
+                    {isPreview ? (
+                        <div className="prose prose-stone dark:prose-invert prose-lg font-serif max-w-none min-h-[500px] leading-loose">
+                            {content ? (
+                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                    {content}
+                                </ReactMarkdown>
+                            ) : (
+                                <p className="text-stone-400 dark:text-stone-500 italic">No content to preview.</p>
+                            )}
+                        </div>
+                    ) : (
+                        <TextareaAutosize
+                            value={content}
+                            onChange={(e) => { setContent(e.target.value); setIsDirty(true); }}
+                            placeholder="Start writing..."
+                            className="w-full bg-transparent resize-none border-none focus:ring-0 text-lg leading-loose font-serif text-stone-800 dark:text-stone-200 placeholder:text-stone-300 dark:placeholder:text-stone-600 min-h-[500px]"
+                            minRows={20}
+                        />
+                    )}
                 </div>
             </div>
-        </div>
+        </div >
     );
 };

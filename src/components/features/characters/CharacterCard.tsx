@@ -15,9 +15,12 @@ export const CharacterCard = ({ character, onUpdate, onDelete }: CharacterCardPr
     const [name, setName] = useState(character.name);
     const [role, setRole] = useState(character.role);
     const [description, setDescription] = useState(character.description);
+    const [arcLie, setArcLie] = useState(character.arcLie || '');
+    const [arcTruth, setArcTruth] = useState(character.arcTruth || '');
+    const [arcGhost, setArcGhost] = useState(character.arcGhost || '');
 
     const handleSave = () => {
-        onUpdate(character.id, { name, role, description });
+        onUpdate(character.id, { name, role, description, arcLie, arcTruth, arcGhost });
         setIsEditing(false);
     };
 
@@ -25,12 +28,15 @@ export const CharacterCard = ({ character, onUpdate, onDelete }: CharacterCardPr
         setName(character.name);
         setRole(character.role);
         setDescription(character.description);
+        setArcLie(character.arcLie || '');
+        setArcTruth(character.arcTruth || '');
+        setArcGhost(character.arcGhost || '');
         setIsEditing(false);
     };
 
     if (isEditing) {
         return (
-            <div className="bg-white p-4 rounded-lg border border-stone-200 shadow-sm space-y-3">
+            <div className="bg-white dark:bg-stone-800 p-4 rounded-lg border border-stone-200 dark:border-stone-700 shadow-sm space-y-3">
                 <div className="flex gap-3">
                     <div className="w-12 h-12 bg-stone-100 rounded-full flex items-center justify-center shrink-0">
                         <User className="w-6 h-6 text-stone-400" />
@@ -40,13 +46,13 @@ export const CharacterCard = ({ character, onUpdate, onDelete }: CharacterCardPr
                             type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            className="w-full px-2 py-1 border border-stone-300 rounded font-medium"
+                            className="w-full px-2 py-1 border border-stone-300 dark:border-stone-600 dark:bg-stone-900 rounded font-medium"
                             placeholder="Character Name"
                         />
                         <select
                             value={role}
                             onChange={(e) => setRole(e.target.value as any)}
-                            className="w-full px-2 py-1 border border-stone-300 rounded text-sm text-stone-600"
+                            className="w-full px-2 py-1 border border-stone-300 dark:border-stone-600 dark:bg-stone-900 rounded text-sm text-stone-600 dark:text-stone-300"
                         >
                             <option value="protagonist">Protagonist</option>
                             <option value="antagonist">Antagonist</option>
@@ -62,6 +68,33 @@ export const CharacterCard = ({ character, onUpdate, onDelete }: CharacterCardPr
                     placeholder="Brief description..."
                     className="w-full px-2 py-1 border border-stone-300 rounded text-sm min-h-[60px]"
                 />
+
+                <div className="space-y-2 pt-2 border-t border-stone-100">
+                    <p className="text-xs font-bold text-stone-400 uppercase tracking-wider">Internal Arc</p>
+                    <div className="grid grid-cols-1 gap-2">
+                        <input
+                            type="text"
+                            value={arcLie}
+                            onChange={(e) => setArcLie(e.target.value)}
+                            placeholder="The Lie they believe..."
+                            className="w-full px-2 py-1 border border-stone-200 rounded text-xs text-stone-700 bg-red-50/30 focus:bg-white focus:border-red-300"
+                        />
+                        <input
+                            type="text"
+                            value={arcTruth}
+                            onChange={(e) => setArcTruth(e.target.value)}
+                            placeholder="The Truth they discover..."
+                            className="w-full px-2 py-1 border border-stone-200 rounded text-xs text-stone-700 bg-emerald-50/30 focus:bg-white focus:border-emerald-300"
+                        />
+                        <input
+                            type="text"
+                            value={arcGhost}
+                            onChange={(e) => setArcGhost(e.target.value)}
+                            placeholder="The Ghost (Backstory wound)..."
+                            className="w-full px-2 py-1 border border-stone-200 rounded text-xs text-stone-700 bg-stone-50 focus:bg-white focus:border-stone-300"
+                        />
+                    </div>
+                </div>
 
                 <div className="flex justify-end gap-2 pt-2">
                     <button onClick={handleCancel} className="p-1 hover:bg-stone-100 rounded">
@@ -106,6 +139,29 @@ export const CharacterCard = ({ character, onUpdate, onDelete }: CharacterCardPr
                     <p className="text-sm text-stone-600 line-clamp-3">
                         {character.description || "No description yet."}
                     </p>
+
+                    {(character.arcLie || character.arcTruth || character.arcGhost) && (
+                        <div className="mt-3 pt-3 border-t border-white/30 space-y-1.5">
+                            {character.arcLie && (
+                                <p className="text-xs flex gap-2">
+                                    <span className="font-medium text-red-700/80 min-w-10">Lie:</span>
+                                    <span className="text-stone-600 line-clamp-1">{character.arcLie}</span>
+                                </p>
+                            )}
+                            {character.arcTruth && (
+                                <p className="text-xs flex gap-2">
+                                    <span className="font-medium text-emerald-700/80 min-w-10">Truth:</span>
+                                    <span className="text-stone-600 line-clamp-1">{character.arcTruth}</span>
+                                </p>
+                            )}
+                            {character.arcGhost && (
+                                <p className="text-xs flex gap-2">
+                                    <span className="font-medium text-stone-500 min-w-10">Ghost:</span>
+                                    <span className="text-stone-600 line-clamp-1">{character.arcGhost}</span>
+                                </p>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

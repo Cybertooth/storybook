@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { PlotEvent } from '@/types';
-import { Edit2, Trash2, Check, X, MapPin } from 'lucide-react';
+import { Edit2, Trash2, Check, X, MapPin, GripVertical } from 'lucide-react';
 import TextareaAutosize from 'react-textarea-autosize';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 interface EventCardProps {
     event: PlotEvent;
@@ -15,6 +17,21 @@ export const EventCard = ({ event, onUpdate, onDelete }: EventCardProps) => {
     const [description, setDescription] = useState(event.description);
     const [plotThread, setPlotThread] = useState(event.plotThread || 'Main');
 
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging,
+    } = useSortable({ id: event.id });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+    };
+
     const handleSave = () => {
         onUpdate(event.id, { title, description, plotThread });
         setIsEditing(false);
@@ -22,12 +39,12 @@ export const EventCard = ({ event, onUpdate, onDelete }: EventCardProps) => {
 
     if (isEditing) {
         return (
-            <div className="bg-white p-3 rounded-md border border-stone-300 shadow-sm space-y-2">
+            <div className="bg-white dark:bg-stone-800 p-3 rounded-md border border-stone-300 dark:border-stone-600 shadow-sm space-y-2">
                 <input
                     type="text"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="w-full px-2 py-1 border border-stone-300 rounded font-medium text-sm"
+                    className="w-full px-2 py-1 border border-stone-300 dark:border-stone-600 dark:bg-stone-900 dark:text-stone-100 rounded font-medium text-sm"
                     placeholder="Event Title"
                     autoFocus
                 />
@@ -35,12 +52,12 @@ export const EventCard = ({ event, onUpdate, onDelete }: EventCardProps) => {
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="Description..."
-                    className="w-full px-2 py-1 border border-stone-300 rounded text-xs min-h-[40px]"
+                    className="w-full px-2 py-1 border border-stone-300 dark:border-stone-600 dark:bg-stone-900 dark:text-stone-200 rounded text-xs min-h-[40px]"
                 />
                 <select
                     value={plotThread}
                     onChange={(e) => setPlotThread(e.target.value)}
-                    className="w-full px-2 py-1 border border-stone-300 rounded text-xs text-stone-600"
+                    className="w-full px-2 py-1 border border-stone-300 dark:border-stone-600 dark:bg-stone-900 rounded text-xs text-stone-600 dark:text-stone-300"
                 >
                     <option value="Main">Main Plot</option>
                     <option value="Subplot">Subplot</option>
@@ -48,10 +65,10 @@ export const EventCard = ({ event, onUpdate, onDelete }: EventCardProps) => {
                     {/* Could add dynamic threads later */}
                 </select>
                 <div className="flex justify-end gap-2">
-                    <button onClick={() => setIsEditing(false)} className="p-1 hover:bg-stone-100 rounded text-stone-500">
+                    <button onClick={() => setIsEditing(false)} className="p-1 hover:bg-stone-100 dark:hover:bg-stone-700/50 rounded text-stone-500 dark:text-stone-400">
                         <X className="w-3 h-3" />
                     </button>
-                    <button onClick={handleSave} className="p-1 hover:bg-stone-100 rounded text-green-600">
+                    <button onClick={handleSave} className="p-1 hover:bg-stone-100 dark:hover:bg-stone-700/50 rounded text-green-600 dark:text-green-500">
                         <Check className="w-3 h-3" />
                     </button>
                 </div>
@@ -60,14 +77,25 @@ export const EventCard = ({ event, onUpdate, onDelete }: EventCardProps) => {
     }
 
     return (
-        <div className="glass-panel p-3 rounded-lg hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 group border-l-4 border-l-stone-300 hover:border-l-indigo-400">
+        <div
+            ref={setNodeRef}
+            style={style}
+            className="glass-panel p-3 rounded-lg hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 group border-l-4 border-l-stone-300 dark:border-l-stone-600 hover:border-l-indigo-400 dark:hover:border-l-indigo-500 relative"
+        >
             <div className="flex justify-between items-start gap-2">
-                <h4 className="font-medium text-stone-800 text-sm leading-tight">{event.title}</h4>
+                <div
+                    {...attributes}
+                    {...listeners}
+                    className="absolute -left-3 top-1/2 -translate-y-1/2 p-1 text-transparent group-hover:text-stone-300 dark:group-hover:text-stone-600 hover:!text-stone-500 dark:hover:!text-stone-400 cursor-grab active:cursor-grabbing"
+                >
+                    <GripVertical className="w-4 h-4" />
+                </div>
+                <h4 className="font-medium text-stone-800 dark:text-stone-200 text-sm leading-tight ml-2">{event.title}</h4>
                 <div className="hidden group-hover:flex gap-1 shrink-0">
-                    <button onClick={() => setIsEditing(true)} className="p-1 hover:bg-stone-100 rounded text-stone-400">
+                    <button onClick={() => setIsEditing(true)} className="p-1 hover:bg-stone-100 dark:hover:bg-stone-700/50 rounded text-stone-400 hover:text-stone-600 dark:hover:text-stone-300">
                         <Edit2 className="w-3 h-3" />
                     </button>
-                    <button onClick={() => { if (window.confirm(`Delete "${event.title}"?`)) onDelete(event.id); }} className="p-1 hover:bg-red-50 rounded text-red-400">
+                    <button onClick={() => { if (window.confirm(`Delete "${event.title}"?`)) onDelete(event.id); }} className="p-1 hover:bg-red-50 dark:hover:bg-red-900/30 rounded text-red-400 hover:text-red-500">
                         <Trash2 className="w-3 h-3" />
                     </button>
                 </div>
