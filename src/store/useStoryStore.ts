@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Story, Character, PlotEvent, Location, Chapter } from '@/types';
+import { Story, Character, PlotEvent, Location, Chapter, Note } from '@/types';
 import { storage } from '@/lib/storage';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -9,6 +9,7 @@ interface StoryState {
     locations: Location[];
     events: PlotEvent[];
     chapters: Chapter[];
+    notes: Note[];
     isLoading: boolean;
     isSaving: boolean;
     error: string | null;
@@ -41,6 +42,11 @@ interface StoryState {
     updateChapter: (id: string, updates: Partial<Chapter>) => Promise<void>;
     deleteChapter: (id: string) => Promise<void>;
 
+    // Note Actions
+    createNote: (content: string) => Promise<void>;
+    updateNote: (id: string, updates: Partial<Note>) => Promise<void>;
+    deleteNote: (id: string) => Promise<void>;
+
     saveProjectToFile: () => Promise<void>;
     loadProjectFromFile: () => Promise<void>;
     newProject: () => Promise<void>;
@@ -53,6 +59,7 @@ export const useStoryStore = create<StoryState>((set, get) => ({
     locations: [],
     events: [],
     chapters: [],
+    notes: [],
     isLoading: false,
     isSaving: false,
     error: null,
@@ -67,7 +74,8 @@ export const useStoryStore = create<StoryState>((set, get) => ({
             const locations = await storage.getLocations(id);
             const events = await storage.getEvents(id);
             const chapters = await storage.getChapters(id);
-            set({ currentStory: story, characters, locations, events, chapters, isLoading: false });
+            const notes = await storage.getNotes(id);
+            set({ currentStory: story, characters, locations, events, chapters, notes, isLoading: false });
         } catch (err) {
             set({ error: (err as Error).message, isLoading: false });
         }
@@ -77,7 +85,7 @@ export const useStoryStore = create<StoryState>((set, get) => ({
         set({ isLoading: true, error: null });
         try {
             const story = await storage.createStory(title);
-            set({ currentStory: story, characters: [], locations: [], events: [], chapters: [], isLoading: false });
+            set({ currentStory: story, characters: [], locations: [], events: [], chapters: [], notes: [], isLoading: false });
         } catch (err) {
             set({ error: (err as Error).message, isLoading: false });
         }
@@ -333,6 +341,54 @@ export const useStoryStore = create<StoryState>((set, get) => ({
         }
     },
 
+    // --- Notes ---
+    createNote: async (content: string) => {
+        const { currentStory, notes } = get();
+        if (!currentStory) return;
+
+        const newNote: Note = {
+            id: uuidv4(),
+            content,
+            createdAt: Date.now(),
+            storyId: currentStory.id
+        };
+
+        set({ notes: [newNote, ...notes], isSaving: true });
+        try {
+            await storage.saveNote(newNote);
+            set({ isSaving: false });
+        } catch (err) {
+            set({ notes, error: (err as Error).message, isSaving: false });
+        }
+    },
+
+    updateNote: async (id: string, updates: Partial<Note>) => {
+        const { notes } = get();
+        const target = notes.find(n => n.id === id);
+        if (!target) return;
+
+        const updatedNote = { ...target, ...updates };
+        set({ notes: notes.map(n => n.id === id ? updatedNote : n), isSaving: true });
+
+        try {
+            await storage.saveNote(updatedNote);
+            set({ isSaving: false });
+        } catch (err) {
+            set({ notes, error: (err as Error).message, isSaving: false });
+        }
+    },
+
+    deleteNote: async (id: string) => {
+        const { notes } = get();
+        set({ notes: notes.filter(n => n.id !== id), isSaving: true });
+        try {
+            await storage.deleteNote(id);
+            set({ isSaving: false });
+        } catch (err) {
+            set({ notes, error: (err as Error).message, isSaving: false });
+        }
+    },
+
     // --- Project File Management ---
     saveProjectToFile: async () => {
         const { currentStory } = get();
@@ -435,12 +491,14 @@ export const useStoryStore = create<StoryState>((set, get) => ({
             const locations = await storage.getLocations(storyId);
             const events = await storage.getEvents(storyId);
             const chapters = await storage.getChapters(storyId);
+            const notes = await storage.getNotes(storyId);
             set({
                 currentStory: story,
                 characters,
                 locations,
                 events,
                 chapters,
+                notes,
                 isLoading: false,
                 projectFileHandle: handle,
                 projectFileName: fileName!,
@@ -460,6 +518,7 @@ export const useStoryStore = create<StoryState>((set, get) => ({
                 locations: [],
                 events: [],
                 chapters: [],
+                notes: [],
                 isLoading: false,
                 projectFileHandle: null,
                 projectFileName: null,

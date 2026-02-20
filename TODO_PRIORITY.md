@@ -7,10 +7,10 @@ This list synthesizes the feature requests from existing roadmaps and the compet
 ## 🟥 Phase 1: MUST HAVE (The Core MVP)
 *These features fulfill the basic premise of a structured, AI-assisted planning tool and represent the most critical additions.*
 
-1.  **The "Codex" Upgrades:** Deep character arcs (flaws, the "Lie"), sensory location fields. 
-2.  **Kanban Timeline & Drag-and-Drop:** True 2D timeline (X for time, Y for plots/characters).
-3.  **Brainstorming Scratchpad / Random Notes:** A frictionless capture area for unformed ideas, thoughts, and research before the formal outlining stage.
-4.  **The "Seed Expander":** A dedicated ideation workspace for building early premises and "what ifs."
+1.  **[DONE] The "Codex" Upgrades:** Deep character arcs (flaws, the "Lie"), sensory location fields.
+2.  **[DONE] Kanban Timeline & Drag-and-Drop:** True 2D timeline (X for time, Y for plots/characters).
+3.  **[DONE] Brainstorming Scratchpad / Random Notes:** A frictionless capture area for unformed ideas, thoughts, and research before the formal outlining stage.
+4.  **[DONE] The "Seed Expander":** A dedicated ideation workspace for building early premises and "what ifs."
 5.  **Split-Pane Reference Sidebar:** Ability to "pin" a character or location next to the active rich-text editor.
 5.  **Manual Control / Override Architecture:** A robust UI flow where every AI suggestion requires explicit approval, diff-checking, or manual typing (no auto-overwrite).
 6.  **AI Brainstorming Partner ("What happens next?"):** Contextual AI prompts integrated directly seamlessly into the timeline/draft views.

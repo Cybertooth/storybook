@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import { useStoryStore } from '@/store/useStoryStore';
 import { aiService, PlotCritique } from '@/lib/ai';
-import { Wand2, Loader2, FileSearch, Sparkles, Check, X } from 'lucide-react';
+import { Wand2, Loader2, FileSearch, Sparkles, Check, X, AlertTriangle, Lightbulb, Info } from 'lucide-react';
 import clsx from 'clsx';
 import { useAnalysis } from '@/hooks/useAnalysis';
 import { PlotExpander } from './PlotExpander';
 import { useDebounce } from '@/hooks/useDebounce';
+import { DiffViewer } from '@/components/ui/DiffViewer';
 
 export const PlotGerminator = () => {
     const { currentStory, characters, events, locations, createStory, isLoading: isStoreLoading, error: storeError, isSaving } = useStoryStore();
@@ -16,7 +17,10 @@ export const PlotGerminator = () => {
     const [isDirty, setIsDirty] = useState(false);
     const [isAiLoading, setIsAiLoading] = useState(false);
     const [aiError, setAiError] = useState<string | null>(null);
-    const [critique, setCritique] = useState<PlotCritique[] | null>(null);
+    const [critiques, setCritiques] = useState<PlotCritique[] | null>(null);
+    const [selectedCritiques, setSelectedCritiques] = useState<number[]>([]);
+    const [revisionOptions, setRevisionOptions] = useState<string[] | null>(null);
+    const [isGeneratingRevisions, setIsGeneratingRevisions] = useState(false);
     const [showExpander, setShowExpander] = useState(false);
 
     // Analysis Hook
@@ -62,7 +66,9 @@ export const PlotGerminator = () => {
         if (!plotText.trim() && !currentStory) return;
         setIsAiLoading(true);
         setAiError(null);
-        setCritique(null);
+        setCritiques(null);
+        setSelectedCritiques([]);
+        setRevisionOptions(null);
 
         try {
             // Build context
@@ -81,13 +87,44 @@ export const PlotGerminator = () => {
             `;
 
             const results = await aiService.generateCritiques(context);
-            setCritique(results);
+            setCritiques(results);
         } catch (err) {
             setAiError((err as Error).message);
         } finally {
             setIsAiLoading(false);
         }
     }
+
+    const toggleCritiqueSelection = (index: number) => {
+        setSelectedCritiques(prev =>
+            prev.includes(index) ? prev.filter(i => i !== index) : [...prev, index]
+        );
+    };
+
+    const handleGenerateRevisions = async () => {
+        if (!critiques || selectedCritiques.length === 0) return;
+        setIsGeneratingRevisions(true);
+        setAiError(null);
+
+        try {
+            const selected = selectedCritiques.map(i => critiques[i]);
+            const options = await aiService.generateRevisionsFromCritiques(plotText, selected);
+            setRevisionOptions(options);
+        } catch (err) {
+            setAiError((err as Error).message);
+        } finally {
+            setIsGeneratingRevisions(false);
+        }
+    };
+
+    const handleApplyRevision = (revisionText: string) => {
+        setPlotText(revisionText);
+        setIsDirty(true);
+        // Clear all panels
+        setCritiques(null);
+        setSelectedCritiques([]);
+        setRevisionOptions(null);
+    };
 
     const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setPlotText(e.target.value);
@@ -99,11 +136,27 @@ export const PlotGerminator = () => {
         setIsDirty(true);
     };
 
-    const isLoading = isStoreLoading || isAiLoading || isAnalyzing;
+    const isLoading = isStoreLoading || isAiLoading || isAnalyzing || isGeneratingRevisions;
     const error = storeError || aiError;
 
+    const getSeverityStyles = (severity: 'small' | 'medium' | 'major') => {
+        switch (severity) {
+            case 'major': return "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300 border-red-200 dark:border-red-800/50";
+            case 'medium': return "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 border-amber-200 dark:border-amber-800/50";
+            case 'small': return "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300 border-blue-200 dark:border-blue-800/50";
+        }
+    };
+
+    const getSeverityIcon = (severity: 'small' | 'medium' | 'major') => {
+        switch (severity) {
+            case 'major': return <AlertTriangle className="w-3 h-3" />;
+            case 'medium': return <Lightbulb className="w-3 h-3" />;
+            case 'small': return <Info className="w-3 h-3" />;
+        }
+    };
+
     return (
-        <div className="max-w-4xl mx-auto space-y-8 pb-12 relative animate-in fade-in duration-500">
+        <div className="max-w-5xl mx-auto space-y-8 pb-12 relative animate-in fade-in duration-500">
             {/* Header - Floating */}
             <div className="flex justify-between items-center sticky top-0 py-4 z-20 backdrop-blur-md bg-stone-50/80 -mx-4 px-4 rounded-b-xl transition-all">
                 <div className="flex items-center gap-3">
@@ -235,8 +288,8 @@ export const PlotGerminator = () => {
                 </div>
             )}
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-                <div className={clsx("glass-panel rounded-xl flex flex-col relative transition-all duration-500", critique ? "lg:col-span-2" : "lg:col-span-3")}>
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
+                <div className={clsx("glass-panel rounded-xl flex flex-col relative transition-all duration-500", critiques ? "lg:col-span-3" : "lg:col-span-5")}>
 
                     {/* Thematic Elements Bar */}
                     <div className="flex flex-col sm:flex-row divide-y sm:divide-y-0 sm:divide-x divide-stone-200 dark:divide-stone-700/50 border-b border-stone-200 dark:border-stone-700/50">
@@ -250,7 +303,7 @@ export const PlotGerminator = () => {
                                 value={coreQuestionText}
                                 onChange={handleDetailsChange(setCoreQuestionText)}
                                 placeholder="e.g., Will the protagonist find their way home?"
-                                className="w-full bg-transparent border-none focus:ring-0 text-stone-800 placeholder:text-stone-300 font-medium p-0"
+                                className="w-full bg-transparent border-none focus:ring-0 text-stone-800 placeholder:text-stone-300 font-medium p-0 text-sm"
                             />
                         </div>
                         <div className="flex-1 p-4 bg-white/50 space-y-2">
@@ -263,7 +316,7 @@ export const PlotGerminator = () => {
                                 value={themeText}
                                 onChange={handleDetailsChange(setThemeText)}
                                 placeholder="e.g., The enduring power of friendship"
-                                className="w-full bg-transparent border-none focus:ring-0 text-stone-800 placeholder:text-stone-300 font-medium p-0"
+                                className="w-full bg-transparent border-none focus:ring-0 text-stone-800 placeholder:text-stone-300 font-medium p-0 text-sm"
                             />
                         </div>
                     </div>
@@ -284,39 +337,114 @@ export const PlotGerminator = () => {
                     </div>
                 </div>
 
-                {critique && critique.length > 0 && (
-                    <div className="lg:col-span-1 glass-panel bg-amber-50/50 dark:bg-amber-900/10 rounded-xl p-0 border-amber-100/50 dark:border-amber-900/30 overflow-hidden flex flex-col shadow-lg animate-in slide-in-from-right-4 duration-500 max-h-[600px]">
-                        <div className="flex justify-between items-start sticky top-0 p-4 border-b border-amber-100/50 dark:border-amber-900/30 z-10 bg-amber-50/90 dark:bg-amber-900/20 backdrop-blur-sm">
-                            <h3 className="font-bold text-amber-900 dark:text-amber-500 flex items-center gap-2">
-                                <FileSearch className="w-4 h-4" />
-                                Critical Analysis
-                            </h3>
-                            <button onClick={() => setCritique(null)} className="text-amber-500 dark:text-amber-600 hover:text-amber-700 dark:hover:text-amber-400 transition-colors p-1 rounded-md">
-                                <X className="w-4 h-4" />
-                            </button>
-                        </div>
-                        <div className="overflow-y-auto p-4 space-y-4">
-                            {critique.map((c, idx) => (
-                                <div key={idx} className="bg-white/60 dark:bg-stone-900/40 p-4 rounded-lg border border-amber-200/50 dark:border-amber-800/30 space-y-3">
-                                    <h4 className="font-bold text-amber-900 dark:text-amber-400 text-sm leading-tight">{c.summary}</h4>
-                                    <p className="text-stone-700 dark:text-stone-300 text-xs leading-relaxed">{c.details}</p>
-                                    <button
-                                        onClick={() => {
-                                            setPlotText(c.revised_plot);
-                                            setIsDirty(true);
-                                            setCritique(null);
-                                        }}
-                                        className="w-full mt-2 py-1.5 px-3 bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/40 dark:hover:bg-amber-900/60 text-amber-800 dark:text-amber-200 text-xs font-bold rounded-md transition-colors flex items-center justify-center gap-2"
-                                    >
-                                        <Check className="w-3 h-3" />
-                                        Apply Revision
-                                    </button>
+                {/* Critique Selection Panel */}
+                {critiques && (
+                    <div className="lg:col-span-2 flex flex-col gap-6">
+                        <div className="glass-panel rounded-xl flex flex-col shadow-lg animate-in slide-in-from-right-4 duration-500 max-h-[700px]">
+                            <div className="flex justify-between items-start p-4 border-b border-stone-200/50 dark:border-stone-800/50 sticky top-0 bg-stone-50/90 dark:bg-stone-900/50 backdrop-blur-md z-10 rounded-t-xl">
+                                <div>
+                                    <h3 className="font-bold text-stone-800 dark:text-stone-200 flex items-center gap-2">
+                                        <FileSearch className="w-4 h-4 text-amber-500" />
+                                        Story Critiques
+                                    </h3>
+                                    <p className="text-xs text-stone-500 mt-1">Select the feedback you want to address.</p>
                                 </div>
-                            ))}
+                                <button onClick={() => { setCritiques(null); setSelectedCritiques([]); setRevisionOptions(null); }} className="text-stone-400 hover:text-stone-600 transition-colors p-1 rounded-md">
+                                    <X className="w-4 h-4" />
+                                </button>
+                            </div>
+
+                            <div className="overflow-y-auto p-4 space-y-4">
+                                {critiques.map((c, idx) => {
+                                    const isSelected = selectedCritiques.includes(idx);
+                                    const severityStyle = getSeverityStyles(c.severity);
+                                    return (
+                                        <div
+                                            key={idx}
+                                            onClick={() => toggleCritiqueSelection(idx)}
+                                            className={clsx(
+                                                "p-4 rounded-xl border-2 transition-all cursor-pointer",
+                                                isSelected
+                                                    ? "bg-white dark:bg-stone-800 border-indigo-400 shadow-md ring-2 ring-indigo-400/20"
+                                                    : "bg-stone-50/50 dark:bg-stone-900/30 border-stone-200 dark:border-stone-800 hover:border-indigo-300 dark:hover:border-indigo-700 hover:bg-white"
+                                            )}
+                                        >
+                                            <div className="flex gap-3">
+                                                <div className="mt-1 flex-shrink-0">
+                                                    <div className={clsx(
+                                                        "w-5 h-5 rounded flex items-center justify-center border transition-colors",
+                                                        isSelected ? "bg-indigo-500 border-indigo-500 text-white" : "border-stone-300 bg-white dark:bg-stone-800"
+                                                    )}>
+                                                        {isSelected && <Check className="w-3 h-3" />}
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <div className="flex items-start justify-between gap-2">
+                                                        <h4 className="font-bold text-stone-800 dark:text-stone-200 text-sm leading-tight">{c.summary}</h4>
+                                                        <span className={clsx("flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border flex-shrink-0", severityStyle)}>
+                                                            {getSeverityIcon(c.severity)}
+                                                            {c.severity}
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-stone-600 dark:text-stone-400 text-xs leading-relaxed">{c.details}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+
+                            <div className="p-4 border-t border-stone-200/50 dark:border-stone-800/50 bg-stone-50/90 dark:bg-stone-900/50 sticky bottom-0 rounded-b-xl z-10 backdrop-blur-md">
+                                <button
+                                    onClick={handleGenerateRevisions}
+                                    disabled={selectedCritiques.length === 0 || isGeneratingRevisions}
+                                    className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-stone-300 disabled:text-stone-500 text-white text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20 disabled:shadow-none"
+                                >
+                                    {isGeneratingRevisions ? <Loader2 className="w-4 h-4 animate-spin" /> : <Wand2 className="w-4 h-4" />}
+                                    Suggest Fixes ({selectedCritiques.length})
+                                </button>
+                            </div>
                         </div>
+
                     </div>
                 )}
             </div>
+
+            {/* Generated Revision Options Panel */}
+            {revisionOptions && revisionOptions.length > 0 && (
+                <div className="my-12 animate-in fade-in slide-in-from-bottom-8 duration-700 space-y-6">
+                    <div className="flex items-center gap-3 px-2">
+                        <div className="p-2 bg-indigo-100 rounded-lg text-indigo-600">
+                            <Wand2 className="w-5 h-5" />
+                        </div>
+                        <div>
+                            <h3 className="text-xl font-bold font-serif text-stone-800">Suggested Revisions</h3>
+                            <p className="text-sm text-stone-500">Pick an option to apply the fixes to your plot.</p>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {revisionOptions.map((opt, idx) => (
+                            <div key={idx} className="glass-panel flex flex-col rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow border border-indigo-100 dark:border-indigo-900/50">
+                                <div className="p-3 bg-indigo-50/50 dark:bg-indigo-900/20 border-b border-indigo-100 dark:border-indigo-900/50 flex justify-between items-center z-10 sticky top-0">
+                                    <span className="font-bold text-indigo-900 dark:text-indigo-300 text-sm">Option {idx + 1}</span>
+                                    <button
+                                        onClick={() => handleApplyRevision(opt)}
+                                        className="py-1 px-3 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded flex items-center gap-1 shadow-sm transition-colors"
+                                    >
+                                        <Check className="w-3 h-3" />
+                                        Apply
+                                    </button>
+                                </div>
+                                <div className="p-6 overflow-y-auto max-h-[600px] custom-scrollbar bg-white/40 dark:bg-stone-900/40">
+                                    <DiffViewer oldText={plotText} newText={opt} />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
 
             {/* Plot Expander Overlay */}
             {showExpander && (

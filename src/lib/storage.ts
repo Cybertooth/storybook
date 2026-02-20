@@ -1,5 +1,5 @@
 import localforage from 'localforage';
-import { Story, Character, PlotEvent, Location, Chapter, ProjectBundle } from '@/types';
+import { Story, Character, PlotEvent, Location, Chapter, ProjectBundle, Note } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 
 // Default initial data for a new story
@@ -17,6 +17,7 @@ const characterStore = localforage.createInstance({ name: 'storybook', storeName
 const locationStore = localforage.createInstance({ name: 'storybook', storeName: 'locations' });
 const eventStore = localforage.createInstance({ name: 'storybook', storeName: 'events' });
 const chapterStore = localforage.createInstance({ name: 'storybook', storeName: 'chapters' });
+const noteStore = localforage.createInstance({ name: 'storybook', storeName: 'notes' });
 
 export interface IStorageService {
     // Stories
@@ -46,6 +47,11 @@ export interface IStorageService {
     getChapters(storyId: string): Promise<Chapter[]>;
     saveChapter(chapter: Chapter): Promise<void>;
     deleteChapter(id: string): Promise<void>;
+
+    // Notes
+    getNotes(storyId: string): Promise<Note[]>;
+    saveNote(note: Note): Promise<void>;
+    deleteNote(id: string): Promise<void>;
 }
 
 class StorageService implements IStorageService {
@@ -150,6 +156,23 @@ class StorageService implements IStorageService {
         await chapterStore.removeItem(id);
     }
 
+    // --- Notes ---
+    async getNotes(storyId: string): Promise<Note[]> {
+        const items: Note[] = [];
+        await noteStore.iterate<Note, void>((item) => {
+            if (item.storyId === storyId) items.push(item);
+        });
+        return items.sort((a, b) => b.createdAt - a.createdAt);
+    }
+
+    async saveNote(item: Note): Promise<void> {
+        await noteStore.setItem(item.id, item);
+    }
+
+    async deleteNote(id: string): Promise<void> {
+        await noteStore.removeItem(id);
+    }
+
     // --- Backup & Restore ---
     async exportDatabase(): Promise<string> {
         const backup = {
@@ -159,7 +182,8 @@ class StorageService implements IStorageService {
             characters: [] as Character[],
             locations: [] as Location[],
             events: [] as PlotEvent[],
-            chapters: [] as Chapter[]
+            chapters: [] as Chapter[],
+            notes: [] as Note[]
         };
 
         await storyStore.iterate<Story, void>((value) => backup.stories.push(value));
@@ -167,6 +191,7 @@ class StorageService implements IStorageService {
         await locationStore.iterate<Location, void>((value) => backup.locations.push(value));
         await eventStore.iterate<PlotEvent, void>((value) => backup.events.push(value));
         await chapterStore.iterate<Chapter, void>((value) => backup.chapters.push(value));
+        await noteStore.iterate<Note, void>((value) => backup.notes.push(value));
 
         return JSON.stringify(backup, null, 2);
     }
@@ -184,6 +209,7 @@ class StorageService implements IStorageService {
             await locationStore.clear();
             await eventStore.clear();
             await chapterStore.clear();
+            await noteStore.clear();
 
             // Import new data
             for (const item of data.stories) await storyStore.setItem(item.id, item);
@@ -191,6 +217,7 @@ class StorageService implements IStorageService {
             for (const item of data.locations) await locationStore.setItem(item.id, item);
             for (const item of data.events) await eventStore.setItem(item.id, item);
             for (const item of data.chapters) await chapterStore.setItem(item.id, item);
+            if (data.notes) for (const item of data.notes) await noteStore.setItem(item.id, item);
 
         } catch (error) {
             console.error("Import failed:", error);
@@ -212,6 +239,7 @@ class StorageService implements IStorageService {
             locations: await this.getLocations(storyId),
             events: await this.getEvents(storyId),
             chapters: await this.getChapters(storyId),
+            notes: await this.getNotes(storyId),
         };
 
         return JSON.stringify(bundle, null, 2);
@@ -232,6 +260,7 @@ class StorageService implements IStorageService {
             await locationStore.clear();
             await eventStore.clear();
             await chapterStore.clear();
+            await noteStore.clear();
 
             // Import project data
             await storyStore.setItem(data.story.id, data.story);
@@ -239,6 +268,7 @@ class StorageService implements IStorageService {
             for (const item of data.locations) await locationStore.setItem(item.id, item);
             for (const item of data.events) await eventStore.setItem(item.id, item);
             for (const item of data.chapters) await chapterStore.setItem(item.id, item);
+            if (data.notes) for (const item of data.notes) await noteStore.setItem(item.id, item);
 
             return data.story.id;
         } catch (error) {

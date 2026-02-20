@@ -8,7 +8,7 @@ export interface AiResponse {
 export interface PlotCritique {
     summary: string;
     details: string;
-    revised_plot: string;
+    severity: 'small' | 'medium' | 'major';
 }
 
 export const aiService = {
@@ -92,14 +92,14 @@ Transform a rough, fragmented sequence of plot points into a cohesive, flowing n
 The user has provided their story bible, including plot, characters, events, and locations.
 
 ## Objective
-Identify the 3 biggest weaknesses in the story (e.g., plot holes, weak motivation, pacing issues) and provide 3 distinct critique options. For each critique, provide a fully rewritten version of the Plot Summary that implements your specific fix.
+Identify the 3 biggest weaknesses in the story (e.g., plot holes, weak motivation, pacing issues). DO NOT rewrite the plot, just provide the critiques.
 
 ## Instructions
 1. Analyze the narrative for structural flaws.
 2. Generate exactly 3 critiques.
 3. For each critique, provide a short 'summary' of the issue.
 4. Provide 'details' explaining why it's a problem and how to fix it.
-5. Create a 'revised_plot' which is the full plot text completely rewritten to integrate your solution seamlessly.
+5. Assign a 'severity' level to each critique: 'small', 'medium', or 'major'.
 
 ## Output Format
 Return ONLY valid JSON containing an array of exactly 3 objects. Do NOT wrap in markdown codeblocks like \`\`\`json.
@@ -107,7 +107,7 @@ Return ONLY valid JSON containing an array of exactly 3 objects. Do NOT wrap in 
   {
     "summary": "Pacing sags in the middle...",
     "details": "To fix this, the protagonist needs...",
-    "revised_plot": "(The entire plot text rewritten with this fix applied...)"
+    "severity": "major"
   }
 ]`;
         const response = await makeAiCall(prompt, context, "Generate Critiques");
@@ -132,6 +132,45 @@ Suggest a compelling new character that would fit perfectly into the provided st
 3. Generate a character with: Name, Role, a brief Description, and a unique Quirk or flaw.
 4. Output ONLY the character details as a readable paragraph or bullet points. Do not add conversational filler.`;
         return await makeAiCall(prompt, context, "Suggest Character");
+    },
+
+    generateRevisionsFromCritiques: async (currentPlot: string, selectedCritiques: PlotCritique[]): Promise<string[]> => {
+        const context = `
+CURRENT PLOT:
+${currentPlot}
+
+SELECTED CRITIQUES TO ADDRESS:
+${selectedCritiques.map(c => `- ${c.summary}: ${c.details} (Severity: ${c.severity})`).join('\n')}
+`;
+        const prompt = `You are an expert Story Editor rewriting a plot to address specific feedback.
+## Context
+The user has provided their current plot summary and a list of specific critiques they want to address.
+
+## Objective
+Generate 3 distinct, full-text rewrites of the plot summary. Each rewrite must address ALL of the selected critiques, but they can approach the solutions in slightly different ways (e.g., one changes the villain's motivation, another changes a key set piece).
+
+## Instructions
+1. Read the current plot and the critiques carefully.
+2. Write 3 distinct, full-length plot summaries that resolve the issues.
+3. The style and tone should remain consistent with the original plot.
+4. Output ONLY the 3 rewrites. Do not add introductory text.
+
+## Output Format
+Return ONLY a valid JSON array of 3 strings. Each string is a full plot rewrite. Do NOT wrap it in markdown codeblocks. Example:
+[
+  "Rewrite option 1...",
+  "Rewrite option 2...",
+  "Rewrite option 3..."
+]`;
+        const response = await makeAiCall(prompt, context, "Generate Revisions from Critiques");
+        try {
+            const jsonMatch = response.match(/\[[\s\S]*\]/);
+            const jsonStr = jsonMatch ? jsonMatch[0] : response;
+            return JSON.parse(jsonStr) as string[];
+        } catch (e) {
+            console.error("Failed to parse revision options", e);
+            throw new Error("Failed to parse AI revision options into actionable data.");
+        }
     }
 };
 

@@ -76,6 +76,13 @@ export interface AppSettings {
     theme: 'light' | 'dark' | 'system';
 }
 
+export interface Note {
+    id: EntityId;
+    content: string;
+    createdAt: number;
+    storyId: EntityId;
+}
+
 export interface ProjectBundle {
     version: number;
     appName: 'storybook';
@@ -85,4 +92,5 @@ export interface ProjectBundle {
     locations: Location[];
     events: PlotEvent[];
     chapters: Chapter[];
+    notes?: Note[]; // Optional for backwards compatibility
 }

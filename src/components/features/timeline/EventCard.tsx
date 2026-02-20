@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { PlotEvent } from '@/types';
 import { Edit2, Trash2, Check, X, MapPin, GripVertical } from 'lucide-react';
 import TextareaAutosize from 'react-textarea-autosize';
-import { useSortable } from '@dnd-kit/sortable';
+import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
 
 interface EventCardProps {
@@ -22,15 +22,15 @@ export const EventCard = ({ event, onUpdate, onDelete }: EventCardProps) => {
         listeners,
         setNodeRef,
         transform,
-        transition,
         isDragging,
-    } = useSortable({ id: event.id });
+    } = useDraggable({ id: event.id, data: { event } });
 
     const style = {
-        transform: CSS.Transform.toString(transform),
-        transition,
-        opacity: isDragging ? 0.5 : 1,
-    };
+        transform: CSS.Translate.toString(transform),
+        opacity: isDragging ? 0.3 : 1,
+        position: isDragging ? 'relative' : 'static',
+        zIndex: isDragging ? 50 : 1,
+    } as React.CSSProperties;
 
     const handleSave = () => {
         onUpdate(event.id, { title, description, plotThread });
@@ -80,7 +80,7 @@ export const EventCard = ({ event, onUpdate, onDelete }: EventCardProps) => {
         <div
             ref={setNodeRef}
             style={style}
-            className="glass-panel p-3 rounded-lg hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 group border-l-4 border-l-stone-300 dark:border-l-stone-600 hover:border-l-indigo-400 dark:hover:border-l-indigo-500 relative"
+            className={`glass-panel p-3 rounded-lg hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 group border-l-4 border-l-stone-300 dark:border-l-stone-600 hover:border-l-indigo-400 dark:hover:border-l-indigo-500 relative ${isDragging ? 'shadow-xl scale-105 rotate-2' : ''}`}
         >
             <div className="flex justify-between items-start gap-2">
                 <div
@@ -100,9 +100,11 @@ export const EventCard = ({ event, onUpdate, onDelete }: EventCardProps) => {
                     </button>
                 </div>
             </div>
-            {event.description && (
-                <p className="text-xs text-stone-500 mt-1 line-clamp-3">{event.description}</p>
-            )}
+            {
+                event.description && (
+                    <p className="text-xs text-stone-500 mt-1 line-clamp-3">{event.description}</p>
+                )
+            }
             <div className="flex gap-2 mt-2">
                 {event.locationId && (
                     <div className="flex items-center gap-1 text-[10px] text-stone-400">
@@ -111,6 +113,6 @@ export const EventCard = ({ event, onUpdate, onDelete }: EventCardProps) => {
                     </div>
                 )}
             </div>
-        </div>
+        </div >
     );
 };

@@ -57,12 +57,6 @@ export const LocationCard = ({ location, onUpdate, onDelete }: LocationCardProps
                     placeholder="Description..."
                     className="w-full px-2 py-1 border border-stone-300 dark:border-stone-600 dark:bg-stone-900 rounded-lg text-sm min-h-[60px]"
                 />
-                <TextareaAutosize
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Description..."
-                    className="w-full px-2 py-1 border border-stone-300 rounded-lg text-sm min-h-[60px]"
-                />
 
                 <div className="space-y-2 pt-2 border-t border-stone-100">
                     <p className="text-xs font-bold text-stone-400 uppercase tracking-wider">Sensory Details</p>

@@ -76,8 +76,8 @@ export const SettingsPage = () => {
                                         className="w-full p-2 glass-input rounded-lg text-sm text-stone-700 font-medium"
                                     >
                                         <option value="gemini-3-flash-preview">Gemini 3 Flash Preview (Fast/Default)</option>
-                                        <option value="gemini-3-pro">Gemini 3 Pro (High Quality)</option>
-                                        <option value="gemini-3.1-pro">Gemini 3.1 Pro (Latest)</option>
+                                        <option value="gemini-3-pro-preview">Gemini 3 Pro (High Quality)</option>
+                                        <option value="gemini-3.1-pro-preview">Gemini 3.1 Pro (Latest)</option>
                                     </select>
                                 </div>
                             </div>
