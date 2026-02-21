@@ -3,6 +3,7 @@ import { useStoryStore } from '@/store/useStoryStore';
 import { EventCard } from './EventCard';
 import { Plus } from 'lucide-react';
 import { PlotEvent } from '@/types';
+import clsx from 'clsx';
 import {
     DndContext,
     closestCenter,
@@ -68,7 +69,7 @@ const TimelineCell = ({ thread, order, events, isCreating, setIsCreating, handle
     );
 };
 
-export const EventBoard = () => {
+export const EventBoard = ({ filterCharacterId }: { filterCharacterId?: string | null }) => {
     const { events, createEvent, updateEvent } = useStoryStore();
     const [isCreating, setIsCreating] = useState<string | null>(null); // cell id: `${thread}-${order}`
     const [newEventTitle, setNewEventTitle] = useState('');
@@ -164,9 +165,10 @@ export const EventBoard = () => {
                                 {Array.from({ length: maxColIndex + 1 }).map((_, c) => {
                                     const cellEvents = events.filter(e => e.plotThread === thread && e.order === c);
                                     const cellId = `${thread}-${c}`;
+                                    const isDimmed = filterCharacterId && cellEvents.length > 0 && !cellEvents.some(e => e.characterIds.includes(filterCharacterId));
 
                                     return (
-                                        <div key={cellId} className="border-b border-stone-200 dark:border-stone-800 group relative">
+                                        <div key={cellId} className={clsx("border-b border-stone-200 dark:border-stone-800 group relative transition-opacity", isDimmed && "opacity-25")}>
                                             <TimelineCell
                                                 thread={thread}
                                                 order={c}

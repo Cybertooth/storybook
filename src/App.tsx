@@ -7,6 +7,7 @@ import { LocationsPage } from './components/pages/LocationsPage';
 import { DraftPage } from './components/pages/DraftPage';
 import { ScratchpadPage } from './components/pages/ScratchpadPage';
 import { SettingsPage } from './components/pages/SettingsPage';
+import { StoryDashboard } from './components/pages/StoryDashboard';
 import { ToastContainer } from './components/ui/Toast';
 import { ThemeProvider } from './components/ThemeProvider';
 
@@ -24,6 +25,7 @@ function App() {
                         <Route path="scratchpad" element={<ScratchpadPage />} />
                         <Route path="write" element={<DraftPage />} />
                         <Route path="settings" element={<SettingsPage />} />
+                        <Route path="dashboard" element={<StoryDashboard />} />
                         <Route path="*" element={<Navigate to="/" replace />} />
                     </Route>
                 </Routes>

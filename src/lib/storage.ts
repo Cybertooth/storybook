@@ -1,5 +1,5 @@
 import localforage from 'localforage';
-import { Story, Character, PlotEvent, Location, Chapter, ProjectBundle, Note, UnresolvedQuestion } from '@/types';
+import { Story, Character, PlotEvent, Location, Chapter, ProjectBundle, Note, UnresolvedQuestion, Relationship } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 
 // Default initial data for a new story
@@ -19,6 +19,7 @@ const eventStore = localforage.createInstance({ name: 'storybook', storeName: 'e
 const chapterStore = localforage.createInstance({ name: 'storybook', storeName: 'chapters' });
 const noteStore = localforage.createInstance({ name: 'storybook', storeName: 'notes' });
 const unresolvedQuestionStore = localforage.createInstance({ name: 'storybook', storeName: 'unresolvedQuestions' });
+const relationshipStore = localforage.createInstance({ name: 'storybook', storeName: 'relationships' });
 
 export interface IStorageService {
     // Stories
@@ -58,6 +59,11 @@ export interface IStorageService {
     getUnresolvedQuestions(storyId: string): Promise<UnresolvedQuestion[]>;
     saveUnresolvedQuestion(question: UnresolvedQuestion): Promise<void>;
     deleteUnresolvedQuestion(id: string): Promise<void>;
+
+    // Relationships
+    getRelationships(storyId: string): Promise<Relationship[]>;
+    saveRelationship(relationship: Relationship): Promise<void>;
+    deleteRelationship(id: string): Promise<void>;
 }
 
 class StorageService implements IStorageService {
@@ -196,6 +202,23 @@ class StorageService implements IStorageService {
         await unresolvedQuestionStore.removeItem(id);
     }
 
+    // --- Relationships ---
+    async getRelationships(storyId: string): Promise<Relationship[]> {
+        const items: Relationship[] = [];
+        await relationshipStore.iterate<Relationship, void>((item) => {
+            if (item.storyId === storyId) items.push(item);
+        });
+        return items;
+    }
+
+    async saveRelationship(item: Relationship): Promise<void> {
+        await relationshipStore.setItem(item.id, item);
+    }
+
+    async deleteRelationship(id: string): Promise<void> {
+        await relationshipStore.removeItem(id);
+    }
+
     // --- Backup & Restore ---
     async exportDatabase(): Promise<string> {
         const backup = {
@@ -207,7 +230,8 @@ class StorageService implements IStorageService {
             events: [] as PlotEvent[],
             chapters: [] as Chapter[],
             notes: [] as Note[],
-            unresolvedQuestions: [] as UnresolvedQuestion[]
+            unresolvedQuestions: [] as UnresolvedQuestion[],
+            relationships: [] as Relationship[]
         };
 
         await storyStore.iterate<Story, void>((value) => backup.stories.push(value));
@@ -217,6 +241,7 @@ class StorageService implements IStorageService {
         await chapterStore.iterate<Chapter, void>((value) => backup.chapters.push(value));
         await noteStore.iterate<Note, void>((value) => backup.notes.push(value));
         await unresolvedQuestionStore.iterate<UnresolvedQuestion, void>((value) => backup.unresolvedQuestions.push(value));
+        await relationshipStore.iterate<Relationship, void>((value) => backup.relationships.push(value));
 
         return JSON.stringify(backup, null, 2);
     }
@@ -236,6 +261,7 @@ class StorageService implements IStorageService {
             await chapterStore.clear();
             await noteStore.clear();
             await unresolvedQuestionStore.clear();
+            await relationshipStore.clear();
 
             // Import new data
             for (const item of data.stories) await storyStore.setItem(item.id, item);
@@ -245,6 +271,7 @@ class StorageService implements IStorageService {
             for (const item of data.chapters) await chapterStore.setItem(item.id, item);
             if (data.notes) for (const item of data.notes) await noteStore.setItem(item.id, item);
             if (data.unresolvedQuestions) for (const item of data.unresolvedQuestions) await unresolvedQuestionStore.setItem(item.id, item);
+            if (data.relationships) for (const item of data.relationships) await relationshipStore.setItem(item.id, item);
 
         } catch (error) {
             console.error("Import failed:", error);
@@ -268,6 +295,7 @@ class StorageService implements IStorageService {
             chapters: await this.getChapters(storyId),
             notes: await this.getNotes(storyId),
             unresolvedQuestions: await this.getUnresolvedQuestions(storyId),
+            relationships: await this.getRelationships(storyId),
         };
 
         return JSON.stringify(bundle, null, 2);
@@ -290,6 +318,7 @@ class StorageService implements IStorageService {
             await chapterStore.clear();
             await noteStore.clear();
             await unresolvedQuestionStore.clear();
+            await relationshipStore.clear();
 
             // Import project data
             await storyStore.setItem(data.story.id, data.story);
@@ -299,6 +328,7 @@ class StorageService implements IStorageService {
             for (const item of data.chapters) await chapterStore.setItem(item.id, item);
             if (data.notes) for (const item of data.notes) await noteStore.setItem(item.id, item);
             if (data.unresolvedQuestions) for (const item of data.unresolvedQuestions) await unresolvedQuestionStore.setItem(item.id, item);
+            if ((data as any).relationships) for (const item of (data as any).relationships) await relationshipStore.setItem(item.id, item);
 
             return data.story.id;
         } catch (error) {

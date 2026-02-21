@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { BookOpen, Users, Map, GitGraph, Edit3, Settings, Check, Loader2, Save, FolderOpen, FilePlus, Lightbulb, Undo2, Redo2 } from 'lucide-react';
+import { BookOpen, Users, Map, GitGraph, Edit3, Settings, Check, Loader2, Save, FolderOpen, FilePlus, Lightbulb, Undo2, Redo2, LayoutDashboard } from 'lucide-react';
 import clsx from 'clsx';
 import { useStoryStore, useTemporalStoryStore } from '@/store/useStoryStore';
 import { useToastStore } from '@/hooks/useToast';
@@ -140,6 +140,7 @@ export const AppShell = () => {
                         <NavItem to="/scratchpad" icon={Lightbulb} label="Scratchpad" />
                         <NavItem to="/timeline" icon={GitGraph} label="Timeline" />
                         <NavItem to="/write" icon={Edit3} label="Draft" />
+                        <NavItem to="/dashboard" icon={LayoutDashboard} label="Dashboard" />
                     </nav>
 
                     <div className="p-4 border-t border-white/20 dark:border-stone-800/50 space-y-2">

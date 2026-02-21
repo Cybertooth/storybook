@@ -4,13 +4,14 @@ import { ChapterList } from '../features/editor/ChapterList';
 import { MarkdownEditor } from '../features/editor/MarkdownEditor';
 import { Edit3, LayoutPanelLeft, Focus, Target, Pin } from 'lucide-react';
 import clsx from 'clsx';
+import { ShowDontTell } from '../features/draft/ShowDontTell';
 
 export const DraftPage = () => {
     const { chapters, createChapter, updateChapter, deleteChapter, characters, locations, events, pinnedRefs, togglePin } = useStoryStore();
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [isFocusMode, setIsFocusMode] = useState(false);
     const [showSidebar, setShowSidebar] = useState(false);
-    const [referenceType, setReferenceType] = useState<'characters' | 'locations' | 'events'>('characters');
+    const [referenceType, setReferenceType] = useState<'characters' | 'locations' | 'events' | 'prose'>('characters');
 
     const activeChapter = chapters.find(c => c.id === selectedId);
 
@@ -120,6 +121,12 @@ export const DraftPage = () => {
                             >
                                 Plot
                             </button>
+                            <button
+                                onClick={() => setReferenceType('prose')}
+                                className={clsx("flex-1 text-xs py-1 px-2 rounded-md font-medium transition-all", referenceType === 'prose' ? "bg-white dark:bg-stone-700 shadow text-stone-800 dark:text-stone-100" : "text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-200")}
+                            >
+                                Prose
+                            </button>
                         </div>
                     </div>
                     <div className="p-4 space-y-6">
@@ -228,6 +235,20 @@ export const DraftPage = () => {
                                     </div>
                                 )
                             })}
+                            {referenceType === 'prose' && activeChapter && (
+                                <ShowDontTell
+                                    draftText={activeChapter.content}
+                                    onApplySuggestion={(original, replacement) => {
+                                        const newContent = activeChapter.content.replace(original, replacement);
+                                        updateChapter(activeChapter.id, { content: newContent });
+                                    }}
+                                />
+                            )}
+                            {referenceType === 'prose' && !activeChapter && (
+                                <div className="text-center py-8 text-stone-400 dark:text-stone-500">
+                                    <p className="text-sm">Select a chapter first to analyze its prose.</p>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

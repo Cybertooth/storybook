@@ -212,6 +212,184 @@ Return ONLY a valid JSON array of 3 strings. Do NOT wrap it in markdown codebloc
             console.error("Failed to parse brainstorm options", e);
             throw new Error("Failed to parse AI brainstorm options.");
         }
+    },
+
+    checkConsistency: async (context: string): Promise<{ issue: string; details: string; type: 'plot_hole' | 'continuity' | 'abandoned_thread' | 'timeline' }[]> => {
+        const prompt = `You are a meticulous Story Continuity Editor and Plot Hole Detector.
+## Context
+The user has provided their full story bible: plot summary, characters, events/timeline, and locations.
+
+## Objective
+Find plot holes, continuity errors, abandoned threads, and timeline inconsistencies.
+
+## Instructions
+1. Check for contradictions between character descriptions and their actions in events.
+2. Check for locations that are mentioned but never used, or used inconsistently.
+3. Check for character arcs (Lie/Truth/Ghost) that are set up but never resolved in the events.
+4. Check for timeline issues (a character appearing in two places at once, illogical event ordering).
+5. Check for abandoned threads (subplots or characters introduced but never followed up).
+6. For each issue, classify it as: 'plot_hole', 'continuity', 'abandoned_thread', or 'timeline'.
+7. Generate between 3-6 issues, prioritizing the most impactful ones.
+
+## Output Format
+Return ONLY valid JSON array. Do NOT wrap in markdown codeblocks.
+[
+  { "issue": "Short title of issue", "details": "Explanation of the problem and a suggestion to fix it", "type": "plot_hole" }
+]`;
+        const response = await makeAiCall(prompt, context, "Consistency Check");
+        try {
+            const jsonMatch = response.match(/\[[\s\S]*\]/);
+            const jsonStr = jsonMatch ? jsonMatch[0] : response;
+            return JSON.parse(jsonStr);
+        } catch (e) {
+            console.error("Failed to parse consistency check", e);
+            throw new Error("Failed to parse AI consistency check results.");
+        }
+    },
+
+    highlightShowDontTell: async (proseText: string): Promise<{ original: string; suggestion: string; explanation: string }[]> => {
+        const prompt = `You are an expert Prose Coach specializing in the "Show, Don't Tell" principle.
+## Context
+The user has provided a passage of their creative writing draft.
+
+## Objective
+Identify instances where the author is "telling" rather than "showing" and suggest rewrites.
+
+## Instructions
+1. Find passages that state emotions or qualities directly instead of demonstrating them through action, dialogue, or sensory detail.
+2. Examples of "telling": "She was angry", "He was a brave man", "The room was scary".
+3. Examples of "showing": "She slammed the door so hard the frame splintered", "He stepped forward, shielding the child", "Shadows pooled in corners where the candlelight couldn't reach".
+4. For each instance found, provide the original text, a rewritten suggestion, and a brief explanation.
+5. Find 3-5 instances maximum. Focus on the most impactful ones.
+6. If the prose is already strong, find fewer items or return an empty array.
+
+## Output Format
+Return ONLY valid JSON array. Do NOT wrap in markdown codeblocks.
+[
+  { "original": "exact quote from text", "suggestion": "rewritten version", "explanation": "brief explanation" }
+]`;
+        const response = await makeAiCall(prompt, proseText, "Show Don't Tell");
+        try {
+            const jsonMatch = response.match(/\[[\s\S]*\]/);
+            const jsonStr = jsonMatch ? jsonMatch[0] : response;
+            return JSON.parse(jsonStr);
+        } catch (e) {
+            console.error("Failed to parse show don't tell results", e);
+            throw new Error("Failed to parse AI prose analysis.");
+        }
+    },
+
+    generateCharacterPortrait: async (characterDescription: string): Promise<string> => {
+        const settings = useSettingsStore.getState();
+        const logStore = useAiLogStore.getState();
+        const apiKey = settings.geminiKey;
+
+        if (!apiKey) {
+            throw new Error('Please configure your Gemini API Key in Settings to generate portraits.');
+        }
+
+        const prompt = `Generate a high-quality character portrait illustration based on this description. The style should be semi-realistic digital art, suitable for a novel character reference sheet. Focus on the face and upper body. Use dramatic, cinematic lighting. Do NOT include any text or labels in the image.
+
+CHARACTER DESCRIPTION:
+${characterDescription}`;
+
+        logStore.addLog({
+            type: 'request',
+            provider: 'gemini',
+            model: 'gemini-2.5-flash-image',
+            content: `Generating character portrait...\n\n${characterDescription.substring(0, 300)}...`,
+            metadata: { action: 'Generate Portrait' }
+        });
+
+        const startTime = Date.now();
+
+        try {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${apiKey}`;
+            const body = {
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: {
+                    responseModalities: ['TEXT', 'IMAGE']
+                }
+            };
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.error?.message || 'Gemini Image API Error');
+            }
+
+            const data = await response.json();
+            const parts = data.candidates?.[0]?.content?.parts || [];
+
+            // Find the inline image part
+            const imagePart = parts.find((p: any) => p.inlineData);
+            if (!imagePart) {
+                throw new Error('No image was generated. The model may not support image generation with your current API key.');
+            }
+
+            const mimeType = imagePart.inlineData.mimeType || 'image/png';
+            const base64 = imagePart.inlineData.data;
+            const dataUrl = `data:${mimeType};base64,${base64}`;
+
+            logStore.addLog({
+                type: 'response',
+                provider: 'gemini',
+                model: 'gemini-2.5-flash-image',
+                content: `Portrait generated successfully (${Math.round(base64.length / 1024)}KB)`,
+                metadata: { action: 'Generate Portrait', latency: Date.now() - startTime }
+            });
+
+            return dataUrl;
+        } catch (error) {
+            logStore.addLog({
+                type: 'error',
+                provider: 'gemini',
+                model: 'gemini-2.5-flash-image',
+                content: (error as Error).message,
+                metadata: { action: 'Generate Portrait', latency: Date.now() - startTime }
+            });
+            throw error;
+        }
+    },
+
+    analyzeTropes: async (context: string): Promise<{ trope: string; usage: string; risk: 'low' | 'medium' | 'high'; suggestion: string }[]> => {
+        const prompt = `You are a Narrative Tropes & Clichés Expert with encyclopedic knowledge of storytelling patterns across all genres.
+## Context
+The user has provided their full story bible: plot summary, characters, events/timeline, and locations.
+
+## Objective
+Identify narrative tropes and clichés being used in this story, whether intentionally or accidentally.
+
+## Instructions
+1. Scan for well-known storytelling tropes (e.g., "Chosen One", "Love Triangle", "Dead Mentor", "Damsel in Distress", "Redemption Arc", "Dark Lord", etc.).
+2. Identify genre-specific clichés (e.g., in mystery: "butler did it"; in sci-fi: "AI becomes sentient"; in romance: "enemies to lovers").
+3. For each trope found, explain HOW it's being used in this specific story.
+4. Classify the risk level:
+   - 'low': The trope is used well or subverted. It adds to the story.
+   - 'medium': The trope is present and could feel derivative if not handled carefully.
+   - 'high': The trope is used in a very predictable/cliché way that may weaken the story.
+5. Provide a concrete suggestion for either subverting the trope or leaning into it more intentionally.
+6. Find 4-7 tropes maximum. Prioritize the most impactful ones.
+
+## Output Format
+Return ONLY valid JSON array. Do NOT wrap in markdown codeblocks.
+[
+  { "trope": "Name of the trope", "usage": "How it appears in this story", "risk": "low", "suggestion": "How to subvert or strengthen it" }
+]`;
+        const response = await makeAiCall(prompt, context, "Tropes & Clichés Analysis");
+        try {
+            const jsonMatch = response.match(/\[[\s\S]*\]/);
+            const jsonStr = jsonMatch ? jsonMatch[0] : response;
+            return JSON.parse(jsonStr);
+        } catch (e) {
+            console.error("Failed to parse tropes analysis", e);
+            throw new Error("Failed to parse AI tropes analysis.");
+        }
     }
 };
 

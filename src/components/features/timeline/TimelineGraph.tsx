@@ -4,7 +4,7 @@ import { PlotEvent } from '@/types';
 import { Plus, MapPin } from 'lucide-react';
 import clsx from 'clsx';
 
-export const TimelineGraph = () => {
+export const TimelineGraph = ({ filterCharacterId: _filterCharacterId }: { filterCharacterId?: string | null }) => {
     const { events, characters, createEvent } = useStoryStore();
     const [hoveredEvent, setHoveredEvent] = useState<string | null>(null);
     const [isCreating, setIsCreating] = useState<{ thread: string, order: number } | null>(null);

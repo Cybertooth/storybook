@@ -8,6 +8,9 @@ import { useAnalysis } from '@/hooks/useAnalysis';
 import { PlotExpander } from './PlotExpander';
 import { useDebounce } from '@/hooks/useDebounce';
 import { DiffViewer } from '@/components/ui/DiffViewer';
+import { BeatSheet } from './BeatSheet';
+import { PlotHoleChecker } from './PlotHoleChecker';
+import { TropesAnalyzer } from './TropesAnalyzer';
 
 export const PlotGerminator = () => {
     const { currentStory, characters, events, locations, createStory, isLoading: isStoreLoading, error: storeError, isSaving } = useStoryStore();
@@ -22,6 +25,8 @@ export const PlotGerminator = () => {
     const [revisionOptions, setRevisionOptions] = useState<string[] | null>(null);
     const [isGeneratingRevisions, setIsGeneratingRevisions] = useState(false);
     const [showExpander, setShowExpander] = useState(false);
+    const [showBeatSheet, setShowBeatSheet] = useState(false);
+    const [showTropes, setShowTropes] = useState(false);
 
     // Analysis Hook
     const { isAnalyzing, analysisResult, analyze, applyAnalysis, discardAnalysis } = useAnalysis();
@@ -445,6 +450,57 @@ export const PlotGerminator = () => {
                 </div>
             )}
 
+
+            {/* Plot Hole & Consistency Checker */}
+            <PlotHoleChecker />
+
+            {/* Beat Sheet / Plot Structure Templates */}
+            <div className="glass-panel rounded-xl overflow-hidden">
+                <button
+                    onClick={() => setShowBeatSheet(!showBeatSheet)}
+                    className="w-full flex items-center justify-between p-4 hover:bg-stone-50/50 dark:hover:bg-stone-800/30 transition-colors"
+                >
+                    <div className="flex items-center gap-3">
+                        <div className="p-1.5 bg-purple-100/50 dark:bg-purple-900/30 rounded-lg text-purple-600 dark:text-purple-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3h18v18H3z" /><path d="M7 7h.01" /><path d="M12 7h5" /><path d="M7 12h.01" /><path d="M12 12h5" /><path d="M7 17h.01" /><path d="M12 17h5" /></svg>
+                        </div>
+                        <div className="text-left">
+                            <h3 className="text-sm font-bold text-stone-700 dark:text-stone-300">Story Structure Templates</h3>
+                            <p className="text-xs text-stone-400 dark:text-stone-500">Beat sheets to guide your plot</p>
+                        </div>
+                    </div>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={clsx("text-stone-400 transition-transform", showBeatSheet && "rotate-180")}><path d="m6 9 6 6 6-6" /></svg>
+                </button>
+                {showBeatSheet && (
+                    <div className="p-6 pt-0 animate-in fade-in slide-in-from-top-2 duration-200">
+                        <BeatSheet />
+                    </div>
+                )}
+            </div>
+
+            {/* Tropes & Clichés Analyzer */}
+            <div className="glass-panel rounded-xl overflow-hidden">
+                <button
+                    onClick={() => setShowTropes(!showTropes)}
+                    className="w-full flex items-center justify-between p-4 hover:bg-stone-50/50 dark:hover:bg-stone-800/30 transition-colors"
+                >
+                    <div className="flex items-center gap-3">
+                        <div className="p-1.5 bg-violet-100/50 dark:bg-violet-900/30 rounded-lg text-violet-600 dark:text-violet-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" /><path d="M12 9v4" /><path d="M12 17h.01" /></svg>
+                        </div>
+                        <div className="text-left">
+                            <h3 className="text-sm font-bold text-stone-700 dark:text-stone-300">Tropes & Clichés Analyzer</h3>
+                            <p className="text-xs text-stone-400 dark:text-stone-500">Identify narrative patterns & clichés</p>
+                        </div>
+                    </div>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={clsx("text-stone-400 transition-transform", showTropes && "rotate-180")}><path d="m6 9 6 6 6-6" /></svg>
+                </button>
+                {showTropes && (
+                    <div className="p-6 pt-0 animate-in fade-in slide-in-from-top-2 duration-200">
+                        <TropesAnalyzer />
+                    </div>
+                )}
+            </div>
 
             {/* Plot Expander Overlay */}
             {showExpander && (

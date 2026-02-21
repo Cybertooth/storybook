@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { temporal } from 'zundo';
-import { Story, Character, PlotEvent, Location, Chapter, Note, UnresolvedQuestion } from '@/types';
+import { Story, Character, PlotEvent, Location, Chapter, Note, UnresolvedQuestion, Relationship } from '@/types';
 import { storage } from '@/lib/storage';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -12,6 +12,7 @@ interface StoryState {
     chapters: Chapter[];
     notes: Note[];
     unresolvedQuestions: UnresolvedQuestion[];
+    relationships: Relationship[];
     pinnedRefs: { id: string, type: 'character' | 'location' | 'event' }[];
     isLoading: boolean;
     isSaving: boolean;
@@ -55,6 +56,11 @@ interface StoryState {
     updateUnresolvedQuestion: (id: string, updates: Partial<UnresolvedQuestion>) => Promise<void>;
     deleteUnresolvedQuestion: (id: string) => Promise<void>;
 
+    // Relationship Actions
+    createRelationship: (sourceId: string, targetId: string, type: string, description?: string) => Promise<void>;
+    updateRelationship: (id: string, updates: Partial<Relationship>) => Promise<void>;
+    deleteRelationship: (id: string) => Promise<void>;
+
     // Reference Actions
     togglePin: (id: string, type: 'character' | 'location' | 'event') => void;
 
@@ -73,6 +79,7 @@ export const useStoryStore = create<StoryState>()(
         chapters: [],
         notes: [],
         unresolvedQuestions: [],
+        relationships: [],
         pinnedRefs: [],
         isLoading: false,
         isSaving: false,
@@ -90,7 +97,8 @@ export const useStoryStore = create<StoryState>()(
                 const chapters = await storage.getChapters(id);
                 const notes = await storage.getNotes(id);
                 const unresolvedQuestions = await storage.getUnresolvedQuestions(id);
-                set({ currentStory: story, characters, locations, events, chapters, notes, unresolvedQuestions, isLoading: false });
+                const relationships = await storage.getRelationships(id);
+                set({ currentStory: story, characters, locations, events, chapters, notes, unresolvedQuestions, relationships, isLoading: false });
             } catch (err) {
                 set({ error: (err as Error).message, isLoading: false });
             }
@@ -100,7 +108,7 @@ export const useStoryStore = create<StoryState>()(
             set({ isLoading: true, error: null });
             try {
                 const story = await storage.createStory(title);
-                set({ currentStory: story, characters: [], locations: [], events: [], chapters: [], notes: [], unresolvedQuestions: [], isLoading: false });
+                set({ currentStory: story, characters: [], locations: [], events: [], chapters: [], notes: [], unresolvedQuestions: [], relationships: [], isLoading: false });
             } catch (err) {
                 set({ error: (err as Error).message, isLoading: false });
             }
@@ -454,6 +462,56 @@ export const useStoryStore = create<StoryState>()(
             }
         },
 
+        // --- Relationships ---
+        createRelationship: async (sourceId: string, targetId: string, type: string, description = '') => {
+            const { currentStory, relationships } = get();
+            if (!currentStory) return;
+
+            const newRel: Relationship = {
+                id: uuidv4(),
+                sourceId,
+                targetId,
+                type,
+                description,
+                storyId: currentStory.id
+            };
+
+            set({ relationships: [...relationships, newRel], isSaving: true });
+            try {
+                await storage.saveRelationship(newRel);
+                set({ isSaving: false });
+            } catch (err) {
+                set({ relationships, error: (err as Error).message, isSaving: false });
+            }
+        },
+
+        updateRelationship: async (id: string, updates: Partial<Relationship>) => {
+            const { relationships } = get();
+            const target = relationships.find(r => r.id === id);
+            if (!target) return;
+
+            const updatedRel = { ...target, ...updates };
+            set({ relationships: relationships.map(r => r.id === id ? updatedRel : r), isSaving: true });
+
+            try {
+                await storage.saveRelationship(updatedRel);
+                set({ isSaving: false });
+            } catch (err) {
+                set({ relationships, error: (err as Error).message, isSaving: false });
+            }
+        },
+
+        deleteRelationship: async (id: string) => {
+            const { relationships } = get();
+            set({ relationships: relationships.filter(r => r.id !== id), isSaving: true });
+            try {
+                await storage.deleteRelationship(id);
+                set({ isSaving: false });
+            } catch (err) {
+                set({ relationships, error: (err as Error).message, isSaving: false });
+            }
+        },
+
         togglePin: (id, type) => {
             set((state) => {
                 const isPinned = state.pinnedRefs.some(ref => ref.id === id);
@@ -569,6 +627,7 @@ export const useStoryStore = create<StoryState>()(
                 const chapters = await storage.getChapters(storyId);
                 const notes = await storage.getNotes(storyId);
                 const unresolvedQuestions = await storage.getUnresolvedQuestions(storyId);
+                const relationships = await storage.getRelationships(storyId);
                 set({
                     currentStory: story,
                     characters,
@@ -577,6 +636,7 @@ export const useStoryStore = create<StoryState>()(
                     chapters,
                     notes,
                     unresolvedQuestions,
+                    relationships,
                     pinnedRefs: [], // Reset pins on load
                     isLoading: false,
                     projectFileHandle: handle,
@@ -599,6 +659,7 @@ export const useStoryStore = create<StoryState>()(
                     chapters: [],
                     notes: [],
                     unresolvedQuestions: [],
+                    relationships: [],
                     pinnedRefs: [],
                     isLoading: false,
                     projectFileHandle: null,

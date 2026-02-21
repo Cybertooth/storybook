@@ -21,14 +21,14 @@ This list synthesizes the feature requests from existing roadmaps and the compet
 ## 🟨 Phase 2: SHOULD HAVE (High-Value Enhancements)
 *These features deliver on the "magic" of AI and visual organizing, pushing the app past basic competitors once the MVP is stable.*
 
-1.  **Dark Mode:** Essential for writers working late.
-2.  **Character Relationship Visualizer:** Node-graph showing tension and connections.
-3.  **Pacing Graph (Emotional Value):** Scene intensity rankings overlaying the timeline to identify sagging middles.
-4.  **Plot Structure Templates (Beat Sheets):** "Save the Cat", Hero's Journey overlays on the timeline/dashboard.
-5.  **AI "Plot Hole & Consistency Checker":** The killer feature for revision (flagging continuity errors and abandoned threads).
-6.  **"Show, Don't Tell" Highlighter:** Inline prose improvement tool.
-7.  **Character-Specific Timeline Filters:** Ensuring a specific character cannot be in two places at once.
-8.  **Story Dashboard & Multi-Story Support:** Managing multiple projects with word count tracking and writing streaks.
+1.  **[DONE] Dark Mode:** Essential for writers working late.
+2.  **[DONE] Character Relationship Visualizer:** Node-graph showing tension and connections.
+3.  **[DONE] Pacing Graph (Emotional Value):** Scene intensity rankings overlaying the timeline to identify sagging middles.
+4.  **[DONE] Plot Structure Templates (Beat Sheets):** "Save the Cat", Hero's Journey overlays on the timeline/dashboard.
+5.  **[DONE] AI "Plot Hole & Consistency Checker":** The killer feature for revision (flagging continuity errors and abandoned threads).
+6.  **[DONE] "Show, Don't Tell" Highlighter:** Inline prose improvement tool.
+7.  **[DONE] Character-Specific Timeline Filters:** Ensuring a specific character cannot be in two places at once.
+8.  **[DONE] Story Dashboard & Multi-Story Support:** Managing multiple projects with word count tracking and writing streaks.
 
 ---
 

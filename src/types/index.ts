@@ -57,6 +57,7 @@ export interface PlotEvent {
     // For Kanban/Timeline
     status?: 'idea' | 'drafted' | 'final';
     plotThread?: string; // e.g. "Main Plot", "Subplot A"
+    emotionalValue?: number; // -5 (lowest) to +5 (highest) for pacing graph
 }
 
 export interface Chapter {
@@ -104,4 +105,5 @@ export interface ProjectBundle {
     chapters: Chapter[];
     notes?: Note[]; // Optional for backwards compatibility
     unresolvedQuestions?: UnresolvedQuestion[]; // Optional for backwards compatibility
+    relationships?: Relationship[]; // Optional for backwards compatibility
 }

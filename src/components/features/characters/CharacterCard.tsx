@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Character } from '@/types';
-import { User, Edit2, Trash2, Check, X } from 'lucide-react';
+import { User, Edit2, Trash2, Check, X, Camera, Loader2, RefreshCw } from 'lucide-react';
 import clsx from 'clsx';
 import TextareaAutosize from 'react-textarea-autosize';
+import { aiService } from '@/lib/ai';
 
 interface CharacterCardProps {
     character: Character;
@@ -19,6 +20,11 @@ export const CharacterCard = ({ character, onUpdate, onDelete }: CharacterCardPr
     const [arcTruth, setArcTruth] = useState(character.arcTruth || '');
     const [arcGhost, setArcGhost] = useState(character.arcGhost || '');
 
+    // Portrait generation state
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [portraitError, setPortraitError] = useState<string | null>(null);
+
     const handleSave = () => {
         onUpdate(character.id, { name, role, description, arcLie, arcTruth, arcGhost });
         setIsEditing(false);
@@ -32,6 +38,58 @@ export const CharacterCard = ({ character, onUpdate, onDelete }: CharacterCardPr
         setArcTruth(character.arcTruth || '');
         setArcGhost(character.arcGhost || '');
         setIsEditing(false);
+    };
+
+    const handleGeneratePortrait = async () => {
+        setIsGenerating(true);
+        setPortraitError(null);
+        try {
+            const desc = `Name: ${character.name}\nRole: ${character.role}\nDescription: ${character.description}${character.arcGhost ? `\nBackstory: ${character.arcGhost}` : ''}${character.traits.length > 0 ? `\nTraits: ${character.traits.join(', ')}` : ''}`;
+            const url = await aiService.generateCharacterPortrait(desc);
+            setPreviewUrl(url);
+        } catch (err) {
+            setPortraitError((err as Error).message);
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+
+    const handleUsePortrait = () => {
+        if (previewUrl) {
+            onUpdate(character.id, { avatarUrl: previewUrl });
+            setPreviewUrl(null);
+        }
+    };
+
+    const handleRemovePortrait = () => {
+        onUpdate(character.id, { avatarUrl: undefined });
+    };
+
+    // Avatar component
+    const Avatar = ({ size = 'md' }: { size?: 'sm' | 'md' }) => {
+        const sizeClass = size === 'md' ? 'w-12 h-12' : 'w-10 h-10';
+        const iconSize = size === 'md' ? 'w-6 h-6' : 'w-5 h-5';
+
+        if (character.avatarUrl) {
+            return (
+                <img
+                    src={character.avatarUrl}
+                    alt={character.name}
+                    className={clsx(sizeClass, "rounded-full object-cover shrink-0 ring-2 ring-white dark:ring-stone-700 shadow-md")}
+                />
+            );
+        }
+
+        return (
+            <div className={clsx(
+                sizeClass, "rounded-full flex items-center justify-center shrink-0",
+                character.role === 'protagonist' ? "bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400" :
+                    character.role === 'antagonist' ? "bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400" :
+                        "bg-stone-100 dark:bg-stone-700 text-stone-400 dark:text-stone-500"
+            )}>
+                <User className={iconSize} />
+            </div>
+        );
     };
 
     if (isEditing) {
@@ -115,23 +173,42 @@ export const CharacterCard = ({ character, onUpdate, onDelete }: CharacterCardPr
         <div className="glass-panel p-4 rounded-xl hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-stone-200 dark:from-stone-700 to-stone-100 dark:to-stone-800 opacity-50"></div>
             <div className="flex gap-4">
-                <div className={clsx(
-                    "w-12 h-12 rounded-full flex items-center justify-center shrink-0",
-                    character.role === 'protagonist' ? "bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400" :
-                        character.role === 'antagonist' ? "bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400" :
-                            "bg-stone-100 dark:bg-stone-700 text-stone-400 dark:text-stone-500"
-                )}>
-                    <User className="w-6 h-6" />
+                <div className="relative">
+                    <Avatar size="md" />
+                    <button
+                        onClick={handleGeneratePortrait}
+                        disabled={isGenerating}
+                        className={clsx(
+                            "absolute -bottom-1 -right-1 p-1 rounded-full shadow-md transition-all",
+                            isGenerating
+                                ? "bg-indigo-500 text-white cursor-wait"
+                                : "bg-white dark:bg-stone-700 text-stone-500 dark:text-stone-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 opacity-0 group-hover:opacity-100 border border-stone-200 dark:border-stone-600"
+                        )}
+                        title="Generate AI Portrait"
+                    >
+                        {isGenerating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Camera className="w-3 h-3" />}
+                    </button>
                 </div>
                 <div className="flex-1 min-w-0">
                     <div className="flex justify-between items-start">
                         <h3 className="font-bold text-stone-900 dark:text-stone-100 truncate">{character.name}</h3>
-                        <button
-                            onClick={() => setIsEditing(true)}
-                            className="opacity-0 group-hover:opacity-100 p-1 hover:bg-stone-100 dark:hover:bg-stone-700 rounded text-stone-400 transition-opacity"
-                        >
-                            <Edit2 className="w-3 h-3" />
-                        </button>
+                        <div className="flex items-center gap-1">
+                            {character.avatarUrl && (
+                                <button
+                                    onClick={handleRemovePortrait}
+                                    className="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-50 dark:hover:bg-red-900/30 rounded text-stone-400 hover:text-red-500 transition-opacity"
+                                    title="Remove portrait"
+                                >
+                                    <X className="w-3 h-3" />
+                                </button>
+                            )}
+                            <button
+                                onClick={() => setIsEditing(true)}
+                                className="opacity-0 group-hover:opacity-100 p-1 hover:bg-stone-100 dark:hover:bg-stone-700 rounded text-stone-400 transition-opacity"
+                            >
+                                <Edit2 className="w-3 h-3" />
+                            </button>
+                        </div>
                     </div>
                     <span className="inline-block px-2 py-0.5 rounded-full bg-stone-100 dark:bg-stone-700 text-stone-500 dark:text-stone-400 text-xs font-medium capitalize mb-2">
                         {character.role}
@@ -164,6 +241,51 @@ export const CharacterCard = ({ character, onUpdate, onDelete }: CharacterCardPr
                     )}
                 </div>
             </div>
+
+            {/* Portrait Error */}
+            {portraitError && (
+                <div className="mt-3 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-xs text-red-700 dark:text-red-300 flex justify-between items-start">
+                    <span>{portraitError}</span>
+                    <button onClick={() => setPortraitError(null)} className="ml-2 shrink-0"><X className="w-3 h-3" /></button>
+                </div>
+            )}
+
+            {/* Portrait Preview Modal (Inline) */}
+            {previewUrl && (
+                <div className="mt-3 p-3 bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-xl animate-in fade-in slide-in-from-bottom-2 duration-300">
+                    <img
+                        src={previewUrl}
+                        alt={`Portrait of ${character.name}`}
+                        className="w-full rounded-lg shadow-lg mb-3 max-h-64 object-cover"
+                    />
+                    <p className="text-[10px] text-stone-400 dark:text-stone-500 text-center mb-3">
+                        Not what you imagined? Try adding more physical details to the description.
+                    </p>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={handleUsePortrait}
+                            className="flex-1 py-2 px-3 bg-indigo-600 text-white text-xs font-bold rounded-lg hover:bg-indigo-700 transition-colors flex items-center justify-center gap-1.5"
+                        >
+                            <Check className="w-3.5 h-3.5" />
+                            Use This
+                        </button>
+                        <button
+                            onClick={handleGeneratePortrait}
+                            disabled={isGenerating}
+                            className="flex-1 py-2 px-3 bg-white dark:bg-stone-800 text-stone-700 dark:text-stone-300 text-xs font-bold rounded-lg hover:bg-stone-100 dark:hover:bg-stone-700 border border-stone-200 dark:border-stone-600 transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50"
+                        >
+                            {isGenerating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+                            Try Again
+                        </button>
+                        <button
+                            onClick={() => setPreviewUrl(null)}
+                            className="py-2 px-3 text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 text-xs rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+                        >
+                            <X className="w-3.5 h-3.5" />
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
