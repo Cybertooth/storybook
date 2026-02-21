@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { AppSettings } from '@/types';
+import { AppSettings } from '@storybook/api';
 
 interface SettingsState extends AppSettings {
     updateSettings: (settings: Partial<AppSettings>) => void;
@@ -9,6 +9,7 @@ interface SettingsState extends AppSettings {
 export const useSettingsStore = create<SettingsState>()(
     persist(
         (set) => ({
+            userId: 'local-user',
             llmProvider: 'gemini',
             geminiKey: '',
             geminiModel: 'gemini-3-flash-preview',

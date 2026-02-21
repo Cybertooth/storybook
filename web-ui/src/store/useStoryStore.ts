@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { temporal } from 'zundo';
-import { Story, Character, PlotEvent, Location, Chapter, Note, UnresolvedQuestion, Relationship } from '@/types';
+import { Story, Character, PlotEvent, Location, Chapter, Note, UnresolvedQuestion, Relationship } from '@storybook/api';
 import { storage } from '@/lib/storage';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -150,6 +150,7 @@ export const useStoryStore = create<StoryState>()(
 
             const newChar: Character = {
                 id: uuidv4(),
+            userId: 'local-user',
                 name,
                 role,
                 description: '',
@@ -201,6 +202,7 @@ export const useStoryStore = create<StoryState>()(
 
             const newLoc: Location = {
                 id: uuidv4(),
+            userId: 'local-user',
                 name,
                 description: '',
                 storyId: currentStory.id
@@ -251,6 +253,7 @@ export const useStoryStore = create<StoryState>()(
 
             const newEvent: PlotEvent = {
                 id: uuidv4(),
+            userId: 'local-user',
                 title,
                 description: '',
                 order: maxOrder + 1,
@@ -321,6 +324,7 @@ export const useStoryStore = create<StoryState>()(
 
             const newChapter: Chapter = {
                 id: uuidv4(),
+            userId: 'local-user',
                 title,
                 content: '',
                 order: maxOrder + 1,
@@ -371,6 +375,7 @@ export const useStoryStore = create<StoryState>()(
 
             const newNote: Note = {
                 id: uuidv4(),
+            userId: 'local-user',
                 content,
                 createdAt: Date.now(),
                 storyId: currentStory.id
@@ -419,6 +424,7 @@ export const useStoryStore = create<StoryState>()(
 
             const newQuestion: UnresolvedQuestion = {
                 id: uuidv4(),
+            userId: 'local-user',
                 question,
                 details,
                 isResolved: false,
@@ -469,6 +475,7 @@ export const useStoryStore = create<StoryState>()(
 
             const newRel: Relationship = {
                 id: uuidv4(),
+            userId: 'local-user',
                 sourceId,
                 targetId,
                 type,

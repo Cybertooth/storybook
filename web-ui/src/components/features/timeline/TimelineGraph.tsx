@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useStoryStore } from '@/store/useStoryStore';
-import { PlotEvent } from '@/types';
+import { PlotEvent } from '@storybook/api';
 import { Plus, MapPin } from 'lucide-react';
 import clsx from 'clsx';
 

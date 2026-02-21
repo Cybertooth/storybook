@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Chapter } from '@/types';
+import { Chapter } from '@storybook/api';
 import { Plus, FileText, Trash2, GripVertical } from 'lucide-react';
 import clsx from 'clsx';
 

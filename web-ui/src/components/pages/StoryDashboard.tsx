@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useStoryStore } from '@/store/useStoryStore';
 import { storage } from '@/lib/storage';
-import { Story } from '@/types';
+import { Story } from '@storybook/api';
 import { BookOpen, Plus, Trash2, Clock, FileText, Users, Map, GitBranch, Flame, Target, TrendingUp } from 'lucide-react';
 import clsx from 'clsx';
 

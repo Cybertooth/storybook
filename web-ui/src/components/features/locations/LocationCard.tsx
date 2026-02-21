@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Location } from '@/types';
+import { Location } from '@storybook/api';
 import { MapPin, Edit2, Trash2, Check, X } from 'lucide-react';
 import TextareaAutosize from 'react-textarea-autosize';
 

@@ -12,6 +12,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "@storybook/api": path.resolve(__dirname, "../api/src/index.ts")
     },
   },
 })

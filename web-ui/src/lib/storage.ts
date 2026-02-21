@@ -1,10 +1,11 @@
 import localforage from 'localforage';
-import { Story, Character, PlotEvent, Location, Chapter, ProjectBundle, Note, UnresolvedQuestion, Relationship } from '@/types';
+import { Story, Character, PlotEvent, Location, Chapter, ProjectBundle, Note, UnresolvedQuestion, Relationship } from '@storybook/api';
 import { v4 as uuidv4 } from 'uuid';
 
 // Default initial data for a new story
 const createNewStory = (title: string): Story => ({
     id: uuidv4(),
+            userId: 'local-user',
     title,
     summary: '',
     createdAt: Date.now(),

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
-import { Chapter } from '@/types';
+import { Chapter } from '@storybook/api';
 import { Loader2, Check, Eye, Edit2, Wand2, X } from 'lucide-react';
 import { useDebounce } from '@/hooks/useDebounce';
 import clsx from 'clsx';

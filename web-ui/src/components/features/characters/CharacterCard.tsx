@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Character } from '@/types';
+import { Character } from '@storybook/api';
 import { User, Edit2, Trash2, Check, X, Camera, Loader2, RefreshCw } from 'lucide-react';
 import clsx from 'clsx';
 import TextareaAutosize from 'react-textarea-autosize';

@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useStoryStore } from '@/store/useStoryStore';
 import { EventCard } from './EventCard';
 import { Plus } from 'lucide-react';
-import { PlotEvent } from '@/types';
+import { PlotEvent } from '@storybook/api';
 import clsx from 'clsx';
 import {
     DndContext,

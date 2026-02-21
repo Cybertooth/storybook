@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PlotEvent } from '@/types';
+import { PlotEvent } from '@storybook/api';
 import { Edit2, Trash2, Check, X, MapPin, GripVertical } from 'lucide-react';
 import TextareaAutosize from 'react-textarea-autosize';
 import { useDraggable } from '@dnd-kit/core';
