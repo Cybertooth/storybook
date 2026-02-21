@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: storybook-backend
+spec:
+  type: LoadBalancer # Expose to external IP using cloud load balancer or localhost on Docker Desktop
+  ports:
+  - port: 3000
+    targetPort: 3000
+  selector:
+    app: storybook-backend

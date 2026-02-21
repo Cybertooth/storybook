@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: storybook-db
+spec:
+  serviceName: storybook-db
+  replicas: 1
+  selector:
+    matchLabels:
+      app: storybook-db
+  template:
+    metadata:
+      labels:
+        app: storybook-db
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15-alpine
+        env:
+        - name: POSTGRES_USER
+          value: storybook
+        - name: POSTGRES_PASSWORD
+          value: password
+        - name: POSTGRES_DB
+          value: storybook
+        ports:
+        - containerPort: 5432
+        volumeMounts:
+        - name: pgdata
+          mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+  - metadata:
+      name: pgdata
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: storybook-db
+spec:
+  ports:
+  - port: 5432
+    targetPort: 5432
+  selector:
+    app: storybook-db

@@ -1,8 +1,9 @@
 import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { BookOpen, Users, Map, GitGraph, Edit3, Settings, Check, Loader2, Save, FolderOpen, FilePlus, Lightbulb, Undo2, Redo2, LayoutDashboard } from 'lucide-react';
+import { BookOpen, Users, Map, GitGraph, Edit3, Settings, Check, Loader2, Save, FolderOpen, FilePlus, Lightbulb, Undo2, Redo2, LayoutDashboard, LogOut } from 'lucide-react';
 import clsx from 'clsx';
 import { useStoryStore, useTemporalStoryStore } from '@/store/useStoryStore';
+import { useAuthStore } from '@/store/useAuthStore';
 import { useToastStore } from '@/hooks/useToast';
 import { ThemeToggle } from '../ThemeToggle';
 import { AiConsole } from '../ui/AiConsole';
@@ -34,6 +35,7 @@ export const AppShell = () => {
     const saveProjectToFile = useStoryStore(s => s.saveProjectToFile);
     const loadProjectFromFile = useStoryStore(s => s.loadProjectFromFile);
     const newProject = useStoryStore(s => s.newProject);
+    const logout = useAuthStore(s => s.logout);
 
     // Zundo time-travel
     const { undo, redo, pastStates, futureStates } = useTemporalStoryStore((state) => state);
@@ -159,6 +161,13 @@ export const AppShell = () => {
                             )}
                         </div>
                         <NavItem to="/settings" icon={Settings} label="Settings" />
+                        <button
+                            onClick={logout}
+                            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30"
+                        >
+                            <LogOut className="w-4 h-4" />
+                            <span>Log out</span>
+                        </button>
                     </div>
                 </div>
             </aside>

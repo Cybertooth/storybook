@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: storybook-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: storybook-backend
+  template:
+    metadata:
+      labels:
+        app: storybook-backend
+    spec:
+      containers:
+      - name: backend
+        image: storybook-backend:latest
+        imagePullPolicy: Never # For local Docker Desktop/Minikube testing
+        ports:
+        - containerPort: 3000
+        env:
+        - name: DATABASE_URL
+          value: "postgresql://storybook:password@storybook-db:5432/storybook?schema=public"
+        - name: GEMINI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: storybook-secrets
+              key: gemini-api-key
+              optional: true

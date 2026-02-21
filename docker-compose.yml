@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: storybook
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: storybook
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://storybook:password@db:5432/storybook?schema=public
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+    depends_on:
+      - db
+
+volumes:
+  pgdata:

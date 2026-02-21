@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: storybook-frontend-svc
+  labels:
+    app: storybook
+    tier: frontend
+spec:
+  type: LoadBalancer # Or use NodePort/ClusterIP based on Ingress strategy
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    app: storybook
+    tier: frontend

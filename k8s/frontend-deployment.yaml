@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: storybook-frontend
+  labels:
+    app: storybook
+    tier: frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: storybook
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: storybook
+        tier: frontend
+    spec:
+      containers:
+        - name: storybook-frontend
+          image: gcr.io/PROJECT_ID/storybook-frontend:latest
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "250m"

@@ -29,27 +29,27 @@ The work to complete this migration should be picked up by multiple sub-agents. 
 - [x] Define API client interfaces (e.g., Axios wrappers or tRPC routers) to ensure type safety across the network boundary.
 
 ### Phase 3: Backend Implementation (Agent 3) -> Cloud-Native & Dual-Deployment
-- [ ] Initialize `/backend` folder using **NestJS** to enforce Hexagonal Architecture and Dependency Injection.
-- [ ] Setup PostgreSQL connection using Prisma ORM. Abstract this behind Repository interfaces.
-- [ ] Implement Hexagonal domain modules for Stories, Characters, Locations, Events, and AI.
-- [ ] Implement REST Controllers adhering strictly to the shared `@storybook/api`.
-- [ ] Implement the AI Proxy Service (Gemini integration securely handled server-side).
-- [ ] Write a production-ready `Dockerfile` and local `docker-compose.yml`.
-- [ ] Provide Kubernetes manifests (`deployment.yaml`, `service.yaml`) for testing on Docker Desktop K8s / deploying to GCP GKE.
+- [x] Initialize `/backend` folder using **NestJS** to enforce Hexagonal Architecture and Dependency Injection.
+- [x] Setup PostgreSQL connection using Prisma ORM. Abstract this behind Repository interfaces.
+- [x] Implement Hexagonal domain modules for Stories, Characters, Locations, Events, and AI.
+- [x] Implement REST Controllers adhering strictly to the shared `@storybook/api`.
+- [x] Implement the AI Proxy Service (Gemini integration securely handled server-side).
+- [x] Write a production-ready `Dockerfile` and local `docker-compose.yml`.
+- [x] Provide Kubernetes manifests (`deployment.yaml`, `service.yaml`) for testing on Docker Desktop K8s / deploying to GCP GKE.
 
 ### Phase 4: Frontend API Integration & Data Layer Swap (Agent 4)
-- [ ] In `/web-ui`, install the shared `/api` package.
-- [ ] Replace `src/lib/storage.ts` (LocalForage) with HTTP calls to the new `/backend` using Axios/Fetch.
-- [ ] Update the global state stores (`useStoryStore`, `useSettingsStore`) to dispatch actions to the backend to persist data, rather than saving to local DB.
-- [ ] Migrate `src/lib/ai.ts` in the frontend to simply call the backend proxy endpoints instead of hitting Gemini/OpenAI directly from the browser.
-- [ ] Handle asynchronous loading states, errors, and optimistic UI updates seamlessly.
+- [x] In `/web-ui`, install the shared `/api` package.
+- [x] Replace `src/lib/storage.ts` (LocalForage) with HTTP calls to the new `/backend` using Axios/Fetch.
+- [x] Update the global state stores (`useStoryStore`, `useSettingsStore`) to dispatch actions to the backend to persist data, rather than saving to local DB.
+- [x] Migrate `src/lib/ai.ts` in the frontend to simply call the backend proxy endpoints instead of hitting Gemini/OpenAI directly from the browser.
+- [x] Handle asynchronous loading states, errors, and optimistic UI updates seamlessly.
 
 ### Phase 5: Authentication & Deployment Prep (Agent 1 & 2)
-- [ ] Implement a basic authentication layer (JWT) on the backend.
-- [ ] Add Login / Registration screens to the `/web-ui`.
-- [ ] Ensure API routes authenticate requests and isolate data by `userId`.
-- [ ] Configure environment variables (`.env`) for both apps.
-- [ ] Write a `docker-compose.yml` or deployment scripts for hosting on platforms like Vercel (Web UI) and Render/Heroku (Backend/DB). Recommendation is to host the entire app in Google Cloud.
+- [x] Implement a basic authentication layer (JWT) on the backend.
+- [x] Add Login / Registration screens to the `/web-ui`.
+- [x] Ensure API routes authenticate requests and isolate data by `userId`.
+- [x] Configure environment variables (`.env`) for both apps.
+- [x] Write a `docker-compose.yml` or deployment scripts for hosting on platforms like Vercel (Web UI) and Render/Heroku (Backend/DB). Recommendation is to host the entire app in Google Cloud.
 
 ## Guidelines for Sub-Agents
 - Read `API.md` and `WEB_UI_FEATURES.md` completely before assuming how a feature works.
