@@ -23,17 +23,19 @@ The work to complete this migration should be picked up by multiple sub-agents. 
 - [x] Ensure the `/web-ui` app still starts up and runs locally using the existing LocalForage implementation in its new location.
 
 ### Phase 2: Shared API & Types Layer (Agent 2)
-- [ ] Initialize `/api` folder as a workspace package (`package.json`, TypeScript config).
-- [ ] Migrate the types from `/web-ui/src/types/index.ts` to the `/api` package so both backend and frontend can import them.
-- [ ] Define standardized REST payload and response types corresponding to `API.md`.
-- [ ] Define API client interfaces (e.g., Axios wrappers or tRPC routers) to ensure type safety across the network boundary.
+- [x] Initialize `/api` folder as a workspace package (`package.json`, TypeScript config).
+- [x] Migrate the types from `/web-ui/src/types/index.ts` to the `/api` package so both backend and frontend can import them.
+- [x] Define standardized REST payload and response types corresponding to `API.md`.
+- [x] Define API client interfaces (e.g., Axios wrappers or tRPC routers) to ensure type safety across the network boundary.
 
-### Phase 3: Backend Implementation (Agent 3)
-- [ ] Initialize `/backend` folder (`package.json`, `tsconfig.json`, basic server setup using Express or Fastify).
-- [ ] Setup a database connection (e.g., PostgreSQL with Prisma/Drizzle ORM or MongoDB with Mongoose).
-- [ ] Implement robust schema models mirroring the Shared API types.
-- [ ] Implement CRUD route handlers for Stories, Characters, Locations, Events, Chapters, Notes, Unresolved Questions, and Relationships, strictly adhering to `API.md`.
-- [ ] Implement the AI Proxy Routes (protecting API keys server-side). Migrate the LLM calling logic from `src/lib/ai.ts` into the backend services.
+### Phase 3: Backend Implementation (Agent 3) -> Cloud-Native & Dual-Deployment
+- [ ] Initialize `/backend` folder using **NestJS** to enforce Hexagonal Architecture and Dependency Injection.
+- [ ] Setup PostgreSQL connection using Prisma ORM. Abstract this behind Repository interfaces.
+- [ ] Implement Hexagonal domain modules for Stories, Characters, Locations, Events, and AI.
+- [ ] Implement REST Controllers adhering strictly to the shared `@storybook/api`.
+- [ ] Implement the AI Proxy Service (Gemini integration securely handled server-side).
+- [ ] Write a production-ready `Dockerfile` and local `docker-compose.yml`.
+- [ ] Provide Kubernetes manifests (`deployment.yaml`, `service.yaml`) for testing on Docker Desktop K8s / deploying to GCP GKE.
 
 ### Phase 4: Frontend API Integration & Data Layer Swap (Agent 4)
 - [ ] In `/web-ui`, install the shared `/api` package.
@@ -47,7 +49,7 @@ The work to complete this migration should be picked up by multiple sub-agents. 
 - [ ] Add Login / Registration screens to the `/web-ui`.
 - [ ] Ensure API routes authenticate requests and isolate data by `userId`.
 - [ ] Configure environment variables (`.env`) for both apps.
-- [ ] Write a `docker-compose.yml` or deployment scripts for hosting on platforms like Vercel (Web UI) and Render/Heroku (Backend/DB).
+- [ ] Write a `docker-compose.yml` or deployment scripts for hosting on platforms like Vercel (Web UI) and Render/Heroku (Backend/DB). Recommendation is to host the entire app in Google Cloud.
 
 ## Guidelines for Sub-Agents
 - Read `API.md` and `WEB_UI_FEATURES.md` completely before assuming how a feature works.
