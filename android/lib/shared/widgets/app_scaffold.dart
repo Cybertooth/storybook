@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../features/questions/screens/questions_bottom_sheet.dart';
 
 class AppScaffold extends StatelessWidget {
   final Widget child;
@@ -25,6 +26,16 @@ class AppScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: child,
+      floatingActionButton: FloatingActionButton.small(
+        heroTag: 'questions_fab',
+        tooltip: 'Unresolved Questions',
+        onPressed: () => showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          builder: (_) => const QuestionsBottomSheet(),
+        ),
+        child: const Text('?', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+      ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _locationToIndex(context),
         onDestinationSelected: (i) => context.go(_tabs[i].path),
