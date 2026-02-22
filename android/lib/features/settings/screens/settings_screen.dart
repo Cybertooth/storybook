@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/providers/active_story_provider.dart';
+import '../../../core/providers/export_provider.dart';
+import '../../../core/providers/repository_providers.dart';
 import '../../../core/providers/settings_provider.dart';
 import '../../../core/providers/theme_provider.dart';
 
@@ -123,6 +126,78 @@ class _State extends ConsumerState<SettingsScreen> {
                         child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                       )
                     : const Text('Save API Keys'),
+              ),
+              const Divider(height: 32),
+
+              // ── Export / Import ──────────────────────────────────
+              const _SectionHeader('Data'),
+              const SizedBox(height: 8),
+              ListTile(
+                leading: const Icon(Icons.upload_file),
+                title: const Text('Export Story'),
+                subtitle: const Text('Share current story as JSON backup'),
+                contentPadding: EdgeInsets.zero,
+                onTap: () async {
+                  final story = ref.read(activeStoryProvider);
+                  if (story == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Select a story from Dashboard first.')),
+                    );
+                    return;
+                  }
+                  try {
+                    final service = ref.read(exportServiceProvider);
+                    final chars = await ref.read(characterRepositoryProvider).getAllForStory(story.id);
+                    final locs = await ref.read(locationRepositoryProvider).getAllForStory(story.id);
+                    final events = await ref.read(plotEventRepositoryProvider).getAllForStory(story.id);
+                    final chapters = await ref.read(chapterRepositoryProvider).getAllForStory(story.id);
+                    final notes = await ref.read(noteRepositoryProvider).getAllForStory(story.id);
+                    final questions = await ref.read(questionRepositoryProvider).getAllForStory(story.id);
+                    final rels = await ref.read(relationshipRepositoryProvider).getAllForStory(story.id);
+                    final bundle = service.buildBundle(
+                      story: story,
+                      characters: chars,
+                      locations: locs,
+                      events: events,
+                      chapters: chapters,
+                      notes: notes,
+                      questions: questions,
+                      relationships: rels,
+                    );
+                    await service.exportToFile(bundle);
+                  } catch (e) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Export failed: $e')),
+                      );
+                    }
+                  }
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.download),
+                title: const Text('Import Story'),
+                subtitle: const Text('Restore from a JSON backup file'),
+                contentPadding: EdgeInsets.zero,
+                onTap: () async {
+                  try {
+                    final service = ref.read(exportServiceProvider);
+                    final bundle = await service.importFromFile();
+                    if (bundle == null) return;
+                    // TODO: deserialize bundle and upsert all entities
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Import parsed. Full restore coming soon.')),
+                      );
+                    }
+                  } catch (e) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Import failed: $e')),
+                      );
+                    }
+                  }
+                },
               ),
             ],
           );

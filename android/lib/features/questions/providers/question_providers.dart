@@ -12,7 +12,7 @@ class QuestionList extends _$QuestionList {
     final storyId = ref.watch(activeStoryProvider)?.id;
     if (storyId == null) return [];
     final repo = ref.read(questionRepositoryProvider);
-    return repo.getAll(storyId);
+    return repo.getAllForStory(storyId);
   }
 
   Future<void> add(String storyId, String text) async {
