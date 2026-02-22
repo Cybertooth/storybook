@@ -20,7 +20,8 @@ class _State extends ConsumerState<ReferenceDrawer> {
     final locations = ref.watch(locationListProvider).valueOrNull ?? [];
     final events = ref.watch(eventListProvider).valueOrNull ?? [];
 
-    final pinnedChars = characters.where((c) => _pinned.contains(c.id)).toList();
+    final pinnedChars =
+        characters.where((c) => _pinned.contains(c.id)).toList();
     final pinnedLocs = locations.where((l) => _pinned.contains(l.id)).toList();
 
     return DraggableScrollableSheet(
@@ -34,7 +35,8 @@ class _State extends ConsumerState<ReferenceDrawer> {
           Center(
             child: Container(
               margin: const EdgeInsets.symmetric(vertical: 8),
-              width: 40, height: 4,
+              width: 40,
+              height: 4,
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.outline,
                 borderRadius: BorderRadius.circular(2),
@@ -42,12 +44,14 @@ class _State extends ConsumerState<ReferenceDrawer> {
             ),
           ),
           if (pinnedChars.isNotEmpty || pinnedLocs.isNotEmpty) ...[
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               child: Row(children: [
-                const Icon(Icons.push_pin, size: 14),
-                const SizedBox(width: 4),
-                const Text('Pinned', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                Icon(Icons.push_pin, size: 14),
+                SizedBox(width: 4),
+                Text('Pinned',
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
               ]),
             ),
             SizedBox(
@@ -57,13 +61,13 @@ class _State extends ConsumerState<ReferenceDrawer> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 children: [
                   ...pinnedChars.map((c) => _PinnedChip(
-                    label: c.name,
-                    onRemove: () => setState(() => _pinned.remove(c.id)),
-                  )),
+                        label: c.name,
+                        onRemove: () => setState(() => _pinned.remove(c.id)),
+                      )),
                   ...pinnedLocs.map((l) => _PinnedChip(
-                    label: l.name,
-                    onRemove: () => setState(() => _pinned.remove(l.id)),
-                  )),
+                        label: l.name,
+                        onRemove: () => setState(() => _pinned.remove(l.id)),
+                      )),
                 ],
               ),
             ),
@@ -82,35 +86,68 @@ class _State extends ConsumerState<ReferenceDrawer> {
                   Expanded(
                     child: TabBarView(children: [
                       // Characters tab
-                      ListView(controller: controller, children: characters.map((c) => ListTile(
-                        leading: CircleAvatar(child: Text(c.name[0])),
-                        title: Text(c.name),
-                        subtitle: c.description.isNotEmpty ? Text(c.description, maxLines: 1) : null,
-                        trailing: IconButton(
-                          icon: Icon(_pinned.contains(c.id) ? Icons.push_pin : Icons.push_pin_outlined, size: 18),
-                          onPressed: () => setState(() {
-                            if (_pinned.contains(c.id)) _pinned.remove(c.id); else _pinned.add(c.id);
-                          }),
-                        ),
-                      )).toList()),
+                      ListView(
+                          controller: controller,
+                          children: characters
+                              .map((c) => ListTile(
+                                    leading:
+                                        CircleAvatar(child: Text(c.name[0])),
+                                    title: Text(c.name),
+                                    subtitle: c.description.isNotEmpty
+                                        ? Text(c.description, maxLines: 1)
+                                        : null,
+                                    trailing: IconButton(
+                                      icon: Icon(
+                                          _pinned.contains(c.id)
+                                              ? Icons.push_pin
+                                              : Icons.push_pin_outlined,
+                                          size: 18),
+                                      onPressed: () => setState(() {
+                                        if (_pinned.contains(c.id)) {
+                                          _pinned.remove(c.id);
+                                        } else {
+                                          _pinned.add(c.id);
+                                        }
+                                      }),
+                                    ),
+                                  ))
+                              .toList()),
                       // Locations tab
-                      ListView(children: locations.map((l) => ListTile(
-                        leading: const Icon(Icons.place),
-                        title: Text(l.name),
-                        subtitle: l.description.isNotEmpty ? Text(l.description, maxLines: 1) : null,
-                        trailing: IconButton(
-                          icon: Icon(_pinned.contains(l.id) ? Icons.push_pin : Icons.push_pin_outlined, size: 18),
-                          onPressed: () => setState(() {
-                            if (_pinned.contains(l.id)) _pinned.remove(l.id); else _pinned.add(l.id);
-                          }),
-                        ),
-                      )).toList()),
+                      ListView(
+                          children: locations
+                              .map((l) => ListTile(
+                                    leading: const Icon(Icons.place),
+                                    title: Text(l.name),
+                                    subtitle: l.description.isNotEmpty
+                                        ? Text(l.description, maxLines: 1)
+                                        : null,
+                                    trailing: IconButton(
+                                      icon: Icon(
+                                          _pinned.contains(l.id)
+                                              ? Icons.push_pin
+                                              : Icons.push_pin_outlined,
+                                          size: 18),
+                                      onPressed: () => setState(() {
+                                        if (_pinned.contains(l.id)) {
+                                          _pinned.remove(l.id);
+                                        } else {
+                                          _pinned.add(l.id);
+                                        }
+                                      }),
+                                    ),
+                                  ))
+                              .toList()),
                       // Events tab
-                      ListView(children: events.map((e) => ListTile(
-                        leading: const Icon(Icons.event),
-                        title: Text(e.title),
-                        subtitle: e.description.isNotEmpty ? Text(e.description, maxLines: 1) : null,
-                      )).toList()),
+                      ListView(
+                          children: events
+                              .map((e) => ListTile(
+                                    leading: const Icon(Icons.event),
+                                    title: Text(e.title),
+                                    subtitle: e.description.isNotEmpty
+                                        ? Text(e.description, maxLines: 1)
+                                        : null,
+                                  ))
+                              .toList()),
                     ]),
                   ),
                 ],

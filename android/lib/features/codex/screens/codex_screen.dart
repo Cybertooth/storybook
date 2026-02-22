@@ -13,7 +13,9 @@ class CodexScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final active = ref.watch(activeStoryProvider);
     if (active == null) {
-      return const Scaffold(body: Center(child: Text('Select a story from the Dashboard first.')));
+      return const Scaffold(
+          body:
+              Center(child: Text('Select a story from the Dashboard first.')));
     }
 
     return DefaultTabController(
@@ -21,9 +23,11 @@ class CodexScreen extends ConsumerWidget {
       child: Scaffold(
         appBar: AppBar(
           title: Text(active.title),
-          bottom: const TabBar(tabs: [Tab(text: 'Characters'), Tab(text: 'Locations')]),
+          bottom: const TabBar(
+              tabs: [Tab(text: 'Characters'), Tab(text: 'Locations')]),
         ),
-        body: const TabBarView(children: [_CharactersTab(), LocationListScreen()]),
+        body: const TabBarView(
+            children: [_CharactersTab(), LocationListScreen()]),
       ),
     );
   }
@@ -46,34 +50,50 @@ class _CharactersTab extends ConsumerWidget {
                 itemCount: list.length,
                 itemBuilder: (ctx, i) => CharacterCard(
                   character: list[i],
-                  onTap: () => Navigator.push(ctx, MaterialPageRoute(
-                    builder: (_) => CharacterDetailScreen(character: list[i]),
-                  )),
-                  onDelete: () => ref.read(characterListProvider.notifier).deleteCharacter(list[i].id),
+                  onTap: () => Navigator.push(
+                      ctx,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            CharacterDetailScreen(character: list[i]),
+                      )),
+                  onDelete: () => ref
+                      .read(characterListProvider.notifier)
+                      .deleteCharacter(list[i].id),
                 ),
               ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => _showCreate(context, ref),
-          child: const Icon(Icons.person_add),
+        floatingActionButton: Padding(
+          padding: const EdgeInsets.only(bottom: 50.0),
+          child: FloatingActionButton(
+            heroTag: 'codex_add',
+            onPressed: () => _showAddDialog(context, ref),
+            child: const Icon(Icons.add),
+          ),
         ),
       ),
     );
   }
 
-  void _showCreate(BuildContext context, WidgetRef ref) {
+  void _showAddDialog(BuildContext context, WidgetRef ref) {
     final ctrl = TextEditingController();
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogCtx) => AlertDialog(
         title: const Text('New Character'),
-        content: TextField(controller: ctrl, autofocus: true, decoration: const InputDecoration(labelText: 'Name')),
+        content: TextField(
+            controller: ctrl,
+            autofocus: true,
+            decoration: const InputDecoration(labelText: 'Name')),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(dialogCtx),
+              child: const Text('Cancel')),
           FilledButton(
             onPressed: () {
               if (ctrl.text.trim().isNotEmpty) {
-                ref.read(characterListProvider.notifier).createCharacter(ctrl.text.trim());
-                Navigator.pop(context);
+                ref
+                    .read(characterListProvider.notifier)
+                    .createCharacter(ctrl.text.trim());
+                Navigator.pop(dialogCtx);
               }
             },
             child: const Text('Create'),

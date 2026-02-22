@@ -123,10 +123,11 @@ class _State extends ConsumerState<CritiqueScreen> {
                         ),
                         value: _selected.contains(e.key),
                         onChanged: (v) => setState(() {
-                          if (v == true)
+                          if (v == true) {
                             _selected.add(e.key);
-                          else
+                          } else {
                             _selected.remove(e.key);
+                          }
                         }),
                         contentPadding: EdgeInsets.zero,
                       )),

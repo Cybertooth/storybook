@@ -35,12 +35,15 @@ class SettingsNotifier extends AsyncNotifier<AppSettings> {
   Future<void> updateSettings(
       {String? geminiKey, String? openAiKey, String? provider}) async {
     final storage = ref.read(secureStorageProvider);
-    if (geminiKey != null)
+    if (geminiKey != null) {
       await storage.write(key: _geminiKey, value: geminiKey);
-    if (openAiKey != null)
+    }
+    if (openAiKey != null) {
       await storage.write(key: _openAiKey, value: openAiKey);
-    if (provider != null)
+    }
+    if (provider != null) {
       await storage.write(key: _providerKey, value: provider);
+    }
     ref.invalidateSelf();
   }
 }

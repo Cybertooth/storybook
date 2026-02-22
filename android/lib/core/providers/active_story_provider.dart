@@ -1,6 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../domain/models/story.dart';
-import '../../domain/repositories/story_repository.dart';
 import 'repository_providers.dart';
 
 part 'active_story_provider.g.dart';

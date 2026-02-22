@@ -73,8 +73,9 @@ class PacingGraphScreen extends ConsumerWidget {
                         showTitles: true,
                         getTitlesWidget: (v, _) {
                           final i = v.toInt();
-                          if (i < 0 || i >= events.length)
+                          if (i < 0 || i >= events.length) {
                             return const Text('');
+                          }
                           return Padding(
                             padding: const EdgeInsets.only(top: 4),
                             child: Text(
@@ -95,7 +96,7 @@ class PacingGraphScreen extends ConsumerWidget {
                 )),
               ),
               const SizedBox(height: 16),
-              Wrap(
+              const Wrap(
                 spacing: 16,
                 children: [
                   _Legend(color: Colors.green, label: 'High tension (+)'),

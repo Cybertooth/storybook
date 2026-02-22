@@ -7,10 +7,10 @@ class AppTheme {
   static ThemeData get dark => ThemeData(
         useMaterial3: true,
         brightness: Brightness.dark,
-        colorScheme: ColorScheme.dark(
+        colorScheme: const ColorScheme.dark(
           primary: _primary,
           surface: _darkSurface,
-          surfaceContainer: const Color(0xFF2A2A3E),
+          surfaceContainer: Color(0xFF2A2A3E),
         ),
         cardTheme: const CardThemeData(
           elevation: 0,

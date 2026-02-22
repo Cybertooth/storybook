@@ -28,17 +28,22 @@ class _State extends ConsumerState<CharacterDetailScreen> {
 
   @override
   void dispose() {
-    _name.dispose(); _desc.dispose(); _arcLie.dispose(); _arcTruth.dispose(); _arcGhost.dispose();
+    _name.dispose();
+    _desc.dispose();
+    _arcLie.dispose();
+    _arcTruth.dispose();
+    _arcGhost.dispose();
     super.dispose();
   }
 
   void _save() {
     ref.read(characterListProvider.notifier).updateCharacter(_char.copyWith(
-      name: _name.text, description: _desc.text,
-      arcLie: _arcLie.text.isEmpty ? null : _arcLie.text,
-      arcTruth: _arcTruth.text.isEmpty ? null : _arcTruth.text,
-      arcGhost: _arcGhost.text.isEmpty ? null : _arcGhost.text,
-    ));
+          name: _name.text,
+          description: _desc.text,
+          arcLie: _arcLie.text.isEmpty ? null : _arcLie.text,
+          arcTruth: _arcTruth.text.isEmpty ? null : _arcTruth.text,
+          arcGhost: _arcGhost.text.isEmpty ? null : _arcGhost.text,
+        ));
     Navigator.pop(context);
   }
 
@@ -52,10 +57,12 @@ class _State extends ConsumerState<CharacterDetailScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          TextField(controller: _name, decoration: const InputDecoration(labelText: 'Name')),
+          TextField(
+              controller: _name,
+              decoration: const InputDecoration(labelText: 'Name')),
           const SizedBox(height: 12),
           DropdownButtonFormField<CharacterRole>(
-            value: _char.role,
+            initialValue: _char.role,
             items: CharacterRole.values
                 .map((r) => DropdownMenuItem(value: r, child: Text(r.name)))
                 .toList(),
@@ -63,16 +70,28 @@ class _State extends ConsumerState<CharacterDetailScreen> {
             decoration: const InputDecoration(labelText: 'Role'),
           ),
           const SizedBox(height: 12),
-          TextField(controller: _desc, decoration: const InputDecoration(labelText: 'Description'), maxLines: 4),
+          TextField(
+              controller: _desc,
+              decoration: const InputDecoration(labelText: 'Description'),
+              maxLines: 4),
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 16),
-            child: Text('Character Arc', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            child: Text('Character Arc',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           ),
-          TextField(controller: _arcLie, decoration: const InputDecoration(labelText: 'The Lie (flaw)')),
+          TextField(
+              controller: _arcLie,
+              decoration: const InputDecoration(labelText: 'The Lie (flaw)')),
           const SizedBox(height: 12),
-          TextField(controller: _arcTruth, decoration: const InputDecoration(labelText: 'The Truth (growth)')),
+          TextField(
+              controller: _arcTruth,
+              decoration:
+                  const InputDecoration(labelText: 'The Truth (growth)')),
           const SizedBox(height: 12),
-          TextField(controller: _arcGhost, decoration: const InputDecoration(labelText: 'The Ghost (backstory wound)')),
+          TextField(
+              controller: _arcGhost,
+              decoration: const InputDecoration(
+                  labelText: 'The Ghost (backstory wound)')),
         ],
       ),
     );

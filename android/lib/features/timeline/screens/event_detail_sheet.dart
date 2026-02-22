@@ -26,13 +26,19 @@ class _State extends ConsumerState<EventDetailSheet> {
   }
 
   @override
-  void dispose() { _title.dispose(); _desc.dispose(); super.dispose(); }
+  void dispose() {
+    _title.dispose();
+    _desc.dispose();
+    super.dispose();
+  }
 
   void _save() {
     ref.read(eventListProvider.notifier).updateEvent(widget.event.copyWith(
-      title: _title.text, description: _desc.text,
-      status: _status, emotionalValue: _emotionalValue,
-    ));
+          title: _title.text,
+          description: _desc.text,
+          status: _status,
+          emotionalValue: _emotionalValue,
+        ));
     Navigator.pop(context);
   }
 
@@ -40,7 +46,9 @@ class _State extends ConsumerState<EventDetailSheet> {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(
-        left: 16, right: 16, top: 16,
+        left: 16,
+        right: 16,
+        top: 16,
         bottom: MediaQuery.of(context).viewInsets.bottom + 16,
       ),
       child: Column(
@@ -49,36 +57,52 @@ class _State extends ConsumerState<EventDetailSheet> {
         children: [
           Row(
             children: [
-              const Text('Edit Event', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+              const Text('Edit Event',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
               const Spacer(),
-              IconButton(icon: const Icon(Icons.delete_outline, color: Colors.red), onPressed: () {
-                ref.read(eventListProvider.notifier).deleteEvent(widget.event.id);
-                Navigator.pop(context);
-              }),
+              IconButton(
+                  icon: const Icon(Icons.delete_outline, color: Colors.red),
+                  onPressed: () {
+                    ref
+                        .read(eventListProvider.notifier)
+                        .deleteEvent(widget.event.id);
+                    Navigator.pop(context);
+                  }),
               FilledButton(onPressed: _save, child: const Text('Save')),
             ],
           ),
           const SizedBox(height: 12),
-          TextField(controller: _title, decoration: const InputDecoration(labelText: 'Title')),
+          TextField(
+              controller: _title,
+              decoration: const InputDecoration(labelText: 'Title')),
           const SizedBox(height: 8),
-          TextField(controller: _desc, decoration: const InputDecoration(labelText: 'Description'), maxLines: 3),
+          TextField(
+              controller: _desc,
+              decoration: const InputDecoration(labelText: 'Description'),
+              maxLines: 3),
           const SizedBox(height: 8),
           DropdownButtonFormField<EventStatus>(
-            value: _status,
-            items: EventStatus.values.map((s) => DropdownMenuItem(value: s, child: Text(s.name))).toList(),
+            initialValue: _status,
+            items: EventStatus.values
+                .map((s) => DropdownMenuItem(value: s, child: Text(s.name)))
+                .toList(),
             onChanged: (s) => setState(() => _status = s!),
             decoration: const InputDecoration(labelText: 'Status'),
           ),
           const SizedBox(height: 8),
           Row(children: [
             const Text('Emotional Value: '),
-            Expanded(child: Slider(
+            Expanded(
+                child: Slider(
               value: _emotionalValue.toDouble(),
-              min: -5, max: 5, divisions: 10,
+              min: -5,
+              max: 5,
+              divisions: 10,
               label: '$_emotionalValue',
               onChanged: (v) => setState(() => _emotionalValue = v.round()),
             )),
-            Text('$_emotionalValue', style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text('$_emotionalValue',
+                style: const TextStyle(fontWeight: FontWeight.bold)),
           ]),
         ],
       ),

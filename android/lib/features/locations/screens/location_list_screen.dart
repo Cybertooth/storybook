@@ -22,15 +22,23 @@ class LocationListScreen extends ConsumerWidget {
                   margin: const EdgeInsets.only(bottom: 8),
                   child: ListTile(
                     leading: const Icon(Icons.place),
-                    title: Text(list[i].name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: list[i].description.isNotEmpty ? Text(list[i].description, maxLines: 1) : null,
+                    title: Text(list[i].name,
+                        style: const TextStyle(fontWeight: FontWeight.bold)),
+                    subtitle: list[i].description.isNotEmpty
+                        ? Text(list[i].description, maxLines: 1)
+                        : null,
                     trailing: IconButton(
                       icon: const Icon(Icons.delete_outline),
-                      onPressed: () => ref.read(locationListProvider.notifier).deleteLocation(list[i].id),
+                      onPressed: () => ref
+                          .read(locationListProvider.notifier)
+                          .deleteLocation(list[i].id),
                     ),
-                    onTap: () => Navigator.push(ctx, MaterialPageRoute(
-                      builder: (_) => LocationDetailScreen(location: list[i]),
-                    )),
+                    onTap: () => Navigator.push(
+                        ctx,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              LocationDetailScreen(location: list[i]),
+                        )),
                   ),
                 ),
               ),
@@ -46,16 +54,23 @@ class LocationListScreen extends ConsumerWidget {
     final ctrl = TextEditingController();
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogCtx) => AlertDialog(
         title: const Text('New Location'),
-        content: TextField(controller: ctrl, autofocus: true, decoration: const InputDecoration(labelText: 'Name')),
+        content: TextField(
+            controller: ctrl,
+            autofocus: true,
+            decoration: const InputDecoration(labelText: 'Name')),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(dialogCtx),
+              child: const Text('Cancel')),
           FilledButton(
             onPressed: () {
               if (ctrl.text.trim().isNotEmpty) {
-                ref.read(locationListProvider.notifier).createLocation(ctrl.text.trim());
-                Navigator.pop(context);
+                ref
+                    .read(locationListProvider.notifier)
+                    .createLocation(ctrl.text.trim());
+                Navigator.pop(dialogCtx);
               }
             },
             child: const Text('Create'),

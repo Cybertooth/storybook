@@ -19,7 +19,10 @@ class _DraftScreenState extends ConsumerState<DraftScreen> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
-  void dispose() { _controller.dispose(); super.dispose(); }
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,39 +38,44 @@ class _DraftScreenState extends ConsumerState<DraftScreen> {
     }
 
     if (active == null) {
-      return const Scaffold(body: Center(child: Text('Select a story from the Dashboard first.')));
+      return const Scaffold(
+          body:
+              Center(child: Text('Select a story from the Dashboard first.')));
     }
 
     return Scaffold(
       key: _scaffoldKey,
-      appBar: _focusMode ? null : AppBar(
-        title: Text(activeChapter?.title ?? 'Draft', overflow: TextOverflow.ellipsis),
-        leading: IconButton(
-          icon: const Icon(Icons.menu),
-          onPressed: () => _scaffoldKey.currentState?.openDrawer(),
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(_previewMode ? Icons.edit : Icons.preview),
-            tooltip: _previewMode ? 'Edit' : 'Preview',
-            onPressed: () => setState(() => _previewMode = !_previewMode),
-          ),
-          IconButton(
-            icon: const Icon(Icons.menu_book),
-            tooltip: 'Reference',
-            onPressed: () => showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              builder: (_) => const ReferenceDrawer(),
+      appBar: _focusMode
+          ? null
+          : AppBar(
+              title: Text(activeChapter?.title ?? 'Draft',
+                  overflow: TextOverflow.ellipsis),
+              leading: IconButton(
+                icon: const Icon(Icons.menu),
+                onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+              ),
+              actions: [
+                IconButton(
+                  icon: Icon(_previewMode ? Icons.edit : Icons.preview),
+                  tooltip: _previewMode ? 'Edit' : 'Preview',
+                  onPressed: () => setState(() => _previewMode = !_previewMode),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.menu_book),
+                  tooltip: 'Reference',
+                  onPressed: () => showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (_) => const ReferenceDrawer(),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.fullscreen),
+                  tooltip: 'Focus Mode',
+                  onPressed: () => setState(() => _focusMode = true),
+                ),
+              ],
             ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.fullscreen),
-            tooltip: 'Focus Mode',
-            onPressed: () => setState(() => _focusMode = true),
-          ),
-        ],
-      ),
       drawer: _buildChapterDrawer(context, chaptersAsync),
       body: _buildBody(context, activeChapter),
       floatingActionButton: _focusMode
@@ -75,7 +83,18 @@ class _DraftScreenState extends ConsumerState<DraftScreen> {
               onPressed: () => setState(() => _focusMode = false),
               child: const Icon(Icons.fullscreen_exit),
             )
-          : null,
+          : active == null
+              ? null
+              : Padding(
+                  padding: const EdgeInsets.only(bottom: 50.0),
+                  child: FloatingActionButton.small(
+                    onPressed: () => ref
+                        .read(chapterListProvider.notifier)
+                        .createChapter(
+                            'New Chapter'), // Assuming a default title for new chapter
+                    child: const Icon(Icons.add),
+                  ),
+                ),
     );
   }
 
@@ -117,7 +136,9 @@ class _DraftScreenState extends ConsumerState<DraftScreen> {
         if (chapter != null) {
           ref.read(chapterListProvider.notifier).saveContent(chapter, content);
           // Update active chapter state to keep it in sync
-          ref.read(activeChapterProvider.notifier).set(chapter.copyWith(content: content));
+          ref
+              .read(activeChapterProvider.notifier)
+              .set(chapter.copyWith(content: content));
         }
       },
     );
@@ -133,7 +154,9 @@ class _DraftScreenState extends ConsumerState<DraftScreen> {
             children: [
               const Padding(
                 padding: EdgeInsets.all(16),
-                child: Text('Chapters', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                child: Text('Chapters',
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
               ),
               Expanded(
                 child: ListView(
@@ -145,7 +168,9 @@ class _DraftScreenState extends ConsumerState<DraftScreen> {
                       trailing: IconButton(
                         icon: const Icon(Icons.delete_outline, size: 18),
                         onPressed: () {
-                          ref.read(chapterListProvider.notifier).deleteChapter(c.id);
+                          ref
+                              .read(chapterListProvider.notifier)
+                              .deleteChapter(c.id);
                           if (ref.read(activeChapterProvider)?.id == c.id) {
                             ref.read(activeChapterProvider.notifier).clear();
                           }
@@ -178,17 +203,24 @@ class _DraftScreenState extends ConsumerState<DraftScreen> {
     final ctrl = TextEditingController();
     await showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogCtx) => AlertDialog(
         title: const Text('New Chapter'),
-        content: TextField(controller: ctrl, autofocus: true, decoration: const InputDecoration(labelText: 'Title')),
+        content: TextField(
+            controller: ctrl,
+            autofocus: true,
+            decoration: const InputDecoration(labelText: 'Title')),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(dialogCtx),
+              child: const Text('Cancel')),
           FilledButton(
             onPressed: () async {
               if (ctrl.text.trim().isNotEmpty) {
-                final chapter = await ref.read(chapterListProvider.notifier).createChapter(ctrl.text.trim());
+                final chapter = await ref
+                    .read(chapterListProvider.notifier)
+                    .createChapter(ctrl.text.trim());
                 ref.read(activeChapterProvider.notifier).set(chapter);
-                if (mounted) Navigator.pop(context);
+                if (mounted) Navigator.pop(dialogCtx);
               }
             },
             child: const Text('Create'),

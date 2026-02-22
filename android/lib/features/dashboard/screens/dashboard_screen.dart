@@ -24,14 +24,18 @@ class DashboardScreen extends ConsumerWidget {
                 itemBuilder: (ctx, i) => StoryCard(
                   story: list[i],
                   isActive: list[i].id == active?.id,
-                  onTap: () => ref.read(activeStoryProvider.notifier).set(list[i]),
+                  onTap: () =>
+                      ref.read(activeStoryProvider.notifier).set(list[i]),
                   onDelete: () => _confirmDelete(ctx, ref, list[i].id),
                 ),
               ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showCreate(context, ref),
-        child: const Icon(Icons.add),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 50.0),
+        child: FloatingActionButton(
+          onPressed: () => _showCreate(context, ref),
+          child: const Icon(Icons.add),
+        ),
       ),
     );
   }
@@ -40,16 +44,23 @@ class DashboardScreen extends ConsumerWidget {
     final ctrl = TextEditingController();
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogCtx) => AlertDialog(
         title: const Text('New Story'),
-        content: TextField(controller: ctrl, autofocus: true, decoration: const InputDecoration(labelText: 'Title')),
+        content: TextField(
+            controller: ctrl,
+            autofocus: true,
+            decoration: const InputDecoration(labelText: 'Title')),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(dialogCtx),
+              child: const Text('Cancel')),
           FilledButton(
             onPressed: () {
               if (ctrl.text.trim().isNotEmpty) {
-                ref.read(storyListProvider.notifier).createStory(ctrl.text.trim());
-                Navigator.pop(context);
+                ref
+                    .read(storyListProvider.notifier)
+                    .createStory(ctrl.text.trim());
+                Navigator.pop(dialogCtx);
               }
             },
             child: const Text('Create'),
@@ -62,16 +73,19 @@ class DashboardScreen extends ConsumerWidget {
   void _confirmDelete(BuildContext context, WidgetRef ref, String id) {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogCtx) => AlertDialog(
         title: const Text('Delete story?'),
-        content: const Text('This will delete all characters, locations, events, and chapters.'),
+        content: const Text(
+            'This will delete all characters, locations, events, and chapters.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(dialogCtx),
+              child: const Text('Cancel')),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () {
               ref.read(storyListProvider.notifier).deleteStory(id);
-              Navigator.pop(context);
+              Navigator.pop(dialogCtx);
             },
             child: const Text('Delete'),
           ),

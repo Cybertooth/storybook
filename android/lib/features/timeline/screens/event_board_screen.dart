@@ -55,7 +55,7 @@ class EventBoardScreen extends ConsumerWidget {
     final ctrl = TextEditingController();
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogCtx) => AlertDialog(
         title: const Text('New Plot Thread'),
         content: TextField(
             controller: ctrl,
@@ -63,7 +63,7 @@ class EventBoardScreen extends ConsumerWidget {
             decoration: const InputDecoration(labelText: 'Thread name')),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.pop(dialogCtx),
               child: const Text('Cancel')),
           FilledButton(
             onPressed: () {
@@ -72,7 +72,7 @@ class EventBoardScreen extends ConsumerWidget {
                       title: 'First event',
                       plotThread: ctrl.text.trim(),
                     );
-                Navigator.pop(context);
+                Navigator.pop(dialogCtx);
               }
             },
             child: const Text('Create'),
@@ -155,7 +155,7 @@ class _AddEventButton extends ConsumerWidget {
     final ctrl = TextEditingController();
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogCtx) => AlertDialog(
         title: Text('Add event to "$plotThread"'),
         content: TextField(
             controller: ctrl,
@@ -163,14 +163,14 @@ class _AddEventButton extends ConsumerWidget {
             decoration: const InputDecoration(labelText: 'Event title')),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.pop(dialogCtx),
               child: const Text('Cancel')),
           FilledButton(
             onPressed: () {
               if (ctrl.text.trim().isNotEmpty) {
                 ref.read(eventListProvider.notifier).createEvent(
                     title: ctrl.text.trim(), plotThread: plotThread);
-                Navigator.pop(context);
+                Navigator.pop(dialogCtx);
               }
             },
             child: const Text('Add'),
