@@ -18,7 +18,12 @@ class UndoStack extends Notifier<List<UndoCommand>> {
     if (state.isEmpty) return;
     final command = state.last;
     state = state.sublist(0, state.length - 1);
-    await command();
+    try {
+      await command();
+    } catch (_) {
+      // Command may fail if the originating provider was disposed;
+      // the database write still succeeded so data is not lost.
+    }
   }
 
   bool get canUndo => state.isNotEmpty;

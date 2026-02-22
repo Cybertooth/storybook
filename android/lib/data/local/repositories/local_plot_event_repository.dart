@@ -45,7 +45,7 @@ class LocalPlotEventRepository implements PlotEventRepository {
       plotThread: Value(event.plotThread),
       emotionalValue: Value(event.emotionalValue),
     ));
-    return (await getById(event.id))!;
+    return event;
   }
 
   @override

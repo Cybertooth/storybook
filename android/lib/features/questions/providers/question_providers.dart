@@ -1,4 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:uuid/uuid.dart';
 import '../../../core/providers/active_story_provider.dart';
 import '../../../core/providers/repository_providers.dart';
 import '../../../core/providers/undo_provider.dart';
@@ -6,7 +7,7 @@ import '../../../domain/models/unresolved_question.dart';
 
 part 'question_providers.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class QuestionList extends _$QuestionList {
   @override
   Future<List<UnresolvedQuestion>> build() async {
@@ -19,7 +20,7 @@ class QuestionList extends _$QuestionList {
   Future<void> add(String storyId, String text) async {
     final repo = ref.read(questionRepositoryProvider);
     await repo.create(UnresolvedQuestion(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      id: const Uuid().v4(),
       storyId: storyId,
       question: text,
       isResolved: false,

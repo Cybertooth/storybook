@@ -8,7 +8,7 @@ import '../../../domain/models/plot_event.dart';
 
 part 'timeline_providers.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class EventList extends _$EventList {
   @override
   Future<List<PlotEvent>> build() async {

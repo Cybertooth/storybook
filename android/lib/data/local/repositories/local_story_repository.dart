@@ -32,7 +32,7 @@ class LocalStoryRepository implements StoryRepository {
     await _db.into(_db.storiesTable).insert(StoriesTableCompanion.insert(
       id: id, title: title, createdAt: now, updatedAt: now,
     ));
-    return (await getById(id))!;
+    return Story(id: id, title: title, createdAt: now, updatedAt: now);
   }
 
   @override

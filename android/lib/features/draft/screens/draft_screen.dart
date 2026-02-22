@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/providers/active_story_provider.dart';
+import '../../../domain/models/chapter.dart';
 import '../providers/draft_providers.dart';
 import '../widgets/reference_drawer.dart';
 
@@ -98,7 +99,7 @@ class _DraftScreenState extends ConsumerState<DraftScreen> {
     );
   }
 
-  Widget _buildBody(BuildContext context, dynamic activeChapter) {
+  Widget _buildBody(BuildContext context, Chapter? activeChapter) {
     if (activeChapter == null) {
       return Center(
         child: Column(
@@ -146,8 +147,16 @@ class _DraftScreenState extends ConsumerState<DraftScreen> {
 
   Widget? _buildChapterDrawer(BuildContext context, AsyncValue chaptersAsync) {
     return chaptersAsync.when(
-      loading: () => null,
-      error: (_, __) => null,
+      loading: () => Drawer(
+        child: const SafeArea(
+          child: Center(child: CircularProgressIndicator()),
+        ),
+      ),
+      error: (e, _) => Drawer(
+        child: SafeArea(
+          child: Center(child: Text('Error: $e')),
+        ),
+      ),
       data: (chapters) => Drawer(
         child: SafeArea(
           child: Column(
@@ -201,32 +210,36 @@ class _DraftScreenState extends ConsumerState<DraftScreen> {
 
   Future<void> _createChapter(BuildContext context) async {
     final ctrl = TextEditingController();
-    await showDialog(
-      context: context,
-      builder: (dialogCtx) => AlertDialog(
-        title: const Text('New Chapter'),
-        content: TextField(
-            controller: ctrl,
-            autofocus: true,
-            decoration: const InputDecoration(labelText: 'Title')),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(dialogCtx),
-              child: const Text('Cancel')),
-          FilledButton(
-            onPressed: () async {
-              if (ctrl.text.trim().isNotEmpty) {
-                final chapter = await ref
-                    .read(chapterListProvider.notifier)
-                    .createChapter(ctrl.text.trim());
-                ref.read(activeChapterProvider.notifier).set(chapter);
-                if (mounted) Navigator.pop(dialogCtx);
-              }
-            },
-            child: const Text('Create'),
-          ),
-        ],
-      ),
-    );
+    try {
+      await showDialog(
+        context: context,
+        builder: (dialogCtx) => AlertDialog(
+          title: const Text('New Chapter'),
+          content: TextField(
+              controller: ctrl,
+              autofocus: true,
+              decoration: const InputDecoration(labelText: 'Title')),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.pop(dialogCtx),
+                child: const Text('Cancel')),
+            FilledButton(
+              onPressed: () async {
+                if (ctrl.text.trim().isNotEmpty) {
+                  final chapter = await ref
+                      .read(chapterListProvider.notifier)
+                      .createChapter(ctrl.text.trim());
+                  ref.read(activeChapterProvider.notifier).set(chapter);
+                  if (mounted) Navigator.pop(dialogCtx);
+                }
+              },
+              child: const Text('Create'),
+            ),
+          ],
+        ),
+      );
+    } finally {
+      ctrl.dispose();
+    }
   }
 }

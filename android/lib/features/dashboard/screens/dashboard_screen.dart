@@ -40,34 +40,38 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  void _showCreate(BuildContext context, WidgetRef ref) {
+  Future<void> _showCreate(BuildContext context, WidgetRef ref) async {
     final ctrl = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (dialogCtx) => AlertDialog(
-        title: const Text('New Story'),
-        content: TextField(
-            controller: ctrl,
-            autofocus: true,
-            decoration: const InputDecoration(labelText: 'Title')),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(dialogCtx),
-              child: const Text('Cancel')),
-          FilledButton(
-            onPressed: () {
-              if (ctrl.text.trim().isNotEmpty) {
-                ref
-                    .read(storyListProvider.notifier)
-                    .createStory(ctrl.text.trim());
-                Navigator.pop(dialogCtx);
-              }
-            },
-            child: const Text('Create'),
-          ),
-        ],
-      ),
-    );
+    try {
+      await showDialog(
+        context: context,
+        builder: (dialogCtx) => AlertDialog(
+          title: const Text('New Story'),
+          content: TextField(
+              controller: ctrl,
+              autofocus: true,
+              decoration: const InputDecoration(labelText: 'Title')),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.pop(dialogCtx),
+                child: const Text('Cancel')),
+            FilledButton(
+              onPressed: () {
+                if (ctrl.text.trim().isNotEmpty) {
+                  ref
+                      .read(storyListProvider.notifier)
+                      .createStory(ctrl.text.trim());
+                  Navigator.pop(dialogCtx);
+                }
+              },
+              child: const Text('Create'),
+            ),
+          ],
+        ),
+      );
+    } finally {
+      ctrl.dispose();
+    }
   }
 
   void _confirmDelete(BuildContext context, WidgetRef ref, String id) {

@@ -4,7 +4,7 @@ import 'repository_providers.dart';
 
 part 'active_story_provider.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class StoryList extends _$StoryList {
   @override
   Future<List<Story>> build() async {
@@ -25,7 +25,7 @@ class StoryList extends _$StoryList {
   }
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 class ActiveStory extends _$ActiveStory {
   @override
   Story? build() => null;

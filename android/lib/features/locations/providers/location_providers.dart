@@ -7,7 +7,7 @@ import '../../../domain/models/location.dart';
 
 part 'location_providers.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class LocationList extends _$LocationList {
   @override
   Future<List<Location>> build() async {

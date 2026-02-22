@@ -27,7 +27,7 @@ String _$eventListHash() => r'433f621492b6d8ad991121fa61091717239cfbbe';
 /// See also [EventList].
 @ProviderFor(EventList)
 final eventListProvider =
-    AutoDisposeAsyncNotifierProvider<EventList, List<PlotEvent>>.internal(
+    AsyncNotifierProvider<EventList, List<PlotEvent>>.internal(
   EventList.new,
   name: r'eventListProvider',
   debugGetCreateSourceHash:
@@ -36,6 +36,6 @@ final eventListProvider =
   allTransitiveDependencies: null,
 );
 
-typedef _$EventList = AutoDisposeAsyncNotifier<List<PlotEvent>>;
+typedef _$EventList = AsyncNotifier<List<PlotEvent>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

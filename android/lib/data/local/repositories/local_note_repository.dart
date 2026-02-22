@@ -30,7 +30,7 @@ class LocalNoteRepository implements NoteRepository {
       id: note.id, storyId: note.storyId, content: note.content,
       createdAt: note.createdAt,
     ));
-    return (await getById(note.id))!;
+    return note;
   }
 
   @override

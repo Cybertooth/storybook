@@ -58,7 +58,9 @@ class _State extends ConsumerState<TropesScreen> {
               padding: const EdgeInsets.all(16),
               children: [
                 FilledButton.icon(
-                  onPressed: (hasKey && !_loading) ? _analyze : null,
+                  onPressed: (hasKey && !_loading && ref.watch(activeStoryProvider) != null)
+                      ? _analyze
+                      : null,
                   icon: _loading
                       ? const SizedBox(
                           width: 16,

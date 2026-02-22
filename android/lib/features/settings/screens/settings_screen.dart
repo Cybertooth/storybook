@@ -18,6 +18,7 @@ class _State extends ConsumerState<SettingsScreen> {
   bool _showGemini = false;
   bool _showOpenAi = false;
   bool _saving = false;
+  bool _populated = false;
 
   @override
   void dispose() {
@@ -27,8 +28,16 @@ class _State extends ConsumerState<SettingsScreen> {
   }
 
   void _populate(AppSettings s) {
-    if (_geminiCtrl.text.isEmpty) _geminiCtrl.text = s.geminiApiKey;
-    if (_openAiCtrl.text.isEmpty) _openAiCtrl.text = s.openAiApiKey;
+    if (!_populated) {
+      _populated = true;
+      // Defer to post-frame to avoid mutating controller state during build.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _geminiCtrl.text = s.geminiApiKey;
+          _openAiCtrl.text = s.openAiApiKey;
+        }
+      });
+    }
   }
 
   Future<void> _saveKeys() async {
@@ -76,17 +85,37 @@ class _State extends ConsumerState<SettingsScreen> {
                 title: const Text('Gemini (Google)'),
                 value: 'gemini',
                 groupValue: settings.aiProvider,
-                onChanged: (v) => ref
-                    .read(settingsProvider.notifier)
-                    .updateSettings(provider: v),
+                onChanged: (v) async {
+                  try {
+                    await ref
+                        .read(settingsProvider.notifier)
+                        .updateSettings(provider: v);
+                  } catch (e) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Failed to save provider: $e')),
+                      );
+                    }
+                  }
+                },
               ),
               RadioListTile<String>(
                 title: const Text('OpenAI'),
                 value: 'openai',
                 groupValue: settings.aiProvider,
-                onChanged: (v) => ref
-                    .read(settingsProvider.notifier)
-                    .updateSettings(provider: v),
+                onChanged: (v) async {
+                  try {
+                    await ref
+                        .read(settingsProvider.notifier)
+                        .updateSettings(provider: v);
+                  } catch (e) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Failed to save provider: $e')),
+                      );
+                    }
+                  }
+                },
               ),
               const Divider(height: 24),
 

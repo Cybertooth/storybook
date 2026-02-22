@@ -73,33 +73,37 @@ class _CharactersTab extends ConsumerWidget {
     );
   }
 
-  void _showAddDialog(BuildContext context, WidgetRef ref) {
+  Future<void> _showAddDialog(BuildContext context, WidgetRef ref) async {
     final ctrl = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (dialogCtx) => AlertDialog(
-        title: const Text('New Character'),
-        content: TextField(
-            controller: ctrl,
-            autofocus: true,
-            decoration: const InputDecoration(labelText: 'Name')),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(dialogCtx),
-              child: const Text('Cancel')),
-          FilledButton(
-            onPressed: () {
-              if (ctrl.text.trim().isNotEmpty) {
-                ref
-                    .read(characterListProvider.notifier)
-                    .createCharacter(ctrl.text.trim());
-                Navigator.pop(dialogCtx);
-              }
-            },
-            child: const Text('Create'),
-          ),
-        ],
-      ),
-    );
+    try {
+      await showDialog(
+        context: context,
+        builder: (dialogCtx) => AlertDialog(
+          title: const Text('New Character'),
+          content: TextField(
+              controller: ctrl,
+              autofocus: true,
+              decoration: const InputDecoration(labelText: 'Name')),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.pop(dialogCtx),
+                child: const Text('Cancel')),
+            FilledButton(
+              onPressed: () {
+                if (ctrl.text.trim().isNotEmpty) {
+                  ref
+                      .read(characterListProvider.notifier)
+                      .createCharacter(ctrl.text.trim());
+                  Navigator.pop(dialogCtx);
+                }
+              },
+              child: const Text('Create'),
+            ),
+          ],
+        ),
+      );
+    } finally {
+      ctrl.dispose();
+    }
   }
 }

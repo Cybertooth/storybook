@@ -7,7 +7,7 @@ import '../../../domain/models/character.dart';
 
 part 'character_providers.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class CharacterList extends _$CharacterList {
   @override
   Future<List<Character>> build() async {

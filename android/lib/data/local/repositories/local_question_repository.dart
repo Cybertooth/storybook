@@ -32,7 +32,7 @@ class LocalQuestionRepository implements QuestionRepository {
       details: Value(question.details), isResolved: Value(question.isResolved),
       answer: Value(question.answer), createdAt: question.createdAt,
     ));
-    return (await getById(question.id))!;
+    return question;
   }
 
   @override

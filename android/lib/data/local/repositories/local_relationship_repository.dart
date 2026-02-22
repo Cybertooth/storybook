@@ -32,7 +32,7 @@ class LocalRelationshipRepository implements RelationshipRepository {
       sourceId: relationship.sourceId, targetId: relationship.targetId,
       type: relationship.type, description: Value(relationship.description),
     ));
-    return (await getById(relationship.id))!;
+    return relationship;
   }
 
   @override

@@ -62,7 +62,7 @@ class _State extends ConsumerState<CharacterDetailScreen> {
               decoration: const InputDecoration(labelText: 'Name')),
           const SizedBox(height: 12),
           DropdownButtonFormField<CharacterRole>(
-            initialValue: _char.role,
+            value: _char.role,
             items: CharacterRole.values
                 .map((r) => DropdownMenuItem(value: r, child: Text(r.name)))
                 .toList(),

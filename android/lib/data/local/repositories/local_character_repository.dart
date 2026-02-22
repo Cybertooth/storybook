@@ -42,7 +42,7 @@ class LocalCharacterRepository implements CharacterRepository {
       arcLie: Value(character.arcLie), arcTruth: Value(character.arcTruth),
       arcGhost: Value(character.arcGhost), avatarUrl: Value(character.avatarUrl),
     ));
-    return (await getById(character.id))!;
+    return character;
   }
 
   @override

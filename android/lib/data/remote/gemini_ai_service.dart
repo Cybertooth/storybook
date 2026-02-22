@@ -25,12 +25,23 @@ class GeminiAiService implements AiService {
         'generationConfig': {'temperature': 0.8, 'maxOutputTokens': 2048},
       },
     );
-    return response.data['candidates'][0]['content']['parts'][0]['text'] as String;
+    final data = response.data;
+    final candidates = data?['candidates'] as List<dynamic>?;
+    if (candidates == null || candidates.isEmpty) {
+      throw Exception(
+          'AI returned no response. This may be due to a safety filter or quota limit.');
+    }
+    return candidates[0]['content']['parts'][0]['text'] as String;
   }
 
   List<dynamic> _parseJsonArray(String raw) {
-    final cleaned = raw.replaceAll(RegExp(r'```json\s*|```\s*'), '').trim();
-    return jsonDecode(cleaned) as List<dynamic>;
+    // Strip markdown code fences (```json ... ``` or ``` ... ```)
+    final cleaned =
+        raw.replaceAll(RegExp(r'```(?:json)?\s*'), '').replaceAll('```', '').trim();
+    final decoded = jsonDecode(cleaned);
+    if (decoded is List) return decoded;
+    throw FormatException(
+        'Expected a JSON array from AI but received ${decoded.runtimeType}');
   }
 
   @override

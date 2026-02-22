@@ -38,7 +38,7 @@ class LocalLocationRepository implements LocationRepository {
       sensoryTouch: Value(location.sensoryTouch),
       sensoryTaste: Value(location.sensoryTaste),
     ));
-    return (await getById(location.id))!;
+    return location;
   }
 
   @override

@@ -35,7 +35,7 @@ class LocalChapterRepository implements ChapterRepository {
       content: Value(chapter.content), order: Value(chapter.order),
       status: Value(chapter.status.name),
     ));
-    return (await getById(chapter.id))!;
+    return chapter;
   }
 
   @override

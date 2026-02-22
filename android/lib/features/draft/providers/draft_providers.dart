@@ -6,7 +6,7 @@ import '../../../domain/models/chapter.dart';
 
 part 'draft_providers.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class ChapterList extends _$ChapterList {
   @override
   Future<List<Chapter>> build() async {
@@ -18,7 +18,8 @@ class ChapterList extends _$ChapterList {
   }
 
   Future<Chapter> createChapter(String title) async {
-    final story = ref.read(activeStoryProvider)!;
+    final story = ref.read(activeStoryProvider);
+    if (story == null) throw StateError('No active story selected');
     final existing = await ref.read(chapterRepositoryProvider).getAllForStory(story.id);
     final chapter = Chapter(
       id: const Uuid().v4(),
@@ -43,7 +44,7 @@ class ChapterList extends _$ChapterList {
   }
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 class ActiveChapter extends _$ActiveChapter {
   @override
   Chapter? build() => null;

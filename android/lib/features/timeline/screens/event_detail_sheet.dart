@@ -82,7 +82,7 @@ class _State extends ConsumerState<EventDetailSheet> {
               maxLines: 3),
           const SizedBox(height: 8),
           DropdownButtonFormField<EventStatus>(
-            initialValue: _status,
+            value: _status,
             items: EventStatus.values
                 .map((s) => DropdownMenuItem(value: s, child: Text(s.name)))
                 .toList(),

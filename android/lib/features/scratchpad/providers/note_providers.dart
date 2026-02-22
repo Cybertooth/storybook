@@ -1,4 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:uuid/uuid.dart';
 import '../../../core/providers/active_story_provider.dart';
 import '../../../core/providers/repository_providers.dart';
 import '../../../core/providers/undo_provider.dart';
@@ -6,7 +7,7 @@ import '../../../domain/models/note.dart';
 
 part 'note_providers.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class NoteList extends _$NoteList {
   @override
   Future<List<Note>> build() async {
@@ -19,7 +20,7 @@ class NoteList extends _$NoteList {
   Future<void> add(String storyId, String content) async {
     final repo = ref.read(noteRepositoryProvider);
     await repo.create(Note(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      id: const Uuid().v4(),
       storyId: storyId,
       content: content,
       createdAt: DateTime.now(),

@@ -114,6 +114,7 @@ class _State extends ConsumerState<ReferenceDrawer> {
                               .toList()),
                       // Locations tab
                       ListView(
+                          controller: controller,
                           children: locations
                               .map((l) => ListTile(
                                     leading: const Icon(Icons.place),
@@ -139,6 +140,7 @@ class _State extends ConsumerState<ReferenceDrawer> {
                               .toList()),
                       // Events tab
                       ListView(
+                          controller: controller,
                           children: events
                               .map((e) => ListTile(
                                     leading: const Icon(Icons.event),
