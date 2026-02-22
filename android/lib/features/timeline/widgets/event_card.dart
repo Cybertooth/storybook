@@ -27,7 +27,7 @@ class EventCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: _statusColor(context, event.status),
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Theme.of(context).colorScheme.outline.withOpacity(0.3)),
+          border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

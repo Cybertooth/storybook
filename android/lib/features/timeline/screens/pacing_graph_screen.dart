@@ -14,10 +14,15 @@ class PacingGraphScreen extends ConsumerWidget {
       error: (e, _) => Center(child: Text('$e')),
       data: (events) {
         if (events.isEmpty) {
-          return const Center(child: Text('Add events to the timeline to see the pacing graph.'));
+          return const Center(
+              child:
+                  Text('Add events to the timeline to see the pacing graph.'));
         }
-        final spots = events.asMap().entries
-            .map((e) => FlSpot(e.key.toDouble(), e.value.emotionalValue.toDouble()))
+        final spots = events
+            .asMap()
+            .entries
+            .map((e) =>
+                FlSpot(e.key.toDouble(), e.value.emotionalValue.toDouble()))
             .toList();
 
         return SingleChildScrollView(
@@ -34,7 +39,8 @@ class PacingGraphScreen extends ConsumerWidget {
               SizedBox(
                 height: 300,
                 child: LineChart(LineChartData(
-                  minY: -5, maxY: 5,
+                  minY: -5,
+                  maxY: 5,
                   gridData: const FlGridData(show: true),
                   borderData: FlBorderData(show: true),
                   lineBarsData: [
@@ -46,7 +52,10 @@ class PacingGraphScreen extends ConsumerWidget {
                       dotData: const FlDotData(show: true),
                       belowBarData: BarAreaData(
                         show: true,
-                        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .primary
+                            .withValues(alpha: 0.1),
                       ),
                     ),
                   ],
@@ -55,8 +64,8 @@ class PacingGraphScreen extends ConsumerWidget {
                       sideTitles: SideTitles(
                         showTitles: true,
                         interval: 1,
-                        getTitlesWidget: (v, _) =>
-                            Text(v.toInt().toString(), style: const TextStyle(fontSize: 10)),
+                        getTitlesWidget: (v, _) => Text(v.toInt().toString(),
+                            style: const TextStyle(fontSize: 10)),
                       ),
                     ),
                     bottomTitles: AxisTitles(
@@ -64,19 +73,24 @@ class PacingGraphScreen extends ConsumerWidget {
                         showTitles: true,
                         getTitlesWidget: (v, _) {
                           final i = v.toInt();
-                          if (i < 0 || i >= events.length) return const Text('');
+                          if (i < 0 || i >= events.length)
+                            return const Text('');
                           return Padding(
                             padding: const EdgeInsets.only(top: 4),
                             child: Text(
-                              events[i].title.length > 8 ? '${events[i].title.substring(0, 8)}…' : events[i].title,
+                              events[i].title.length > 8
+                                  ? '${events[i].title.substring(0, 8)}…'
+                                  : events[i].title,
                               style: const TextStyle(fontSize: 9),
                             ),
                           );
                         },
                       ),
                     ),
-                    topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    topTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false)),
+                    rightTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false)),
                   ),
                 )),
               ),
@@ -104,11 +118,14 @@ class _Legend extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      Container(width: 12, height: 12, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
-      const SizedBox(width: 4),
-      Text(label, style: const TextStyle(fontSize: 12)),
-    ],
-  );
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+              width: 12,
+              height: 12,
+              decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+          const SizedBox(width: 4),
+          Text(label, style: const TextStyle(fontSize: 12)),
+        ],
+      );
 }

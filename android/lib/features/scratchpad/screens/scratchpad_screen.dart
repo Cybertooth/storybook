@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../dashboard/providers/story_providers.dart';
+
 import '../providers/note_providers.dart';
 import '../../../core/providers/active_story_provider.dart';
 import '../../../domain/models/note.dart';
@@ -121,7 +121,7 @@ class _NoteCardState extends ConsumerState<_NoteCard> {
 
   Future<void> _save() async {
     final updated = widget.note.copyWith(content: _ctrl.text);
-    await ref.read(noteListProvider.notifier).update(updated);
+    await ref.read(noteListProvider.notifier).updateNote(updated);
     setState(() => _editing = false);
   }
 
@@ -171,8 +171,9 @@ class _NoteCardState extends ConsumerState<_NoteCard> {
                     icon: const Icon(Icons.delete_outline, size: 18),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
-                    onPressed: () =>
-                        ref.read(noteListProvider.notifier).delete(widget.note.id),
+                    onPressed: () => ref
+                        .read(noteListProvider.notifier)
+                        .delete(widget.note.id),
                   ),
                 ),
               ],

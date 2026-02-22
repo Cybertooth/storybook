@@ -27,7 +27,7 @@ class NoteList extends _$NoteList {
     ref.invalidateSelf();
   }
 
-  Future<void> update(Note note) async {
+  Future<void> updateNote(Note note) async {
     final repo = ref.read(noteRepositoryProvider);
     await repo.update(note);
     ref.invalidateSelf();

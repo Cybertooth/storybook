@@ -21,7 +21,7 @@ class QuestionList extends _$QuestionList {
     await repo.create(UnresolvedQuestion(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       storyId: storyId,
-      text: text,
+      question: text,
       isResolved: false,
       createdAt: DateTime.now(),
     ));

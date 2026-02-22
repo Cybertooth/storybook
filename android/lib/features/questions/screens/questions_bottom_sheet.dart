@@ -160,12 +160,11 @@ class _QuestionTile extends ConsumerWidget {
       contentPadding: EdgeInsets.zero,
       leading: Checkbox(
         value: question.isResolved,
-        onChanged: question.isResolved
-            ? null
-            : (_) => notifier.resolve(question),
+        onChanged:
+            question.isResolved ? null : (_) => notifier.resolve(question),
       ),
       title: Text(
-        question.text,
+        question.question,
         style: question.isResolved
             ? const TextStyle(decoration: TextDecoration.lineThrough)
             : null,

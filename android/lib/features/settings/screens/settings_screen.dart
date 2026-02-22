@@ -33,7 +33,7 @@ class _State extends ConsumerState<SettingsScreen> {
 
   Future<void> _saveKeys() async {
     setState(() => _saving = true);
-    await ref.read(settingsProvider.notifier).update(
+    await ref.read(settingsProvider.notifier).updateSettings(
           geminiKey: _geminiCtrl.text.trim(),
           openAiKey: _openAiCtrl.text.trim(),
         );
@@ -76,15 +76,17 @@ class _State extends ConsumerState<SettingsScreen> {
                 title: const Text('Gemini (Google)'),
                 value: 'gemini',
                 groupValue: settings.aiProvider,
-                onChanged: (v) =>
-                    ref.read(settingsProvider.notifier).update(provider: v),
+                onChanged: (v) => ref
+                    .read(settingsProvider.notifier)
+                    .updateSettings(provider: v),
               ),
               RadioListTile<String>(
                 title: const Text('OpenAI'),
                 value: 'openai',
                 groupValue: settings.aiProvider,
-                onChanged: (v) =>
-                    ref.read(settingsProvider.notifier).update(provider: v),
+                onChanged: (v) => ref
+                    .read(settingsProvider.notifier)
+                    .updateSettings(provider: v),
               ),
               const Divider(height: 24),
 
@@ -98,7 +100,8 @@ class _State extends ConsumerState<SettingsScreen> {
                   labelText: 'Gemini API Key',
                   border: const OutlineInputBorder(),
                   suffixIcon: IconButton(
-                    icon: Icon(_showGemini ? Icons.visibility_off : Icons.visibility),
+                    icon: Icon(
+                        _showGemini ? Icons.visibility_off : Icons.visibility),
                     onPressed: () => setState(() => _showGemini = !_showGemini),
                   ),
                 ),
@@ -111,7 +114,8 @@ class _State extends ConsumerState<SettingsScreen> {
                   labelText: 'OpenAI API Key',
                   border: const OutlineInputBorder(),
                   suffixIcon: IconButton(
-                    icon: Icon(_showOpenAi ? Icons.visibility_off : Icons.visibility),
+                    icon: Icon(
+                        _showOpenAi ? Icons.visibility_off : Icons.visibility),
                     onPressed: () => setState(() => _showOpenAi = !_showOpenAi),
                   ),
                 ),
@@ -123,7 +127,8 @@ class _State extends ConsumerState<SettingsScreen> {
                     ? const SizedBox(
                         width: 16,
                         height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: Colors.white),
                       )
                     : const Text('Save API Keys'),
               ),
@@ -141,19 +146,35 @@ class _State extends ConsumerState<SettingsScreen> {
                   final story = ref.read(activeStoryProvider);
                   if (story == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Select a story from Dashboard first.')),
+                      const SnackBar(
+                          content:
+                              Text('Select a story from Dashboard first.')),
                     );
                     return;
                   }
                   try {
                     final service = ref.read(exportServiceProvider);
-                    final chars = await ref.read(characterRepositoryProvider).getAllForStory(story.id);
-                    final locs = await ref.read(locationRepositoryProvider).getAllForStory(story.id);
-                    final events = await ref.read(plotEventRepositoryProvider).getAllForStory(story.id);
-                    final chapters = await ref.read(chapterRepositoryProvider).getAllForStory(story.id);
-                    final notes = await ref.read(noteRepositoryProvider).getAllForStory(story.id);
-                    final questions = await ref.read(questionRepositoryProvider).getAllForStory(story.id);
-                    final rels = await ref.read(relationshipRepositoryProvider).getAllForStory(story.id);
+                    final chars = await ref
+                        .read(characterRepositoryProvider)
+                        .getAllForStory(story.id);
+                    final locs = await ref
+                        .read(locationRepositoryProvider)
+                        .getAllForStory(story.id);
+                    final events = await ref
+                        .read(plotEventRepositoryProvider)
+                        .getAllForStory(story.id);
+                    final chapters = await ref
+                        .read(chapterRepositoryProvider)
+                        .getAllForStory(story.id);
+                    final notes = await ref
+                        .read(noteRepositoryProvider)
+                        .getAllForStory(story.id);
+                    final questions = await ref
+                        .read(questionRepositoryProvider)
+                        .getAllForStory(story.id);
+                    final rels = await ref
+                        .read(relationshipRepositoryProvider)
+                        .getAllForStory(story.id);
                     final bundle = service.buildBundle(
                       story: story,
                       characters: chars,
@@ -187,7 +208,9 @@ class _State extends ConsumerState<SettingsScreen> {
                     // TODO: deserialize bundle and upsert all entities
                     if (mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Import parsed. Full restore coming soon.')),
+                        const SnackBar(
+                            content: Text(
+                                'Import parsed. Full restore coming soon.')),
                       );
                     }
                   } catch (e) {

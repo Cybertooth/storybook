@@ -22,7 +22,8 @@ class EventBoardScreen extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
               children: [
-                const Text('Plot Threads', style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text('Plot Threads',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
                 const Spacer(),
                 TextButton.icon(
                   icon: const Icon(Icons.add, size: 16),
@@ -37,8 +38,10 @@ class EventBoardScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: threads.map((thread) {
-                  final threadEvents = events.where((e) => e.plotThread == thread).toList();
-                  return _ThreadRow(thread: thread, events: threadEvents, allEvents: events);
+                  final threadEvents =
+                      events.where((e) => e.plotThread == thread).toList();
+                  return _ThreadRow(
+                      thread: thread, events: threadEvents, allEvents: events);
                 }).toList(),
               ),
             ),
@@ -54,15 +57,21 @@ class EventBoardScreen extends ConsumerWidget {
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('New Plot Thread'),
-        content: TextField(controller: ctrl, autofocus: true, decoration: const InputDecoration(labelText: 'Thread name')),
+        content: TextField(
+            controller: ctrl,
+            autofocus: true,
+            decoration: const InputDecoration(labelText: 'Thread name')),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel')),
           FilledButton(
             onPressed: () {
               if (ctrl.text.trim().isNotEmpty) {
                 ref.read(eventListProvider.notifier).createEvent(
-                  title: 'First event', plotThread: ctrl.text.trim(),
-                );
+                      title: 'First event',
+                      plotThread: ctrl.text.trim(),
+                    );
                 Navigator.pop(context);
               }
             },
@@ -79,7 +88,8 @@ class _ThreadRow extends ConsumerWidget {
   final List<PlotEvent> events;
   final List<PlotEvent> allEvents;
 
-  const _ThreadRow({required this.thread, required this.events, required this.allEvents});
+  const _ThreadRow(
+      {required this.thread, required this.events, required this.allEvents});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -88,7 +98,11 @@ class _ThreadRow extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(thread, style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
+          Text(thread,
+              style: Theme.of(context)
+                  .textTheme
+                  .titleSmall
+                  ?.copyWith(fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           SizedBox(
             height: 100,
@@ -96,13 +110,13 @@ class _ThreadRow extends ConsumerWidget {
               scrollDirection: Axis.horizontal,
               children: [
                 ...events.map((e) => EventCard(
-                  event: e,
-                  onTap: () => showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    builder: (_) => EventDetailSheet(event: e),
-                  ),
-                )),
+                      event: e,
+                      onTap: () => showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        builder: (_) => EventDetailSheet(event: e),
+                      ),
+                    )),
                 _AddEventButton(plotThread: thread),
               ],
             ),
@@ -126,7 +140,10 @@ class _AddEventButton extends ConsumerWidget {
         width: 100,
         height: 90,
         decoration: BoxDecoration(
-          border: Border.all(color: Theme.of(context).colorScheme.outline.withOpacity(0.5), style: BorderStyle.solid),
+          border: Border.all(
+              color:
+                  Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
+              style: BorderStyle.solid),
           borderRadius: BorderRadius.circular(8),
         ),
         child: const Icon(Icons.add),
@@ -140,13 +157,19 @@ class _AddEventButton extends ConsumerWidget {
       context: context,
       builder: (_) => AlertDialog(
         title: Text('Add event to "$plotThread"'),
-        content: TextField(controller: ctrl, autofocus: true, decoration: const InputDecoration(labelText: 'Event title')),
+        content: TextField(
+            controller: ctrl,
+            autofocus: true,
+            decoration: const InputDecoration(labelText: 'Event title')),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel')),
           FilledButton(
             onPressed: () {
               if (ctrl.text.trim().isNotEmpty) {
-                ref.read(eventListProvider.notifier).createEvent(title: ctrl.text.trim(), plotThread: plotThread);
+                ref.read(eventListProvider.notifier).createEvent(
+                    title: ctrl.text.trim(), plotThread: plotThread);
                 Navigator.pop(context);
               }
             },

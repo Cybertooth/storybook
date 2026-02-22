@@ -56,3 +56,7 @@ pnpm-debug.log*
 
 # Storybook app specific
 *.storybook
+
+
+.gradle/
+.dart_tool/
