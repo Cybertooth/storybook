@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/providers/active_story_provider.dart';
 import '../../../core/providers/repository_providers.dart';
+import '../../../core/providers/undo_provider.dart';
 import '../../../domain/models/note.dart';
 
 part 'note_providers.g.dart';
@@ -34,7 +35,14 @@ class NoteList extends _$NoteList {
 
   Future<void> delete(String id) async {
     final repo = ref.read(noteRepositoryProvider);
+    final backup = await repo.getById(id);
     await repo.delete(id);
     ref.invalidateSelf();
+    if (backup != null) {
+      ref.read(undoStackProvider.notifier).push(() async {
+        await ref.read(noteRepositoryProvider).create(backup);
+        ref.invalidateSelf();
+      });
+    }
   }
 }

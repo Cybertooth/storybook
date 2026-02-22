@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 import '../../../core/providers/active_story_provider.dart';
 import '../../../core/providers/repository_providers.dart';
+import '../../../core/providers/undo_provider.dart';
 import '../../../domain/models/character.dart';
 
 part 'character_providers.g.dart';
@@ -29,7 +30,14 @@ class CharacterList extends _$CharacterList {
   }
 
   Future<void> deleteCharacter(String id) async {
+    final backup = await ref.read(characterRepositoryProvider).getById(id);
     await ref.read(characterRepositoryProvider).delete(id);
     ref.invalidateSelf();
+    if (backup != null) {
+      ref.read(undoStackProvider.notifier).push(() async {
+        await ref.read(characterRepositoryProvider).create(backup);
+        ref.invalidateSelf();
+      });
+    }
   }
 }

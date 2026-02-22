@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 import '../../../core/providers/active_story_provider.dart';
 import '../../../core/providers/repository_providers.dart';
+import '../../../core/providers/undo_provider.dart';
 import '../../../domain/models/plot_event.dart';
 
 part 'timeline_providers.g.dart';
@@ -38,8 +39,15 @@ class EventList extends _$EventList {
   }
 
   Future<void> deleteEvent(String id) async {
+    final backup = await ref.read(plotEventRepositoryProvider).getById(id);
     await ref.read(plotEventRepositoryProvider).delete(id);
     ref.invalidateSelf();
+    if (backup != null) {
+      ref.read(undoStackProvider.notifier).push(() async {
+        await ref.read(plotEventRepositoryProvider).create(backup);
+        ref.invalidateSelf();
+      });
+    }
   }
 }
 

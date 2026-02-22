@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 import '../../../core/providers/active_story_provider.dart';
 import '../../../core/providers/repository_providers.dart';
+import '../../../core/providers/undo_provider.dart';
 import '../../../domain/models/location.dart';
 
 part 'location_providers.g.dart';
@@ -29,7 +30,14 @@ class LocationList extends _$LocationList {
   }
 
   Future<void> deleteLocation(String id) async {
+    final backup = await ref.read(locationRepositoryProvider).getById(id);
     await ref.read(locationRepositoryProvider).delete(id);
     ref.invalidateSelf();
+    if (backup != null) {
+      ref.read(undoStackProvider.notifier).push(() async {
+        await ref.read(locationRepositoryProvider).create(backup);
+        ref.invalidateSelf();
+      });
+    }
   }
 }
