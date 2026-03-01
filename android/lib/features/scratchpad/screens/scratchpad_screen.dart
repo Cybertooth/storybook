@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../providers/note_providers.dart';
 import '../../../core/providers/active_story_provider.dart';
@@ -29,13 +30,34 @@ class _State extends ConsumerState<ScratchpadScreen> {
     _quickAddCtrl.clear();
   }
 
+  List<Widget> _buildActions(BuildContext context, WidgetRef ref) {
+    return [
+      IconButton(
+        icon: const Icon(Icons.settings),
+        tooltip: 'Settings',
+        onPressed: () => context.push('/settings'),
+      ),
+      IconButton(
+        icon: const Icon(Icons.library_books),
+        tooltip: 'Switch Project',
+        onPressed: () {
+          ref.read(activeStoryProvider.notifier).clear();
+          context.go('/projects');
+        },
+      ),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     final notesAsync = ref.watch(noteListProvider);
     final hasStory = ref.watch(activeStoryProvider) != null;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Scratchpad')),
+      appBar: AppBar(
+        title: const Text('Scratchpad'),
+        actions: _buildActions(context, ref),
+      ),
       body: Column(
         children: [
           Padding(

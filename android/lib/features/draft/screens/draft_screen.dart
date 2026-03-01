@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/providers/active_story_provider.dart';
 import '../../../domain/models/chapter.dart';
 import '../providers/draft_providers.dart';
@@ -57,6 +58,19 @@ class _DraftScreenState extends ConsumerState<DraftScreen> {
               ),
               actions: [
                 IconButton(
+                  icon: const Icon(Icons.library_books),
+                  tooltip: 'Switch Project',
+                  onPressed: () {
+                    ref.read(activeStoryProvider.notifier).clear();
+                    context.go('/projects');
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.settings),
+                  tooltip: 'Settings',
+                  onPressed: () => context.push('/settings'),
+                ),
+                IconButton(
                   icon: Icon(_previewMode ? Icons.edit : Icons.preview),
                   tooltip: _previewMode ? 'Edit' : 'Preview',
                   onPressed: () => setState(() => _previewMode = !_previewMode),
@@ -84,18 +98,16 @@ class _DraftScreenState extends ConsumerState<DraftScreen> {
               onPressed: () => setState(() => _focusMode = false),
               child: const Icon(Icons.fullscreen_exit),
             )
-          : active == null
-              ? null
-              : Padding(
-                  padding: const EdgeInsets.only(bottom: 50.0),
-                  child: FloatingActionButton.small(
-                    onPressed: () => ref
-                        .read(chapterListProvider.notifier)
-                        .createChapter(
-                            'New Chapter'), // Assuming a default title for new chapter
-                    child: const Icon(Icons.add),
-                  ),
-                ),
+          : Padding(
+              padding: const EdgeInsets.only(bottom: 50.0),
+              child: FloatingActionButton.small(
+                onPressed: () => ref
+                    .read(chapterListProvider.notifier)
+                    .createChapter(
+                        'New Chapter'), // Assuming a default title for new chapter
+                child: const Icon(Icons.add),
+              ),
+            ),
     );
   }
 
@@ -147,8 +159,8 @@ class _DraftScreenState extends ConsumerState<DraftScreen> {
 
   Widget? _buildChapterDrawer(BuildContext context, AsyncValue chaptersAsync) {
     return chaptersAsync.when(
-      loading: () => Drawer(
-        child: const SafeArea(
+      loading: () => const Drawer(
+        child: SafeArea(
           child: Center(child: CircularProgressIndicator()),
         ),
       ),
