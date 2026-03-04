@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/providers/active_story_provider.dart';
 import '../providers/character_providers.dart';
 import '../widgets/character_card.dart';
@@ -9,13 +10,31 @@ import '../../locations/screens/location_list_screen.dart';
 class CodexScreen extends ConsumerWidget {
   const CodexScreen({super.key});
 
+  List<Widget> _buildActions(BuildContext context, WidgetRef ref) {
+    return [
+      IconButton(
+        icon: const Icon(Icons.library_books),
+        tooltip: 'Switch Project',
+        onPressed: () {
+          ref.read(activeStoryProvider.notifier).clear();
+          context.go('/projects');
+        },
+      ),
+      IconButton(
+        icon: const Icon(Icons.settings),
+        tooltip: 'Settings',
+        onPressed: () => context.push('/settings'),
+      ),
+    ];
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final active = ref.watch(activeStoryProvider);
     if (active == null) {
       return const Scaffold(
-          body:
-              Center(child: Text('Select a story from the Dashboard first.')));
+          body: Center(
+              child: Text('Select a project from the Projects screen first.')));
     }
 
     return DefaultTabController(
@@ -23,6 +42,7 @@ class CodexScreen extends ConsumerWidget {
       child: Scaffold(
         appBar: AppBar(
           title: Text(active.title),
+          actions: _buildActions(context, ref),
           bottom: const TabBar(
               tabs: [Tab(text: 'Characters'), Tab(text: 'Locations')]),
         ),

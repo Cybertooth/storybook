@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../../../core/providers/active_story_provider.dart';
 import 'seed_expander_screen.dart';
 import 'critique_screen.dart';
 import 'plot_hole_screen.dart';
@@ -6,11 +9,29 @@ import 'beat_sheet_screen.dart';
 import 'tropes_screen.dart';
 import 'show_dont_tell_screen.dart';
 
-class StoryEngineScreen extends StatelessWidget {
+class StoryEngineScreen extends ConsumerWidget {
   const StoryEngineScreen({super.key});
 
+  List<Widget> _buildActions(BuildContext context, WidgetRef ref) {
+    return [
+      IconButton(
+        icon: const Icon(Icons.settings),
+        tooltip: 'Settings',
+        onPressed: () => context.push('/settings'),
+      ),
+      IconButton(
+        icon: const Icon(Icons.library_books),
+        tooltip: 'Switch Project',
+        onPressed: () {
+          ref.read(activeStoryProvider.notifier).clear();
+          context.go('/projects');
+        },
+      ),
+    ];
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final tools = [
       (
         'Seed Expander',
@@ -51,7 +72,10 @@ class StoryEngineScreen extends StatelessWidget {
     ];
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Story Engine')),
+      appBar: AppBar(
+        title: const Text('Story Engine'),
+        actions: _buildActions(context, ref),
+      ),
       body: ListView.separated(
         padding: const EdgeInsets.all(16),
         itemCount: tools.length,

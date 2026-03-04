@@ -7,11 +7,11 @@ class AppScaffold extends StatelessWidget {
   const AppScaffold({super.key, required this.child});
 
   static const _tabs = [
-    (icon: Icons.dashboard, label: 'Dashboard', path: '/dashboard'),
-    (icon: Icons.menu_book, label: 'Codex', path: '/codex'),
+    (icon: Icons.sticky_note_2, label: 'Scratchpad', path: '/scratchpad'),
+    (icon: Icons.edit_document, label: 'Draft', path: '/draft'),
+    (icon: Icons.auto_awesome, label: 'Story Engine', path: '/ai'),
     (icon: Icons.timeline, label: 'Timeline', path: '/timeline'),
-    (icon: Icons.edit, label: 'Draft', path: '/draft'),
-    (icon: Icons.more_horiz, label: 'More', path: '/more'),
+    (icon: Icons.menu_book, label: 'Codex', path: '/codex'),
   ];
 
   int _locationToIndex(BuildContext context) {
@@ -34,13 +34,15 @@ class AppScaffold extends StatelessWidget {
           isScrollControlled: true,
           builder: (_) => const QuestionsBottomSheet(),
         ),
-        child: const Text('?', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        child: const Text('?',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _locationToIndex(context),
         onDestinationSelected: (i) => context.go(_tabs[i].path),
         destinations: _tabs
-            .map((t) => NavigationDestination(icon: Icon(t.icon), label: t.label))
+            .map((t) =>
+                NavigationDestination(icon: Icon(t.icon), label: t.label))
             .toList(),
       ),
     );
