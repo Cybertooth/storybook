@@ -6,7 +6,7 @@ part of 'story.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$StoryImpl _$$StoryImplFromJson(Map<String, dynamic> json) => _$StoryImpl(
+_Story _$StoryFromJson(Map<String, dynamic> json) => _Story(
       id: json['id'] as String,
       title: json['title'] as String,
       summary: json['summary'] as String? ?? '',
@@ -16,8 +16,7 @@ _$StoryImpl _$$StoryImplFromJson(Map<String, dynamic> json) => _$StoryImpl(
       updatedAt: DateTime.parse(json['updatedAt'] as String),
     );
 
-Map<String, dynamic> _$$StoryImplToJson(_$StoryImpl instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$StoryToJson(_Story instance) => <String, dynamic>{
       'id': instance.id,
       'title': instance.title,
       'summary': instance.summary,

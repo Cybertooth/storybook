@@ -6,9 +6,8 @@ part of 'unresolved_question.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$UnresolvedQuestionImpl _$$UnresolvedQuestionImplFromJson(
-        Map<String, dynamic> json) =>
-    _$UnresolvedQuestionImpl(
+_UnresolvedQuestion _$UnresolvedQuestionFromJson(Map<String, dynamic> json) =>
+    _UnresolvedQuestion(
       id: json['id'] as String,
       storyId: json['storyId'] as String,
       question: json['question'] as String,
@@ -18,8 +17,7 @@ _$UnresolvedQuestionImpl _$$UnresolvedQuestionImplFromJson(
       createdAt: DateTime.parse(json['createdAt'] as String),
     );
 
-Map<String, dynamic> _$$UnresolvedQuestionImplToJson(
-        _$UnresolvedQuestionImpl instance) =>
+Map<String, dynamic> _$UnresolvedQuestionToJson(_UnresolvedQuestion instance) =>
     <String, dynamic>{
       'id': instance.id,
       'storyId': instance.storyId,

@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,159 +9,31 @@ part of 'note.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-Note _$NoteFromJson(Map<String, dynamic> json) {
-  return _Note.fromJson(json);
-}
 
 /// @nodoc
 mixin _$Note {
-  String get id => throw _privateConstructorUsedError;
-  String get storyId => throw _privateConstructorUsedError;
-  String get content => throw _privateConstructorUsedError;
-  DateTime get createdAt => throw _privateConstructorUsedError;
-
-  /// Serializes this Note to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  String get id;
+  String get storyId;
+  String get content;
+  DateTime get createdAt;
 
   /// Create a copy of Note
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $NoteCopyWith<Note> get copyWith => throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $NoteCopyWith<$Res> {
-  factory $NoteCopyWith(Note value, $Res Function(Note) then) =
-      _$NoteCopyWithImpl<$Res, Note>;
-  @useResult
-  $Res call({String id, String storyId, String content, DateTime createdAt});
-}
-
-/// @nodoc
-class _$NoteCopyWithImpl<$Res, $Val extends Note>
-    implements $NoteCopyWith<$Res> {
-  _$NoteCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of Note
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? storyId = null,
-    Object? content = null,
-    Object? createdAt = null,
-  }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      storyId: null == storyId
-          ? _value.storyId
-          : storyId // ignore: cast_nullable_to_non_nullable
-              as String,
-      content: null == content
-          ? _value.content
-          : content // ignore: cast_nullable_to_non_nullable
-              as String,
-      createdAt: null == createdAt
-          ? _value.createdAt
-          : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-    ) as $Val);
-  }
-}
+  $NoteCopyWith<Note> get copyWith =>
+      _$NoteCopyWithImpl<Note>(this as Note, _$identity);
 
-/// @nodoc
-abstract class _$$NoteImplCopyWith<$Res> implements $NoteCopyWith<$Res> {
-  factory _$$NoteImplCopyWith(
-          _$NoteImpl value, $Res Function(_$NoteImpl) then) =
-      __$$NoteImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({String id, String storyId, String content, DateTime createdAt});
-}
-
-/// @nodoc
-class __$$NoteImplCopyWithImpl<$Res>
-    extends _$NoteCopyWithImpl<$Res, _$NoteImpl>
-    implements _$$NoteImplCopyWith<$Res> {
-  __$$NoteImplCopyWithImpl(_$NoteImpl _value, $Res Function(_$NoteImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of Note
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? storyId = null,
-    Object? content = null,
-    Object? createdAt = null,
-  }) {
-    return _then(_$NoteImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      storyId: null == storyId
-          ? _value.storyId
-          : storyId // ignore: cast_nullable_to_non_nullable
-              as String,
-      content: null == content
-          ? _value.content
-          : content // ignore: cast_nullable_to_non_nullable
-              as String,
-      createdAt: null == createdAt
-          ? _value.createdAt
-          : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-    ));
-  }
-}
-
-/// @nodoc
-@JsonSerializable()
-class _$NoteImpl implements _Note {
-  const _$NoteImpl(
-      {required this.id,
-      required this.storyId,
-      required this.content,
-      required this.createdAt});
-
-  factory _$NoteImpl.fromJson(Map<String, dynamic> json) =>
-      _$$NoteImplFromJson(json);
-
-  @override
-  final String id;
-  @override
-  final String storyId;
-  @override
-  final String content;
-  @override
-  final DateTime createdAt;
-
-  @override
-  String toString() {
-    return 'Note(id: $id, storyId: $storyId, content: $content, createdAt: $createdAt)';
-  }
+  /// Serializes this Note to a JSON map.
+  Map<String, dynamic> toJson();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$NoteImpl &&
+            other is Note &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.storyId, storyId) || other.storyId == storyId) &&
             (identical(other.content, content) || other.content == content) &&
@@ -173,44 +45,325 @@ class _$NoteImpl implements _Note {
   @override
   int get hashCode => Object.hash(runtimeType, id, storyId, content, createdAt);
 
-  /// Create a copy of Note
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$NoteImplCopyWith<_$NoteImpl> get copyWith =>
-      __$$NoteImplCopyWithImpl<_$NoteImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$NoteImplToJson(
-      this,
-    );
+  String toString() {
+    return 'Note(id: $id, storyId: $storyId, content: $content, createdAt: $createdAt)';
   }
 }
 
-abstract class _Note implements Note {
-  const factory _Note(
-      {required final String id,
-      required final String storyId,
-      required final String content,
-      required final DateTime createdAt}) = _$NoteImpl;
+/// @nodoc
+abstract mixin class $NoteCopyWith<$Res> {
+  factory $NoteCopyWith(Note value, $Res Function(Note) _then) =
+      _$NoteCopyWithImpl;
+  @useResult
+  $Res call({String id, String storyId, String content, DateTime createdAt});
+}
 
-  factory _Note.fromJson(Map<String, dynamic> json) = _$NoteImpl.fromJson;
+/// @nodoc
+class _$NoteCopyWithImpl<$Res> implements $NoteCopyWith<$Res> {
+  _$NoteCopyWithImpl(this._self, this._then);
+
+  final Note _self;
+  final $Res Function(Note) _then;
+
+  /// Create a copy of Note
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? storyId = null,
+    Object? content = null,
+    Object? createdAt = null,
+  }) {
+    return _then(_self.copyWith(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      storyId: null == storyId
+          ? _self.storyId
+          : storyId // ignore: cast_nullable_to_non_nullable
+              as String,
+      content: null == content
+          ? _self.content
+          : content // ignore: cast_nullable_to_non_nullable
+              as String,
+      createdAt: null == createdAt
+          ? _self.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [Note].
+extension NotePatterns on Note {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_Note value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _Note() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_Note value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _Note():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_Note value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _Note() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String id, String storyId, String content, DateTime createdAt)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _Note() when $default != null:
+        return $default(
+            _that.id, _that.storyId, _that.content, _that.createdAt);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String id, String storyId, String content, DateTime createdAt)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _Note():
+        return $default(
+            _that.id, _that.storyId, _that.content, _that.createdAt);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String id, String storyId, String content, DateTime createdAt)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _Note() when $default != null:
+        return $default(
+            _that.id, _that.storyId, _that.content, _that.createdAt);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _Note implements Note {
+  const _Note(
+      {required this.id,
+      required this.storyId,
+      required this.content,
+      required this.createdAt});
+  factory _Note.fromJson(Map<String, dynamic> json) => _$NoteFromJson(json);
 
   @override
-  String get id;
+  final String id;
   @override
-  String get storyId;
+  final String storyId;
   @override
-  String get content;
+  final String content;
   @override
-  DateTime get createdAt;
+  final DateTime createdAt;
 
   /// Create a copy of Note
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$NoteImplCopyWith<_$NoteImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  _$NoteCopyWith<_Note> get copyWith =>
+      __$NoteCopyWithImpl<_Note>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$NoteToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _Note &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.storyId, storyId) || other.storyId == storyId) &&
+            (identical(other.content, content) || other.content == content) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, storyId, content, createdAt);
+
+  @override
+  String toString() {
+    return 'Note(id: $id, storyId: $storyId, content: $content, createdAt: $createdAt)';
+  }
 }
+
+/// @nodoc
+abstract mixin class _$NoteCopyWith<$Res> implements $NoteCopyWith<$Res> {
+  factory _$NoteCopyWith(_Note value, $Res Function(_Note) _then) =
+      __$NoteCopyWithImpl;
+  @override
+  @useResult
+  $Res call({String id, String storyId, String content, DateTime createdAt});
+}
+
+/// @nodoc
+class __$NoteCopyWithImpl<$Res> implements _$NoteCopyWith<$Res> {
+  __$NoteCopyWithImpl(this._self, this._then);
+
+  final _Note _self;
+  final $Res Function(_Note) _then;
+
+  /// Create a copy of Note
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? storyId = null,
+    Object? content = null,
+    Object? createdAt = null,
+  }) {
+    return _then(_Note(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      storyId: null == storyId
+          ? _self.storyId
+          : storyId // ignore: cast_nullable_to_non_nullable
+              as String,
+      content: null == content
+          ? _self.content
+          : content // ignore: cast_nullable_to_non_nullable
+              as String,
+      createdAt: null == createdAt
+          ? _self.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ));
+  }
+}
+
+// dart format on

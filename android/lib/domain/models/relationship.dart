@@ -4,7 +4,7 @@ part 'relationship.freezed.dart';
 part 'relationship.g.dart';
 
 @freezed
-class Relationship with _$Relationship {
+abstract class Relationship with _$Relationship {
   const factory Relationship({
     required String id,
     required String storyId,

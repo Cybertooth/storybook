@@ -6,8 +6,7 @@ part of 'plot_event.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$PlotEventImpl _$$PlotEventImplFromJson(Map<String, dynamic> json) =>
-    _$PlotEventImpl(
+_PlotEvent _$PlotEventFromJson(Map<String, dynamic> json) => _PlotEvent(
       id: json['id'] as String,
       storyId: json['storyId'] as String,
       title: json['title'] as String,
@@ -25,7 +24,7 @@ _$PlotEventImpl _$$PlotEventImplFromJson(Map<String, dynamic> json) =>
       emotionalValue: (json['emotionalValue'] as num?)?.toInt() ?? 0,
     );
 
-Map<String, dynamic> _$$PlotEventImplToJson(_$PlotEventImpl instance) =>
+Map<String, dynamic> _$PlotEventToJson(_PlotEvent instance) =>
     <String, dynamic>{
       'id': instance.id,
       'storyId': instance.storyId,

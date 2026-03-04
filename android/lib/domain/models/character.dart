@@ -6,7 +6,7 @@ part 'character.g.dart';
 enum CharacterRole { protagonist, antagonist, supporting, other }
 
 @freezed
-class Character with _$Character {
+abstract class Character with _$Character {
   const factory Character({
     required String id,
     required String storyId,
@@ -20,5 +20,6 @@ class Character with _$Character {
     String? avatarUrl,
   }) = _Character;
 
-  factory Character.fromJson(Map<String, dynamic> json) => _$CharacterFromJson(json);
+  factory Character.fromJson(Map<String, dynamic> json) =>
+      _$CharacterFromJson(json);
 }

@@ -4,7 +4,7 @@ part 'location.freezed.dart';
 part 'location.g.dart';
 
 @freezed
-class Location with _$Location {
+abstract class Location with _$Location {
   const factory Location({
     required String id,
     required String storyId,
@@ -17,5 +17,6 @@ class Location with _$Location {
     String? sensoryTaste,
   }) = _Location;
 
-  factory Location.fromJson(Map<String, dynamic> json) => _$LocationFromJson(json);
+  factory Location.fromJson(Map<String, dynamic> json) =>
+      _$LocationFromJson(json);
 }

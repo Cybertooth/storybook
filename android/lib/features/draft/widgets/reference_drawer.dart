@@ -16,9 +16,9 @@ class _State extends ConsumerState<ReferenceDrawer> {
 
   @override
   Widget build(BuildContext context) {
-    final characters = ref.watch(characterListProvider).valueOrNull ?? [];
-    final locations = ref.watch(locationListProvider).valueOrNull ?? [];
-    final events = ref.watch(eventListProvider).valueOrNull ?? [];
+    final characters = ref.watch(characterListProvider).value ?? [];
+    final locations = ref.watch(locationListProvider).value ?? [];
+    final events = ref.watch(eventListProvider).value ?? [];
 
     final pinnedChars =
         characters.where((c) => _pinned.contains(c.id)).toList();

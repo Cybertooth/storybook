@@ -6,36 +6,87 @@ part of 'timeline_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$plotThreadsHash() => r'f77e681336ed2a5764c162b9e58f7e630e76889f';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// See also [plotThreads].
-@ProviderFor(plotThreads)
-final plotThreadsProvider = AutoDisposeProvider<List<String>>.internal(
-  plotThreads,
-  name: r'plotThreadsProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$plotThreadsHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef PlotThreadsRef = AutoDisposeProviderRef<List<String>>;
-String _$eventListHash() => r'433f621492b6d8ad991121fa61091717239cfbbe';
-
-/// See also [EventList].
 @ProviderFor(EventList)
-final eventListProvider =
-    AsyncNotifierProvider<EventList, List<PlotEvent>>.internal(
-  EventList.new,
-  name: r'eventListProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$eventListHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final eventListProvider = EventListProvider._();
 
-typedef _$EventList = AsyncNotifier<List<PlotEvent>>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+final class EventListProvider
+    extends $AsyncNotifierProvider<EventList, List<PlotEvent>> {
+  EventListProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'eventListProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$eventListHash();
+
+  @$internal
+  @override
+  EventList create() => EventList();
+}
+
+String _$eventListHash() => r'83c44c438effc3afa63fa90e0ec55176ea386459';
+
+abstract class _$EventList extends $AsyncNotifier<List<PlotEvent>> {
+  FutureOr<List<PlotEvent>> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<List<PlotEvent>>, List<PlotEvent>>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<List<PlotEvent>>, List<PlotEvent>>,
+        AsyncValue<List<PlotEvent>>,
+        Object?,
+        Object?>;
+    element.handleCreate(ref, build);
+  }
+}
+
+@ProviderFor(plotThreads)
+final plotThreadsProvider = PlotThreadsProvider._();
+
+final class PlotThreadsProvider
+    extends $FunctionalProvider<List<String>, List<String>, List<String>>
+    with $Provider<List<String>> {
+  PlotThreadsProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'plotThreadsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$plotThreadsHash();
+
+  @$internal
+  @override
+  $ProviderElement<List<String>> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  List<String> create(Ref ref) {
+    return plotThreads(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(List<String> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<List<String>>(value),
+    );
+  }
+}
+
+String _$plotThreadsHash() => r'03aa361d8e3b9411243dd8356e765cf11364116a';

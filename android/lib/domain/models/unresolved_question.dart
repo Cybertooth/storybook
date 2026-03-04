@@ -4,7 +4,7 @@ part 'unresolved_question.freezed.dart';
 part 'unresolved_question.g.dart';
 
 @freezed
-class UnresolvedQuestion with _$UnresolvedQuestion {
+abstract class UnresolvedQuestion with _$UnresolvedQuestion {
   const factory UnresolvedQuestion({
     required String id,
     required String storyId,

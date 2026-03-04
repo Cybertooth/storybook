@@ -6,7 +6,7 @@ part 'chapter.g.dart';
 enum ChapterStatus { planned, drafting, completed }
 
 @freezed
-class Chapter with _$Chapter {
+abstract class Chapter with _$Chapter {
   const factory Chapter({
     required String id,
     required String storyId,
@@ -16,5 +16,6 @@ class Chapter with _$Chapter {
     @Default(ChapterStatus.planned) ChapterStatus status,
   }) = _Chapter;
 
-  factory Chapter.fromJson(Map<String, dynamic> json) => _$ChapterFromJson(json);
+  factory Chapter.fromJson(Map<String, dynamic> json) =>
+      _$ChapterFromJson(json);
 }

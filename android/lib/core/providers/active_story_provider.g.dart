@@ -6,35 +6,91 @@ part of 'active_story_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$storyListHash() => r'7851d0797fdc9ba7407f06dfae36af8857c96956';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// See also [StoryList].
 @ProviderFor(StoryList)
-final storyListProvider =
-    AsyncNotifierProvider<StoryList, List<Story>>.internal(
-  StoryList.new,
-  name: r'storyListProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$storyListHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final storyListProvider = StoryListProvider._();
 
-typedef _$StoryList = AsyncNotifier<List<Story>>;
-String _$activeStoryHash() => r'4f5543f5bc68ec875d64eb44e748d5277e9b9f73';
+final class StoryListProvider
+    extends $AsyncNotifierProvider<StoryList, List<Story>> {
+  StoryListProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'storyListProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
 
-/// See also [ActiveStory].
+  @override
+  String debugGetCreateSourceHash() => _$storyListHash();
+
+  @$internal
+  @override
+  StoryList create() => StoryList();
+}
+
+String _$storyListHash() => r'22e34cc95650dde3f2bb48d4e94e5a51167b7db0';
+
+abstract class _$StoryList extends $AsyncNotifier<List<Story>> {
+  FutureOr<List<Story>> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<List<Story>>, List<Story>>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<List<Story>>, List<Story>>,
+        AsyncValue<List<Story>>,
+        Object?,
+        Object?>;
+    element.handleCreate(ref, build);
+  }
+}
+
 @ProviderFor(ActiveStory)
-final activeStoryProvider =
-    NotifierProvider<ActiveStory, Story?>.internal(
-  ActiveStory.new,
-  name: r'activeStoryProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$activeStoryHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final activeStoryProvider = ActiveStoryProvider._();
 
-typedef _$ActiveStory = Notifier<Story?>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+final class ActiveStoryProvider extends $NotifierProvider<ActiveStory, Story?> {
+  ActiveStoryProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'activeStoryProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$activeStoryHash();
+
+  @$internal
+  @override
+  ActiveStory create() => ActiveStory();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(Story? value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<Story?>(value),
+    );
+  }
+}
+
+String _$activeStoryHash() => r'2bdafd4d6ad0f9537a5411464127f188096448bc';
+
+abstract class _$ActiveStory extends $Notifier<Story?> {
+  Story? build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<Story?, Story?>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<Story?, Story?>, Story?, Object?, Object?>;
+    element.handleCreate(ref, build);
+  }
+}

@@ -6,21 +6,46 @@ part of 'character_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$characterListHash() => r'b455aeef602c497d2c1edd4a323ee3875cca81bb';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// See also [CharacterList].
 @ProviderFor(CharacterList)
-final characterListProvider =
-    AsyncNotifierProvider<CharacterList, List<Character>>.internal(
-  CharacterList.new,
-  name: r'characterListProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$characterListHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final characterListProvider = CharacterListProvider._();
 
-typedef _$CharacterList = AsyncNotifier<List<Character>>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+final class CharacterListProvider
+    extends $AsyncNotifierProvider<CharacterList, List<Character>> {
+  CharacterListProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'characterListProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$characterListHash();
+
+  @$internal
+  @override
+  CharacterList create() => CharacterList();
+}
+
+String _$characterListHash() => r'e3f3cbb2d9c6bd7065ac3585f919a06e15eade4d';
+
+abstract class _$CharacterList extends $AsyncNotifier<List<Character>> {
+  FutureOr<List<Character>> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<List<Character>>, List<Character>>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<List<Character>>, List<Character>>,
+        AsyncValue<List<Character>>,
+        Object?,
+        Object?>;
+    element.handleCreate(ref, build);
+  }
+}

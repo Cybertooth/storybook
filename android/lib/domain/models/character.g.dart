@@ -6,8 +6,7 @@ part of 'character.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$CharacterImpl _$$CharacterImplFromJson(Map<String, dynamic> json) =>
-    _$CharacterImpl(
+_Character _$CharacterFromJson(Map<String, dynamic> json) => _Character(
       id: json['id'] as String,
       storyId: json['storyId'] as String,
       name: json['name'] as String,
@@ -24,7 +23,7 @@ _$CharacterImpl _$$CharacterImplFromJson(Map<String, dynamic> json) =>
       avatarUrl: json['avatarUrl'] as String?,
     );
 
-Map<String, dynamic> _$$CharacterImplToJson(_$CharacterImpl instance) =>
+Map<String, dynamic> _$CharacterToJson(_Character instance) =>
     <String, dynamic>{
       'id': instance.id,
       'storyId': instance.storyId,

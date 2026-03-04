@@ -1,9 +1,15 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/annotations.dart';
+import 'package:storybook_android/data/local/database.dart';
 import 'package:storybook_android/data/local/export_service.dart';
 import 'package:storybook_android/domain/models/story.dart';
 
+@GenerateMocks([AppDatabase])
+import 'export_service_test.mocks.dart';
+
 void main() {
-  final service = ExportService();
+  final db = MockAppDatabase();
+  final service = ExportService(db);
 
   test('buildBundle produces correct structure', () {
     final story = Story(
@@ -29,7 +35,7 @@ void main() {
   });
 
   test('buildBundle throws FormatException on wrong appName', () {
-    // Simulated import validation
+    // Simulated import validation in importFromFile or similar
     final badJson = {'appName': 'wrong', 'story': {}};
     expect(
       () {

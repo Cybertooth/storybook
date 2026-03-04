@@ -84,18 +84,16 @@ class _DraftScreenState extends ConsumerState<DraftScreen> {
               onPressed: () => setState(() => _focusMode = false),
               child: const Icon(Icons.fullscreen_exit),
             )
-          : active == null
-              ? null
-              : Padding(
-                  padding: const EdgeInsets.only(bottom: 50.0),
-                  child: FloatingActionButton.small(
-                    onPressed: () => ref
-                        .read(chapterListProvider.notifier)
-                        .createChapter(
-                            'New Chapter'), // Assuming a default title for new chapter
-                    child: const Icon(Icons.add),
-                  ),
-                ),
+          : Padding(
+              padding: const EdgeInsets.only(bottom: 50.0),
+              child: FloatingActionButton.small(
+                onPressed: () => ref
+                    .read(chapterListProvider.notifier)
+                    .createChapter(
+                        'New Chapter'), // Assuming a default title for new chapter
+                child: const Icon(Icons.add),
+              ),
+            ),
     );
   }
 
@@ -230,7 +228,7 @@ class _DraftScreenState extends ConsumerState<DraftScreen> {
                       .read(chapterListProvider.notifier)
                       .createChapter(ctrl.text.trim());
                   ref.read(activeChapterProvider.notifier).set(chapter);
-                  if (mounted) Navigator.pop(dialogCtx);
+                  if (mounted && dialogCtx.mounted) Navigator.pop(dialogCtx);
                 }
               },
               child: const Text('Create'),

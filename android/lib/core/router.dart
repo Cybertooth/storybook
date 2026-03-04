@@ -1,4 +1,3 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../features/dashboard/screens/dashboard_screen.dart';
@@ -18,7 +17,8 @@ GoRouter router(Ref ref) {
       ShellRoute(
         builder: (context, state, child) => AppScaffold(child: child),
         routes: [
-          GoRoute(path: '/dashboard', builder: (c, s) => const DashboardScreen()),
+          GoRoute(
+              path: '/dashboard', builder: (c, s) => const DashboardScreen()),
           GoRoute(path: '/codex', builder: (c, s) => const CodexScreen()),
           GoRoute(path: '/timeline', builder: (c, s) => const TimelineScreen()),
           GoRoute(path: '/draft', builder: (c, s) => const DraftScreen()),

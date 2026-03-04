@@ -1,4 +1,3 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 import '../../../core/providers/active_story_provider.dart';
@@ -14,15 +13,18 @@ class EventList extends _$EventList {
   Future<List<PlotEvent>> build() async {
     final story = ref.watch(activeStoryProvider);
     if (story == null) return [];
-    final events = await ref.watch(plotEventRepositoryProvider).getAllForStory(story.id);
+    final events =
+        await ref.watch(plotEventRepositoryProvider).getAllForStory(story.id);
     events.sort((a, b) => a.order.compareTo(b.order));
     return events;
   }
 
-  Future<void> createEvent({required String title, required String plotThread}) async {
+  Future<void> createEvent(
+      {required String title, required String plotThread}) async {
     final story = ref.read(activeStoryProvider);
     if (story == null) return;
-    final all = await ref.read(plotEventRepositoryProvider).getAllForStory(story.id);
+    final all =
+        await ref.read(plotEventRepositoryProvider).getAllForStory(story.id);
     final event = PlotEvent(
       id: const Uuid().v4(),
       storyId: story.id,
@@ -54,7 +56,7 @@ class EventList extends _$EventList {
 
 @riverpod
 List<String> plotThreads(Ref ref) {
-  final events = ref.watch(eventListProvider).valueOrNull ?? [];
+  final events = ref.watch(eventListProvider).value ?? [];
   final threads = events.map((e) => e.plotThread).toSet().toList();
   if (!threads.contains('Main Plot')) threads.insert(0, 'Main Plot');
   return threads;

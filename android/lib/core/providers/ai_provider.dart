@@ -7,7 +7,7 @@ import 'settings_provider.dart';
 /// To switch to the NestJS backend proxy: replace GeminiAiService
 /// with BackendProxyAiService (to be created in a future phase).
 final aiServiceProvider = Provider<AiService?>((ref) {
-  final settings = ref.watch(settingsProvider).valueOrNull;
+  final settings = ref.watch(settingsProvider).value;
   if (settings == null || settings.geminiApiKey.isEmpty) return null;
   return GeminiAiService(settings.geminiApiKey);
 });

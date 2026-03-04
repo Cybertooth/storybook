@@ -6,7 +6,7 @@ part 'plot_event.g.dart';
 enum EventStatus { idea, drafted, finalEvent }
 
 @freezed
-class PlotEvent with _$PlotEvent {
+abstract class PlotEvent with _$PlotEvent {
   const factory PlotEvent({
     required String id,
     required String storyId,
@@ -21,5 +21,6 @@ class PlotEvent with _$PlotEvent {
     @Default(0) int emotionalValue,
   }) = _PlotEvent;
 
-  factory PlotEvent.fromJson(Map<String, dynamic> json) => _$PlotEventFromJson(json);
+  factory PlotEvent.fromJson(Map<String, dynamic> json) =>
+      _$PlotEventFromJson(json);
 }

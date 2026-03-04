@@ -6,20 +6,46 @@ part of 'note_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$noteListHash() => r'5a08a2196d33b728d70399d9187be4cab5f1aaa3';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// See also [NoteList].
 @ProviderFor(NoteList)
-final noteListProvider =
-    AsyncNotifierProvider<NoteList, List<Note>>.internal(
-  NoteList.new,
-  name: r'noteListProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$noteListHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final noteListProvider = NoteListProvider._();
 
-typedef _$NoteList = AsyncNotifier<List<Note>>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+final class NoteListProvider
+    extends $AsyncNotifierProvider<NoteList, List<Note>> {
+  NoteListProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'noteListProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$noteListHash();
+
+  @$internal
+  @override
+  NoteList create() => NoteList();
+}
+
+String _$noteListHash() => r'a167a6340c8e55fd93d40d818606c51aeba99502';
+
+abstract class _$NoteList extends $AsyncNotifier<List<Note>> {
+  FutureOr<List<Note>> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<List<Note>>, List<Note>>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<List<Note>>, List<Note>>,
+        AsyncValue<List<Note>>,
+        Object?,
+        Object?>;
+    element.handleCreate(ref, build);
+  }
+}

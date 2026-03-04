@@ -41,17 +41,16 @@ class _State extends ConsumerState<SettingsScreen> {
   }
 
   Future<void> _saveKeys() async {
+    final sm = ScaffoldMessenger.of(context);
     setState(() => _saving = true);
     await ref.read(settingsProvider.notifier).updateSettings(
           geminiKey: _geminiCtrl.text.trim(),
           openAiKey: _openAiCtrl.text.trim(),
         );
     setState(() => _saving = false);
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('API keys saved.')),
-      );
-    }
+    sm.showSnackBar(
+      const SnackBar(content: Text('API keys saved.')),
+    );
   }
 
   @override
@@ -91,7 +90,7 @@ class _State extends ConsumerState<SettingsScreen> {
                         .read(settingsProvider.notifier)
                         .updateSettings(provider: v);
                   } catch (e) {
-                    if (mounted) {
+                    if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('Failed to save provider: $e')),
                       );
@@ -109,11 +108,10 @@ class _State extends ConsumerState<SettingsScreen> {
                         .read(settingsProvider.notifier)
                         .updateSettings(provider: v);
                   } catch (e) {
-                    if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Failed to save provider: $e')),
-                      );
-                    }
+                    if (!mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Failed to save provider: $e')),
+                    );
                   }
                 },
               ),
@@ -216,7 +214,7 @@ class _State extends ConsumerState<SettingsScreen> {
                     );
                     await service.exportToFile(bundle);
                   } catch (e) {
-                    if (mounted) {
+                    if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('Export failed: $e')),
                       );
@@ -234,16 +232,19 @@ class _State extends ConsumerState<SettingsScreen> {
                     final service = ref.read(exportServiceProvider);
                     final bundle = await service.importFromFile();
                     if (bundle == null) return;
-                    // TODO: deserialize bundle and upsert all entities
-                    if (mounted) {
+
+                    await service.importBundle(bundle);
+
+                    if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                            content: Text(
-                                'Import parsed. Full restore coming soon.')),
+                            content: Text('Story imported successfully.')),
                       );
+                      // Force refresh dashboard/active story if needed
+                      ref.invalidate(activeStoryProvider);
                     }
                   } catch (e) {
-                    if (mounted) {
+                    if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('Import failed: $e')),
                       );

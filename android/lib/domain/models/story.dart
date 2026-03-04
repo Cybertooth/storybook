@@ -4,7 +4,7 @@ part 'story.freezed.dart';
 part 'story.g.dart';
 
 @freezed
-class Story with _$Story {
+abstract class Story with _$Story {
   const factory Story({
     required String id,
     required String title,

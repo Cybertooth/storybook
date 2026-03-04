@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 part 'theme_provider.g.dart';
 
-class AppThemeMode extends Notifier<ThemeMode> {
+@Riverpod(keepAlive: true)
+class AppThemeMode extends _$AppThemeMode {
   static const _themeKey = 'app_theme_mode';
 
   @override

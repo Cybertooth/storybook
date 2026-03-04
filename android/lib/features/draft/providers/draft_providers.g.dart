@@ -6,36 +6,92 @@ part of 'draft_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$chapterListHash() => r'a0ab6267ee66542437938c9261e4f40d5e60965f';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// See also [ChapterList].
 @ProviderFor(ChapterList)
-final chapterListProvider =
-    AsyncNotifierProvider<ChapterList, List<Chapter>>.internal(
-  ChapterList.new,
-  name: r'chapterListProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$chapterListHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final chapterListProvider = ChapterListProvider._();
 
-typedef _$ChapterList = AsyncNotifier<List<Chapter>>;
-String _$activeChapterHash() => r'c029452bc4a9f9bd151c496832be54ed86821945';
+final class ChapterListProvider
+    extends $AsyncNotifierProvider<ChapterList, List<Chapter>> {
+  ChapterListProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'chapterListProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
 
-/// See also [ActiveChapter].
+  @override
+  String debugGetCreateSourceHash() => _$chapterListHash();
+
+  @$internal
+  @override
+  ChapterList create() => ChapterList();
+}
+
+String _$chapterListHash() => r'dfbea948e9bc4e9073ec92bcdb30b5edeb23c708';
+
+abstract class _$ChapterList extends $AsyncNotifier<List<Chapter>> {
+  FutureOr<List<Chapter>> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<List<Chapter>>, List<Chapter>>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<List<Chapter>>, List<Chapter>>,
+        AsyncValue<List<Chapter>>,
+        Object?,
+        Object?>;
+    element.handleCreate(ref, build);
+  }
+}
+
 @ProviderFor(ActiveChapter)
-final activeChapterProvider =
-    NotifierProvider<ActiveChapter, Chapter?>.internal(
-  ActiveChapter.new,
-  name: r'activeChapterProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$activeChapterHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final activeChapterProvider = ActiveChapterProvider._();
 
-typedef _$ActiveChapter = Notifier<Chapter?>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+final class ActiveChapterProvider
+    extends $NotifierProvider<ActiveChapter, Chapter?> {
+  ActiveChapterProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'activeChapterProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$activeChapterHash();
+
+  @$internal
+  @override
+  ActiveChapter create() => ActiveChapter();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(Chapter? value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<Chapter?>(value),
+    );
+  }
+}
+
+String _$activeChapterHash() => r'258cac9a59cff3fb370239534bdd490f8989503a';
+
+abstract class _$ActiveChapter extends $Notifier<Chapter?> {
+  Chapter? build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<Chapter?, Chapter?>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<Chapter?, Chapter?>, Chapter?, Object?, Object?>;
+    element.handleCreate(ref, build);
+  }
+}

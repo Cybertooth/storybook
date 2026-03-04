@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,111 +9,61 @@ part of 'story.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-Story _$StoryFromJson(Map<String, dynamic> json) {
-  return _Story.fromJson(json);
-}
 
 /// @nodoc
 mixin _$Story {
-  String get id => throw _privateConstructorUsedError;
-  String get title => throw _privateConstructorUsedError;
-  String get summary => throw _privateConstructorUsedError;
-  String get theme => throw _privateConstructorUsedError;
-  String get coreQuestion => throw _privateConstructorUsedError;
-  DateTime get createdAt => throw _privateConstructorUsedError;
-  DateTime get updatedAt => throw _privateConstructorUsedError;
-
-  /// Serializes this Story to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  String get id;
+  String get title;
+  String get summary;
+  String get theme;
+  String get coreQuestion;
+  DateTime get createdAt;
+  DateTime get updatedAt;
 
   /// Create a copy of Story
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $StoryCopyWith<Story> get copyWith => throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $StoryCopyWith<$Res> {
-  factory $StoryCopyWith(Story value, $Res Function(Story) then) =
-      _$StoryCopyWithImpl<$Res, Story>;
-  @useResult
-  $Res call(
-      {String id,
-      String title,
-      String summary,
-      String theme,
-      String coreQuestion,
-      DateTime createdAt,
-      DateTime updatedAt});
-}
-
-/// @nodoc
-class _$StoryCopyWithImpl<$Res, $Val extends Story>
-    implements $StoryCopyWith<$Res> {
-  _$StoryCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of Story
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
+  $StoryCopyWith<Story> get copyWith =>
+      _$StoryCopyWithImpl<Story>(this as Story, _$identity);
+
+  /// Serializes this Story to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
-  $Res call({
-    Object? id = null,
-    Object? title = null,
-    Object? summary = null,
-    Object? theme = null,
-    Object? coreQuestion = null,
-    Object? createdAt = null,
-    Object? updatedAt = null,
-  }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      title: null == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String,
-      summary: null == summary
-          ? _value.summary
-          : summary // ignore: cast_nullable_to_non_nullable
-              as String,
-      theme: null == theme
-          ? _value.theme
-          : theme // ignore: cast_nullable_to_non_nullable
-              as String,
-      coreQuestion: null == coreQuestion
-          ? _value.coreQuestion
-          : coreQuestion // ignore: cast_nullable_to_non_nullable
-              as String,
-      createdAt: null == createdAt
-          ? _value.createdAt
-          : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      updatedAt: null == updatedAt
-          ? _value.updatedAt
-          : updatedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-    ) as $Val);
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is Story &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.title, title) || other.title == title) &&
+            (identical(other.summary, summary) || other.summary == summary) &&
+            (identical(other.theme, theme) || other.theme == theme) &&
+            (identical(other.coreQuestion, coreQuestion) ||
+                other.coreQuestion == coreQuestion) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, title, summary, theme,
+      coreQuestion, createdAt, updatedAt);
+
+  @override
+  String toString() {
+    return 'Story(id: $id, title: $title, summary: $summary, theme: $theme, coreQuestion: $coreQuestion, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 }
 
 /// @nodoc
-abstract class _$$StoryImplCopyWith<$Res> implements $StoryCopyWith<$Res> {
-  factory _$$StoryImplCopyWith(
-          _$StoryImpl value, $Res Function(_$StoryImpl) then) =
-      __$$StoryImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $StoryCopyWith<$Res> {
+  factory $StoryCopyWith(Story value, $Res Function(Story) _then) =
+      _$StoryCopyWithImpl;
   @useResult
   $Res call(
       {String id,
@@ -126,12 +76,11 @@ abstract class _$$StoryImplCopyWith<$Res> implements $StoryCopyWith<$Res> {
 }
 
 /// @nodoc
-class __$$StoryImplCopyWithImpl<$Res>
-    extends _$StoryCopyWithImpl<$Res, _$StoryImpl>
-    implements _$$StoryImplCopyWith<$Res> {
-  __$$StoryImplCopyWithImpl(
-      _$StoryImpl _value, $Res Function(_$StoryImpl) _then)
-      : super(_value, _then);
+class _$StoryCopyWithImpl<$Res> implements $StoryCopyWith<$Res> {
+  _$StoryCopyWithImpl(this._self, this._then);
+
+  final Story _self;
+  final $Res Function(Story) _then;
 
   /// Create a copy of Story
   /// with the given fields replaced by the non-null parameter values.
@@ -146,43 +95,209 @@ class __$$StoryImplCopyWithImpl<$Res>
     Object? createdAt = null,
     Object? updatedAt = null,
   }) {
-    return _then(_$StoryImpl(
+    return _then(_self.copyWith(
       id: null == id
-          ? _value.id
+          ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
       title: null == title
-          ? _value.title
+          ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
       summary: null == summary
-          ? _value.summary
+          ? _self.summary
           : summary // ignore: cast_nullable_to_non_nullable
               as String,
       theme: null == theme
-          ? _value.theme
+          ? _self.theme
           : theme // ignore: cast_nullable_to_non_nullable
               as String,
       coreQuestion: null == coreQuestion
-          ? _value.coreQuestion
+          ? _self.coreQuestion
           : coreQuestion // ignore: cast_nullable_to_non_nullable
               as String,
       createdAt: null == createdAt
-          ? _value.createdAt
+          ? _self.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
       updatedAt: null == updatedAt
-          ? _value.updatedAt
+          ? _self.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [Story].
+extension StoryPatterns on Story {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_Story value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _Story() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_Story value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _Story():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_Story value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _Story() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(String id, String title, String summary, String theme,
+            String coreQuestion, DateTime createdAt, DateTime updatedAt)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _Story() when $default != null:
+        return $default(_that.id, _that.title, _that.summary, _that.theme,
+            _that.coreQuestion, _that.createdAt, _that.updatedAt);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(String id, String title, String summary, String theme,
+            String coreQuestion, DateTime createdAt, DateTime updatedAt)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _Story():
+        return $default(_that.id, _that.title, _that.summary, _that.theme,
+            _that.coreQuestion, _that.createdAt, _that.updatedAt);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(String id, String title, String summary, String theme,
+            String coreQuestion, DateTime createdAt, DateTime updatedAt)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _Story() when $default != null:
+        return $default(_that.id, _that.title, _that.summary, _that.theme,
+            _that.coreQuestion, _that.createdAt, _that.updatedAt);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 @JsonSerializable()
-class _$StoryImpl implements _Story {
-  const _$StoryImpl(
+class _Story implements Story {
+  const _Story(
       {required this.id,
       required this.title,
       this.summary = '',
@@ -190,9 +305,7 @@ class _$StoryImpl implements _Story {
       this.coreQuestion = '',
       required this.createdAt,
       required this.updatedAt});
-
-  factory _$StoryImpl.fromJson(Map<String, dynamic> json) =>
-      _$$StoryImplFromJson(json);
+  factory _Story.fromJson(Map<String, dynamic> json) => _$StoryFromJson(json);
 
   @override
   final String id;
@@ -212,16 +325,26 @@ class _$StoryImpl implements _Story {
   @override
   final DateTime updatedAt;
 
+  /// Create a copy of Story
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'Story(id: $id, title: $title, summary: $summary, theme: $theme, coreQuestion: $coreQuestion, createdAt: $createdAt, updatedAt: $updatedAt)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$StoryCopyWith<_Story> get copyWith =>
+      __$StoryCopyWithImpl<_Story>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$StoryToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$StoryImpl &&
+            other is _Story &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.title, title) || other.title == title) &&
             (identical(other.summary, summary) || other.summary == summary) &&
@@ -239,53 +362,79 @@ class _$StoryImpl implements _Story {
   int get hashCode => Object.hash(runtimeType, id, title, summary, theme,
       coreQuestion, createdAt, updatedAt);
 
-  /// Create a copy of Story
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$StoryImplCopyWith<_$StoryImpl> get copyWith =>
-      __$$StoryImplCopyWithImpl<_$StoryImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$StoryImplToJson(
-      this,
-    );
+  String toString() {
+    return 'Story(id: $id, title: $title, summary: $summary, theme: $theme, coreQuestion: $coreQuestion, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 }
 
-abstract class _Story implements Story {
-  const factory _Story(
-      {required final String id,
-      required final String title,
-      final String summary,
-      final String theme,
-      final String coreQuestion,
-      required final DateTime createdAt,
-      required final DateTime updatedAt}) = _$StoryImpl;
+/// @nodoc
+abstract mixin class _$StoryCopyWith<$Res> implements $StoryCopyWith<$Res> {
+  factory _$StoryCopyWith(_Story value, $Res Function(_Story) _then) =
+      __$StoryCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String id,
+      String title,
+      String summary,
+      String theme,
+      String coreQuestion,
+      DateTime createdAt,
+      DateTime updatedAt});
+}
 
-  factory _Story.fromJson(Map<String, dynamic> json) = _$StoryImpl.fromJson;
+/// @nodoc
+class __$StoryCopyWithImpl<$Res> implements _$StoryCopyWith<$Res> {
+  __$StoryCopyWithImpl(this._self, this._then);
 
-  @override
-  String get id;
-  @override
-  String get title;
-  @override
-  String get summary;
-  @override
-  String get theme;
-  @override
-  String get coreQuestion;
-  @override
-  DateTime get createdAt;
-  @override
-  DateTime get updatedAt;
+  final _Story _self;
+  final $Res Function(_Story) _then;
 
   /// Create a copy of Story
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$StoryImplCopyWith<_$StoryImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? title = null,
+    Object? summary = null,
+    Object? theme = null,
+    Object? coreQuestion = null,
+    Object? createdAt = null,
+    Object? updatedAt = null,
+  }) {
+    return _then(_Story(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      title: null == title
+          ? _self.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String,
+      summary: null == summary
+          ? _self.summary
+          : summary // ignore: cast_nullable_to_non_nullable
+              as String,
+      theme: null == theme
+          ? _self.theme
+          : theme // ignore: cast_nullable_to_non_nullable
+              as String,
+      coreQuestion: null == coreQuestion
+          ? _self.coreQuestion
+          : coreQuestion // ignore: cast_nullable_to_non_nullable
+              as String,
+      createdAt: null == createdAt
+          ? _self.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      updatedAt: null == updatedAt
+          ? _self.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ));
+  }
 }
+
+// dart format on

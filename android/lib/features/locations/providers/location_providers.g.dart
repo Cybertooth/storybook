@@ -6,20 +6,46 @@ part of 'location_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$locationListHash() => r'39b4b66049b34cad83a65eef17d3a69fc0c8ca1b';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// See also [LocationList].
 @ProviderFor(LocationList)
-final locationListProvider =
-    AsyncNotifierProvider<LocationList, List<Location>>.internal(
-  LocationList.new,
-  name: r'locationListProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$locationListHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final locationListProvider = LocationListProvider._();
 
-typedef _$LocationList = AsyncNotifier<List<Location>>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+final class LocationListProvider
+    extends $AsyncNotifierProvider<LocationList, List<Location>> {
+  LocationListProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'locationListProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$locationListHash();
+
+  @$internal
+  @override
+  LocationList create() => LocationList();
+}
+
+String _$locationListHash() => r'ba022c1a18333e50130b48aaa9583b7f07d90a32';
+
+abstract class _$LocationList extends $AsyncNotifier<List<Location>> {
+  FutureOr<List<Location>> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<List<Location>>, List<Location>>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<List<Location>>, List<Location>>,
+        AsyncValue<List<Location>>,
+        Object?,
+        Object?>;
+    element.handleCreate(ref, build);
+  }
+}

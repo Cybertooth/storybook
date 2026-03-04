@@ -26,47 +26,47 @@ dependencies:
     sdk: flutter
 
   # State
-  flutter_riverpod: ^2.5.1
-  riverpod_annotation: ^2.3.5
+  flutter_riverpod: ^3.2.1
+  riverpod_annotation: ^4.0.2
 
   # Storage
   drift: ^2.18.0
   drift_flutter: ^0.2.1
   path_provider: ^2.1.3
-  flutter_secure_storage: ^9.0.0
+  flutter_secure_storage: ^10.0.0
 
   # Navigation
-  go_router: ^14.2.1
+  go_router: ^17.1.0
 
   # HTTP
   dio: ^5.4.3+1
 
   # Models
-  freezed_annotation: ^2.4.1
+  freezed_annotation: ^3.1.0
   json_annotation: ^4.9.0
 
   # UUID
   uuid: ^4.4.0
 
   # UI
-  fl_chart: ^0.68.0
+  fl_chart: ^1.1.1
   graphview: ^1.2.0
   flutter_markdown_plus: ^1.0.0
   gap: ^3.0.1
 
   # File operations (used in Phase 8)
-  file_picker: ^8.0.3
-  share_plus: ^10.0.0
+  file_picker: ^10.3.10
+  share_plus: ^12.0.1
   flutter_markdown: ^0.7.7+1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^4.0.0
+  flutter_lints: ^6.0.0
   build_runner: ^2.4.11
-  riverpod_generator: ^2.4.3
+  riverpod_generator: ^4.0.3
   drift_dev: ^2.18.0
-  freezed: ^2.5.2
+  freezed: ^3.2.5
   json_serializable: ^6.8.0
   mockito: ^5.4.4
 
