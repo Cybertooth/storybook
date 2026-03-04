@@ -14,10 +14,12 @@ part 'router.g.dart';
 
 @riverpod
 GoRouter router(Ref ref) {
+  // Watch activeStoryProvider to trigger router re-evaluation on state change
+  final activeStory = ref.watch(activeStoryProvider);
+
   return GoRouter(
     initialLocation: '/',
     redirect: (context, state) {
-      final activeStory = ref.read(activeStoryProvider);
       final isAtProjects = state.uri.path == '/projects';
 
       if (activeStory == null && !isAtProjects) {

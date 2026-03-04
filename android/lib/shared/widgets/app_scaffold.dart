@@ -8,8 +8,8 @@ class AppScaffold extends StatelessWidget {
 
   static const _tabs = [
     (icon: Icons.sticky_note_2, label: 'Scratchpad', path: '/scratchpad'),
-    (icon: Icons.edit_document, label: 'Draft', path: '/draft'),
     (icon: Icons.auto_awesome, label: 'Story Engine', path: '/ai'),
+    (icon: Icons.edit_document, label: 'Draft', path: '/draft'),
     (icon: Icons.timeline, label: 'Timeline', path: '/timeline'),
     (icon: Icons.menu_book, label: 'Codex', path: '/codex'),
   ];

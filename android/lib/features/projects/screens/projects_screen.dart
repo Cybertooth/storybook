@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/providers/active_story_provider.dart';
 import '../widgets/project_card.dart';
 
@@ -12,30 +13,44 @@ class ProjectsScreen extends ConsumerWidget {
     final active = ref.watch(activeStoryProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('My Stories')),
-      body: stories.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
-        data: (list) => list.isEmpty
-            ? const Center(child: Text('No stories yet. Tap + to create one.'))
-            : ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: list.length,
-                itemBuilder: (ctx, i) => ProjectCard(
-                  story: list[i],
-                  isActive: list[i].id == active?.id,
-                  onTap: () =>
-                      ref.read(activeStoryProvider.notifier).set(list[i]),
-                  onDelete: () => _confirmDelete(ctx, ref, list[i].id),
-                ),
-              ),
+      appBar: AppBar(title: const Text('Projects')),
+      body: Column(
+        children: [
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: Text(
+              'Select a project to continue writing, or tap + to create a new one.',
+              style: TextStyle(fontSize: 14, color: Colors.grey),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          Expanded(
+            child: stories.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, _) => Center(child: Text('Error: $e')),
+              data: (list) => list.isEmpty
+                  ? const Center(
+                      child: Text('No projects yet. Tap + to create one.'))
+                  : ListView.builder(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: list.length,
+                      itemBuilder: (ctx, i) => ProjectCard(
+                        story: list[i],
+                        isActive: list[i].id == active?.id,
+                        onTap: () {
+                          ref.read(activeStoryProvider.notifier).set(list[i]);
+                          context.go('/scratchpad');
+                        },
+                        onDelete: () => _confirmDelete(ctx, ref, list[i].id),
+                      ),
+                    ),
+            ),
+          ),
+        ],
       ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 50.0),
-        child: FloatingActionButton(
-          onPressed: () => _showCreate(context, ref),
-          child: const Icon(Icons.add),
-        ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showCreate(context, ref),
+        child: const Icon(Icons.add),
       ),
     );
   }
