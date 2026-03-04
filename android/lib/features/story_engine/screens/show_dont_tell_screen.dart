@@ -24,16 +24,16 @@ class _State extends ConsumerState<ShowDontTellScreen> {
       _results = [];
       _error = null;
     });
+    final messenger = ScaffoldMessenger.of(context);
     try {
       final results = await ai.showDontTell(_textCtrl.text);
       setState(() => _results = results);
       if (results.isEmpty) {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text('No tell-heavy sentences found. Great job!')),
-          );
-        }
+        messenger.showSnackBar(
+          const SnackBar(
+            content: Text('No tell-heavy sentences found. Great job!'),
+          ),
+        );
       }
     } catch (e) {
       setState(() => _error = e.toString());
@@ -55,8 +55,9 @@ class _State extends ConsumerState<ShowDontTellScreen> {
               padding: const EdgeInsets.all(16),
               children: [
                 const Text(
-                    'Paste prose below to identify "tell-heavy" sentences and get "showing" alternatives.',
-                    style: TextStyle(fontSize: 14, color: Colors.grey)),
+                  'Paste prose below to identify "tell-heavy" sentences and get "showing" alternatives.',
+                  style: TextStyle(fontSize: 14, color: Colors.grey),
+                ),
                 const SizedBox(height: 16),
                 TextField(
                   controller: _textCtrl,
@@ -74,42 +75,56 @@ class _State extends ConsumerState<ShowDontTellScreen> {
                           width: 16,
                           height: 16,
                           child: CircularProgressIndicator(
-                              strokeWidth: 2, color: Colors.white))
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
                       : const Icon(Icons.auto_awesome),
                   label: const Text('Find Tells'),
                 ),
                 if (_error != null) ...[
                   const SizedBox(height: 8),
-                  Text('Error: $_error',
-                      style: const TextStyle(color: Colors.red)),
+                  Text(
+                    'Error: $_error',
+                    style: const TextStyle(color: Colors.red),
+                  ),
                 ],
                 const SizedBox(height: 16),
-                ..._results.map((res) => Card(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text('Original (Telling):',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.redAccent,
-                                    fontSize: 12)),
-                            Text(res['original'] ?? '',
-                                style: const TextStyle(
-                                    fontStyle: FontStyle.italic)),
-                            const Divider(height: 16),
-                            const Text('Suggestion (Showing):',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.green,
-                                    fontSize: 12)),
-                            Text(res['suggestion'] ?? ''),
-                          ],
-                        ),
+                ..._results.map(
+                  (res) => Card(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Original (Telling):',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.redAccent,
+                              fontSize: 12,
+                            ),
+                          ),
+                          Text(
+                            res['original'] ?? '',
+                            style: const TextStyle(fontStyle: FontStyle.italic),
+                          ),
+                          const Divider(height: 16),
+                          const Text(
+                            'Suggestion (Showing):',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green,
+                              fontSize: 12,
+                            ),
+                          ),
+                          Text(res['suggestion'] ?? ''),
+                        ],
                       ),
-                    )),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),

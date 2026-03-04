@@ -48,9 +48,7 @@ class _State extends ConsumerState<SettingsScreen> {
           openAiKey: _openAiCtrl.text.trim(),
         );
     setState(() => _saving = false);
-    sm.showSnackBar(
-      const SnackBar(content: Text('API keys saved.')),
-    );
+    sm.showSnackBar(const SnackBar(content: Text('API keys saved.')));
   }
 
   @override
@@ -79,41 +77,36 @@ class _State extends ConsumerState<SettingsScreen> {
               const Divider(height: 24),
 
               // ── AI Provider ──────────────────────────────────────
-              const _SectionHeader('AI Provider'),
-              RadioListTile<String>(
-                title: const Text('Gemini (Google)'),
-                value: 'gemini',
-                groupValue: settings.aiProvider,
-                onChanged: (v) async {
-                  try {
-                    await ref
-                        .read(settingsProvider.notifier)
-                        .updateSettings(provider: v);
-                  } catch (e) {
-                    if (context.mounted) {
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: SegmentedButton<String>(
+                  segments: const [
+                    ButtonSegment(
+                      value: 'gemini',
+                      label: Text('Gemini'),
+                      icon: Icon(Icons.auto_awesome),
+                    ),
+                    ButtonSegment(
+                      value: 'openai',
+                      label: Text('OpenAI'),
+                      icon: Icon(Icons.bolt),
+                    ),
+                  ],
+                  selected: {settings.aiProvider},
+                  onSelectionChanged: (newSelection) async {
+                    final v = newSelection.first;
+                    try {
+                      await ref
+                          .read(settingsProvider.notifier)
+                          .updateSettings(provider: v);
+                    } catch (e) {
+                      if (!context.mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('Failed to save provider: $e')),
                       );
                     }
-                  }
-                },
-              ),
-              RadioListTile<String>(
-                title: const Text('OpenAI'),
-                value: 'openai',
-                groupValue: settings.aiProvider,
-                onChanged: (v) async {
-                  try {
-                    await ref
-                        .read(settingsProvider.notifier)
-                        .updateSettings(provider: v);
-                  } catch (e) {
-                    if (!mounted) return;
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Failed to save provider: $e')),
-                    );
-                  }
-                },
+                  },
+                ),
               ),
               const Divider(height: 24),
 
@@ -128,7 +121,8 @@ class _State extends ConsumerState<SettingsScreen> {
                   border: const OutlineInputBorder(),
                   suffixIcon: IconButton(
                     icon: Icon(
-                        _showGemini ? Icons.visibility_off : Icons.visibility),
+                      _showGemini ? Icons.visibility_off : Icons.visibility,
+                    ),
                     onPressed: () => setState(() => _showGemini = !_showGemini),
                   ),
                 ),
@@ -142,7 +136,8 @@ class _State extends ConsumerState<SettingsScreen> {
                   border: const OutlineInputBorder(),
                   suffixIcon: IconButton(
                     icon: Icon(
-                        _showOpenAi ? Icons.visibility_off : Icons.visibility),
+                      _showOpenAi ? Icons.visibility_off : Icons.visibility,
+                    ),
                     onPressed: () => setState(() => _showOpenAi = !_showOpenAi),
                   ),
                 ),
@@ -155,7 +150,9 @@ class _State extends ConsumerState<SettingsScreen> {
                         width: 16,
                         height: 16,
                         child: CircularProgressIndicator(
-                            strokeWidth: 2, color: Colors.white),
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
                       )
                     : const Text('Save API Keys'),
               ),
@@ -174,8 +171,8 @@ class _State extends ConsumerState<SettingsScreen> {
                   if (story == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                          content:
-                              Text('Select a story from Dashboard first.')),
+                        content: Text('Select a story from Dashboard first.'),
+                      ),
                     );
                     return;
                   }
@@ -238,7 +235,8 @@ class _State extends ConsumerState<SettingsScreen> {
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                            content: Text('Story imported successfully.')),
+                          content: Text('Story imported successfully.'),
+                        ),
                       );
                       // Force refresh dashboard/active story if needed
                       ref.invalidate(activeStoryProvider);

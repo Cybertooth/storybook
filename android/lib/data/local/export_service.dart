@@ -55,8 +55,9 @@ class ExportService {
     final file = File('${dir.path}/${storyTitle}_backup.json');
     await file.writeAsString(json);
 
-    // Note: 'Share' is deprecated in some versions, but 'Share.shareXFiles'
-    // is currently the stable entry point for files in share_plus 12.0.1.
+    // Note: Use Share.shareXFiles for file sharing.
+    // The lint suggesting SharePlus.instance.share() is for text only.
+    // ignore: deprecated_member_use
     await Share.shareXFiles(
       [XFile(file.path, mimeType: 'application/json')],
       subject: 'Storybook backup: ${bundle['story']['title']}',
