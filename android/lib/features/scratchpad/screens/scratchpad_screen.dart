@@ -95,18 +95,83 @@ class _State extends ConsumerState<ScratchpadScreen> {
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (e, _) => Center(child: Text('Error: $e')),
               data: (notes) {
-                if (notes.isEmpty) {
-                  return const Center(
-                    child: Text('No notes yet. Add one above!'),
-                  );
-                }
-                return SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
-                  child: Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: notes.map((n) => _NoteCard(note: n)).toList(),
-                  ),
+                final activeFilter = ref.watch(noteFilterProvider);
+                final filteredNotes = activeFilter == null
+                    ? notes
+                    : notes.where((n) => n.label == activeFilter).toList();
+
+                // Get all unique labels to show in chips
+                final allLabels = notes
+                    .map((n) => n.label)
+                    .whereType<String>()
+                    .toSet()
+                    .toList()
+                  ..sort();
+
+                return Column(
+                  children: [
+                    if (allLabels.isNotEmpty)
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        child: Row(
+                          children: [
+                            ChoiceChip(
+                              label: const Text('All'),
+                              selected: activeFilter == null,
+                              onSelected: (_) => ref
+                                  .read(noteFilterProvider.notifier)
+                                  .setFilter(null),
+                            ),
+                            const SizedBox(width: 8),
+                            ...allLabels.map((label) => Padding(
+                                  padding: const EdgeInsets.only(right: 8),
+                                  child: ChoiceChip(
+                                    label: Text(label),
+                                    selected: activeFilter == label,
+                                    onSelected: (_) => ref
+                                        .read(noteFilterProvider.notifier)
+                                        .setFilter(label),
+                                  ),
+                                )),
+                          ],
+                        ),
+                      ),
+                    Expanded(
+                      child: filteredNotes.isEmpty
+                          ? const Center(
+                              child: Text('No notes found.'),
+                            )
+                          : ReorderableListView.builder(
+                              padding: const EdgeInsets.fromLTRB(16, 8, 16, 80),
+                              itemCount: filteredNotes.length,
+                              onReorder: (oldIndex, newIndex) {
+                                // If filtered, we shouldn't really reorder directly, or we can find original indices
+                                // For simplicity, if we are filtered, disable reordering or map it back.
+                                // Best to only reorder when 'All' is selected.
+                                if (activeFilter != null) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content: Text(
+                                              'Clear filter to reorder notes.')));
+                                  return;
+                                }
+                                ref
+                                    .read(noteListProvider.notifier)
+                                    .reorderNotes(oldIndex, newIndex);
+                              },
+                              itemBuilder: (context, index) {
+                                final n = filteredNotes[index];
+                                return Padding(
+                                  key: ValueKey(n.id),
+                                  padding: const EdgeInsets.only(bottom: 8),
+                                  child: _NoteListTile(note: n),
+                                );
+                              },
+                            ),
+                    ),
+                  ],
                 );
               },
             ),
@@ -117,17 +182,25 @@ class _State extends ConsumerState<ScratchpadScreen> {
   }
 }
 
-class _NoteCard extends ConsumerStatefulWidget {
+class _NoteListTile extends ConsumerStatefulWidget {
   final Note note;
-  const _NoteCard({required this.note});
+  const _NoteListTile({required this.note});
 
   @override
-  ConsumerState<_NoteCard> createState() => _NoteCardState();
+  ConsumerState<_NoteListTile> createState() => _NoteListTileState();
 }
 
-class _NoteCardState extends ConsumerState<_NoteCard> {
+class _NoteListTileState extends ConsumerState<_NoteListTile> {
   bool _editing = false;
   late final TextEditingController _ctrl;
+  final List<String> _suggestedLabels = [
+    'Idea',
+    'Draft',
+    'Todo',
+    'Research',
+    'Plot point',
+    'Character'
+  ];
 
   @override
   void initState() {
@@ -147,60 +220,103 @@ class _NoteCardState extends ConsumerState<_NoteCard> {
     setState(() => _editing = false);
   }
 
+  Future<void> _setLabel(String? label) async {
+    final updated = widget.note.copyWith(label: label);
+    await ref.read(noteListProvider.notifier).updateNote(updated);
+  }
+
   @override
   Widget build(BuildContext context) {
-    final width = (MediaQuery.of(context).size.width - 48) / 2;
-    return SizedBox(
-      width: width.clamp(140, 220),
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (_editing) ...[
-                TextField(
-                  controller: _ctrl,
-                  maxLines: null,
-                  autofocus: true,
-                  decoration: const InputDecoration(
-                    isDense: true,
-                    border: OutlineInputBorder(),
+    return Card(
+      elevation: 0,
+      margin: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(
+          color: Theme.of(context)
+              .colorScheme
+              .outlineVariant
+              .withValues(alpha: 0.5),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (_editing) ...[
+              TextField(
+                controller: _ctrl,
+                maxLines: null,
+                autofocus: true,
+                decoration: const InputDecoration(
+                  isDense: true,
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => setState(() => _editing = false),
+                    child: const Text('Cancel'),
                   ),
-                ),
-                const SizedBox(height: 6),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      onPressed: () => setState(() => _editing = false),
-                      child: const Text('Cancel'),
+                  const SizedBox(width: 8),
+                  FilledButton.tonal(
+                      onPressed: _save, child: const Text('Save')),
+                ],
+              ),
+            ] else ...[
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(Icons.drag_indicator,
+                      color: Colors.grey, size: 20),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => setState(() => _editing = true),
+                      child: Text(
+                        widget.note.content,
+                        style: const TextStyle(fontSize: 15, height: 1.4),
+                      ),
                     ),
-                    const SizedBox(width: 4),
-                    FilledButton(onPressed: _save, child: const Text('Save')),
-                  ],
-                ),
-              ] else ...[
-                GestureDetector(
-                  onTap: () => setState(() => _editing = true),
-                  child: Text(widget.note.content),
-                ),
-                const SizedBox(height: 4),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: IconButton(
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  const SizedBox(width: 28), // align with text
+                  if (widget.note.label != null)
+                    InputChip(
+                      label: Text(widget.note.label!),
+                      onDeleted: () => _setLabel(null),
+                      visualDensity: VisualDensity.compact,
+                    )
+                  else
+                    PopupMenuButton<String>(
+                      tooltip: 'Add Label',
+                      icon: const Icon(Icons.label_outline, size: 18),
+                      onSelected: _setLabel,
+                      itemBuilder: (context) => _suggestedLabels
+                          .map((l) => PopupMenuItem(value: l, child: Text(l)))
+                          .toList(),
+                    ),
+                  const Spacer(),
+                  IconButton(
                     icon: const Icon(Icons.delete_outline, size: 18),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
+                    tooltip: 'Delete Note',
                     onPressed: () => ref
                         .read(noteListProvider.notifier)
                         .delete(widget.note.id),
                   ),
-                ),
-              ],
+                ],
+              ),
             ],
-          ),
+          ],
         ),
       ),
     );

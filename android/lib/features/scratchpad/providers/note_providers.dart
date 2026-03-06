@@ -7,6 +7,16 @@ import '../../../domain/models/note.dart';
 
 part 'note_providers.g.dart';
 
+@riverpod
+class NoteFilter extends _$NoteFilter {
+  @override
+  String? build() => null;
+
+  void setFilter(String? label) {
+    state = label;
+  }
+}
+
 @Riverpod(keepAlive: true)
 class NoteList extends _$NoteList {
   @override
@@ -18,12 +28,16 @@ class NoteList extends _$NoteList {
   }
 
   Future<void> add(String storyId, String content) async {
+    final notes = state.value ?? [];
+    final targetOrder = notes.isEmpty ? 0 : notes.last.orderIndex + 1;
+
     final repo = ref.read(noteRepositoryProvider);
     await repo.create(Note(
       id: const Uuid().v4(),
       storyId: storyId,
       content: content,
       createdAt: DateTime.now(),
+      orderIndex: targetOrder,
     ));
     ref.invalidateSelf();
   }
@@ -32,6 +46,29 @@ class NoteList extends _$NoteList {
     final repo = ref.read(noteRepositoryProvider);
     await repo.update(note);
     ref.invalidateSelf();
+  }
+
+  Future<void> reorderNotes(int oldIndex, int newIndex) async {
+    final notes = state.value?.toList();
+    if (notes == null) return;
+
+    if (oldIndex < newIndex) {
+      newIndex -= 1;
+    }
+
+    final note = notes.removeAt(oldIndex);
+    notes.insert(newIndex, note);
+
+    // Update orders in DB
+    final repo = ref.read(noteRepositoryProvider);
+    for (int i = 0; i < notes.length; i++) {
+      if (notes[i].orderIndex != i) {
+        final updated = notes[i].copyWith(orderIndex: i);
+        notes[i] = updated;
+        await repo.update(updated);
+      }
+    }
+    state = AsyncData(notes);
   }
 
   Future<void> delete(String id) async {

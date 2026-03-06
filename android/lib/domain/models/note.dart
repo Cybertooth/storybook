@@ -10,6 +10,8 @@ abstract class Note with _$Note {
     required String storyId,
     required String content,
     required DateTime createdAt,
+    @Default(0) int orderIndex,
+    String? label,
   }) = _Note;
 
   factory Note.fromJson(Map<String, dynamic> json) => _$NoteFromJson(json);

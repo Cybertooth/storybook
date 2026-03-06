@@ -12,15 +12,34 @@ import 'tables/relationships_table.dart';
 part 'database.g.dart';
 
 @DriftDatabase(tables: [
-  StoriesTable, CharactersTable, LocationsTable, PlotEventsTable,
-  ChaptersTable, NotesTable, QuestionsTable, RelationshipsTable,
+  StoriesTable,
+  CharactersTable,
+  LocationsTable,
+  PlotEventsTable,
+  ChaptersTable,
+  NotesTable,
+  QuestionsTable,
+  RelationshipsTable,
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
   AppDatabase.forTesting(super.connection);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+        onCreate: (Migrator m) async {
+          await m.createAll();
+        },
+        onUpgrade: (Migrator m, int from, int to) async {
+          if (from < 2) {
+            await m.addColumn(notesTable, notesTable.orderIndex);
+            await m.addColumn(notesTable, notesTable.label);
+          }
+        },
+      );
 
   static QueryExecutor _openConnection() => driftDatabase(name: 'storybook_db');
 }

@@ -8,18 +8,30 @@ class LocalNoteRepository implements NoteRepository {
   const LocalNoteRepository(this._db);
 
   Note _fromRow(NotesTableData row) => Note(
-        id: row.id, storyId: row.storyId,
-        content: row.content, createdAt: row.createdAt,
+        id: row.id,
+        storyId: row.storyId,
+        content: row.content,
+        createdAt: row.createdAt,
+        orderIndex: row.orderIndex,
+        label: row.label,
       );
 
   @override
-  Future<List<Note>> getAllForStory(String storyId) async =>
-      (await (_db.select(_db.notesTable)..where((t) => t.storyId.equals(storyId))).get())
-          .map(_fromRow).toList();
+  Future<List<Note>> getAllForStory(String storyId) async => (await (_db
+              .select(_db.notesTable)
+            ..where((t) => t.storyId.equals(storyId))
+            ..orderBy([
+              (t) =>
+                  OrderingTerm(expression: t.orderIndex, mode: OrderingMode.asc)
+            ]))
+          .get())
+      .map(_fromRow)
+      .toList();
 
   @override
   Future<Note?> getById(String id) async {
-    final row = await (_db.select(_db.notesTable)..where((t) => t.id.equals(id)))
+    final row = await (_db.select(_db.notesTable)
+          ..where((t) => t.id.equals(id)))
         .getSingleOrNull();
     return row == null ? null : _fromRow(row);
   }
@@ -27,16 +39,23 @@ class LocalNoteRepository implements NoteRepository {
   @override
   Future<Note> create(Note note) async {
     await _db.into(_db.notesTable).insert(NotesTableCompanion.insert(
-      id: note.id, storyId: note.storyId, content: note.content,
-      createdAt: note.createdAt,
-    ));
+          id: note.id,
+          storyId: note.storyId,
+          content: note.content,
+          createdAt: note.createdAt,
+          orderIndex: Value(note.orderIndex),
+          label: Value(note.label),
+        ));
     return note;
   }
 
   @override
   Future<Note> update(Note note) async {
     await (_db.update(_db.notesTable)..where((t) => t.id.equals(note.id)))
-        .write(NotesTableCompanion(content: Value(note.content)));
+        .write(NotesTableCompanion(
+            content: Value(note.content),
+            orderIndex: Value(note.orderIndex),
+            label: Value(note.label)));
     return note;
   }
 

@@ -18,6 +18,8 @@ mixin _$Note {
   String get storyId;
   String get content;
   DateTime get createdAt;
+  int get orderIndex;
+  String? get label;
 
   /// Create a copy of Note
   /// with the given fields replaced by the non-null parameter values.
@@ -38,16 +40,20 @@ mixin _$Note {
             (identical(other.storyId, storyId) || other.storyId == storyId) &&
             (identical(other.content, content) || other.content == content) &&
             (identical(other.createdAt, createdAt) ||
-                other.createdAt == createdAt));
+                other.createdAt == createdAt) &&
+            (identical(other.orderIndex, orderIndex) ||
+                other.orderIndex == orderIndex) &&
+            (identical(other.label, label) || other.label == label));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, storyId, content, createdAt);
+  int get hashCode => Object.hash(
+      runtimeType, id, storyId, content, createdAt, orderIndex, label);
 
   @override
   String toString() {
-    return 'Note(id: $id, storyId: $storyId, content: $content, createdAt: $createdAt)';
+    return 'Note(id: $id, storyId: $storyId, content: $content, createdAt: $createdAt, orderIndex: $orderIndex, label: $label)';
   }
 }
 
@@ -56,7 +62,13 @@ abstract mixin class $NoteCopyWith<$Res> {
   factory $NoteCopyWith(Note value, $Res Function(Note) _then) =
       _$NoteCopyWithImpl;
   @useResult
-  $Res call({String id, String storyId, String content, DateTime createdAt});
+  $Res call(
+      {String id,
+      String storyId,
+      String content,
+      DateTime createdAt,
+      int orderIndex,
+      String? label});
 }
 
 /// @nodoc
@@ -75,6 +87,8 @@ class _$NoteCopyWithImpl<$Res> implements $NoteCopyWith<$Res> {
     Object? storyId = null,
     Object? content = null,
     Object? createdAt = null,
+    Object? orderIndex = null,
+    Object? label = freezed,
   }) {
     return _then(_self.copyWith(
       id: null == id
@@ -93,6 +107,14 @@ class _$NoteCopyWithImpl<$Res> implements $NoteCopyWith<$Res> {
           ? _self.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
+      orderIndex: null == orderIndex
+          ? _self.orderIndex
+          : orderIndex // ignore: cast_nullable_to_non_nullable
+              as int,
+      label: freezed == label
+          ? _self.label
+          : label // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -190,16 +212,16 @@ extension NotePatterns on Note {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(
-            String id, String storyId, String content, DateTime createdAt)?
+    TResult Function(String id, String storyId, String content,
+            DateTime createdAt, int orderIndex, String? label)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _Note() when $default != null:
-        return $default(
-            _that.id, _that.storyId, _that.content, _that.createdAt);
+        return $default(_that.id, _that.storyId, _that.content, _that.createdAt,
+            _that.orderIndex, _that.label);
       case _:
         return orElse();
     }
@@ -220,15 +242,15 @@ extension NotePatterns on Note {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(
-            String id, String storyId, String content, DateTime createdAt)
+    TResult Function(String id, String storyId, String content,
+            DateTime createdAt, int orderIndex, String? label)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _Note():
-        return $default(
-            _that.id, _that.storyId, _that.content, _that.createdAt);
+        return $default(_that.id, _that.storyId, _that.content, _that.createdAt,
+            _that.orderIndex, _that.label);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -248,15 +270,15 @@ extension NotePatterns on Note {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(
-            String id, String storyId, String content, DateTime createdAt)?
+    TResult? Function(String id, String storyId, String content,
+            DateTime createdAt, int orderIndex, String? label)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _Note() when $default != null:
-        return $default(
-            _that.id, _that.storyId, _that.content, _that.createdAt);
+        return $default(_that.id, _that.storyId, _that.content, _that.createdAt,
+            _that.orderIndex, _that.label);
       case _:
         return null;
     }
@@ -270,7 +292,9 @@ class _Note implements Note {
       {required this.id,
       required this.storyId,
       required this.content,
-      required this.createdAt});
+      required this.createdAt,
+      this.orderIndex = 0,
+      this.label});
   factory _Note.fromJson(Map<String, dynamic> json) => _$NoteFromJson(json);
 
   @override
@@ -281,6 +305,11 @@ class _Note implements Note {
   final String content;
   @override
   final DateTime createdAt;
+  @override
+  @JsonKey()
+  final int orderIndex;
+  @override
+  final String? label;
 
   /// Create a copy of Note
   /// with the given fields replaced by the non-null parameter values.
@@ -306,16 +335,20 @@ class _Note implements Note {
             (identical(other.storyId, storyId) || other.storyId == storyId) &&
             (identical(other.content, content) || other.content == content) &&
             (identical(other.createdAt, createdAt) ||
-                other.createdAt == createdAt));
+                other.createdAt == createdAt) &&
+            (identical(other.orderIndex, orderIndex) ||
+                other.orderIndex == orderIndex) &&
+            (identical(other.label, label) || other.label == label));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, storyId, content, createdAt);
+  int get hashCode => Object.hash(
+      runtimeType, id, storyId, content, createdAt, orderIndex, label);
 
   @override
   String toString() {
-    return 'Note(id: $id, storyId: $storyId, content: $content, createdAt: $createdAt)';
+    return 'Note(id: $id, storyId: $storyId, content: $content, createdAt: $createdAt, orderIndex: $orderIndex, label: $label)';
   }
 }
 
@@ -325,7 +358,13 @@ abstract mixin class _$NoteCopyWith<$Res> implements $NoteCopyWith<$Res> {
       __$NoteCopyWithImpl;
   @override
   @useResult
-  $Res call({String id, String storyId, String content, DateTime createdAt});
+  $Res call(
+      {String id,
+      String storyId,
+      String content,
+      DateTime createdAt,
+      int orderIndex,
+      String? label});
 }
 
 /// @nodoc
@@ -344,6 +383,8 @@ class __$NoteCopyWithImpl<$Res> implements _$NoteCopyWith<$Res> {
     Object? storyId = null,
     Object? content = null,
     Object? createdAt = null,
+    Object? orderIndex = null,
+    Object? label = freezed,
   }) {
     return _then(_Note(
       id: null == id
@@ -362,6 +403,14 @@ class __$NoteCopyWithImpl<$Res> implements _$NoteCopyWith<$Res> {
           ? _self.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
+      orderIndex: null == orderIndex
+          ? _self.orderIndex
+          : orderIndex // ignore: cast_nullable_to_non_nullable
+              as int,
+      label: freezed == label
+          ? _self.label
+          : label // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }

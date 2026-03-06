@@ -2346,8 +2346,22 @@ class $NotesTableTable extends NotesTable
   late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
       'created_at', aliasedName, false,
       type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _orderIndexMeta =
+      const VerificationMeta('orderIndex');
   @override
-  List<GeneratedColumn> get $columns => [id, storyId, content, createdAt];
+  late final GeneratedColumn<int> orderIndex = GeneratedColumn<int>(
+      'order_index', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
+  static const VerificationMeta _labelMeta = const VerificationMeta('label');
+  @override
+  late final GeneratedColumn<String> label = GeneratedColumn<String>(
+      'label', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, storyId, content, createdAt, orderIndex, label];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -2381,6 +2395,16 @@ class $NotesTableTable extends NotesTable
     } else if (isInserting) {
       context.missing(_createdAtMeta);
     }
+    if (data.containsKey('order_index')) {
+      context.handle(
+          _orderIndexMeta,
+          orderIndex.isAcceptableOrUnknown(
+              data['order_index']!, _orderIndexMeta));
+    }
+    if (data.containsKey('label')) {
+      context.handle(
+          _labelMeta, label.isAcceptableOrUnknown(data['label']!, _labelMeta));
+    }
     return context;
   }
 
@@ -2398,6 +2422,10 @@ class $NotesTableTable extends NotesTable
           .read(DriftSqlType.string, data['${effectivePrefix}content'])!,
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+      orderIndex: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}order_index'])!,
+      label: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}label']),
     );
   }
 
@@ -2412,11 +2440,15 @@ class NotesTableData extends DataClass implements Insertable<NotesTableData> {
   final String storyId;
   final String content;
   final DateTime createdAt;
+  final int orderIndex;
+  final String? label;
   const NotesTableData(
       {required this.id,
       required this.storyId,
       required this.content,
-      required this.createdAt});
+      required this.createdAt,
+      required this.orderIndex,
+      this.label});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -2424,6 +2456,10 @@ class NotesTableData extends DataClass implements Insertable<NotesTableData> {
     map['story_id'] = Variable<String>(storyId);
     map['content'] = Variable<String>(content);
     map['created_at'] = Variable<DateTime>(createdAt);
+    map['order_index'] = Variable<int>(orderIndex);
+    if (!nullToAbsent || label != null) {
+      map['label'] = Variable<String>(label);
+    }
     return map;
   }
 
@@ -2433,6 +2469,9 @@ class NotesTableData extends DataClass implements Insertable<NotesTableData> {
       storyId: Value(storyId),
       content: Value(content),
       createdAt: Value(createdAt),
+      orderIndex: Value(orderIndex),
+      label:
+          label == null && nullToAbsent ? const Value.absent() : Value(label),
     );
   }
 
@@ -2444,6 +2483,8 @@ class NotesTableData extends DataClass implements Insertable<NotesTableData> {
       storyId: serializer.fromJson<String>(json['storyId']),
       content: serializer.fromJson<String>(json['content']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      orderIndex: serializer.fromJson<int>(json['orderIndex']),
+      label: serializer.fromJson<String?>(json['label']),
     );
   }
   @override
@@ -2454,6 +2495,8 @@ class NotesTableData extends DataClass implements Insertable<NotesTableData> {
       'storyId': serializer.toJson<String>(storyId),
       'content': serializer.toJson<String>(content),
       'createdAt': serializer.toJson<DateTime>(createdAt),
+      'orderIndex': serializer.toJson<int>(orderIndex),
+      'label': serializer.toJson<String?>(label),
     };
   }
 
@@ -2461,12 +2504,16 @@ class NotesTableData extends DataClass implements Insertable<NotesTableData> {
           {String? id,
           String? storyId,
           String? content,
-          DateTime? createdAt}) =>
+          DateTime? createdAt,
+          int? orderIndex,
+          Value<String?> label = const Value.absent()}) =>
       NotesTableData(
         id: id ?? this.id,
         storyId: storyId ?? this.storyId,
         content: content ?? this.content,
         createdAt: createdAt ?? this.createdAt,
+        orderIndex: orderIndex ?? this.orderIndex,
+        label: label.present ? label.value : this.label,
       );
   NotesTableData copyWithCompanion(NotesTableCompanion data) {
     return NotesTableData(
@@ -2474,6 +2521,9 @@ class NotesTableData extends DataClass implements Insertable<NotesTableData> {
       storyId: data.storyId.present ? data.storyId.value : this.storyId,
       content: data.content.present ? data.content.value : this.content,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      orderIndex:
+          data.orderIndex.present ? data.orderIndex.value : this.orderIndex,
+      label: data.label.present ? data.label.value : this.label,
     );
   }
 
@@ -2483,13 +2533,16 @@ class NotesTableData extends DataClass implements Insertable<NotesTableData> {
           ..write('id: $id, ')
           ..write('storyId: $storyId, ')
           ..write('content: $content, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('orderIndex: $orderIndex, ')
+          ..write('label: $label')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, storyId, content, createdAt);
+  int get hashCode =>
+      Object.hash(id, storyId, content, createdAt, orderIndex, label);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -2497,7 +2550,9 @@ class NotesTableData extends DataClass implements Insertable<NotesTableData> {
           other.id == this.id &&
           other.storyId == this.storyId &&
           other.content == this.content &&
-          other.createdAt == this.createdAt);
+          other.createdAt == this.createdAt &&
+          other.orderIndex == this.orderIndex &&
+          other.label == this.label);
 }
 
 class NotesTableCompanion extends UpdateCompanion<NotesTableData> {
@@ -2505,12 +2560,16 @@ class NotesTableCompanion extends UpdateCompanion<NotesTableData> {
   final Value<String> storyId;
   final Value<String> content;
   final Value<DateTime> createdAt;
+  final Value<int> orderIndex;
+  final Value<String?> label;
   final Value<int> rowid;
   const NotesTableCompanion({
     this.id = const Value.absent(),
     this.storyId = const Value.absent(),
     this.content = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.orderIndex = const Value.absent(),
+    this.label = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   NotesTableCompanion.insert({
@@ -2518,6 +2577,8 @@ class NotesTableCompanion extends UpdateCompanion<NotesTableData> {
     required String storyId,
     required String content,
     required DateTime createdAt,
+    this.orderIndex = const Value.absent(),
+    this.label = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : id = Value(id),
         storyId = Value(storyId),
@@ -2528,6 +2589,8 @@ class NotesTableCompanion extends UpdateCompanion<NotesTableData> {
     Expression<String>? storyId,
     Expression<String>? content,
     Expression<DateTime>? createdAt,
+    Expression<int>? orderIndex,
+    Expression<String>? label,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -2535,6 +2598,8 @@ class NotesTableCompanion extends UpdateCompanion<NotesTableData> {
       if (storyId != null) 'story_id': storyId,
       if (content != null) 'content': content,
       if (createdAt != null) 'created_at': createdAt,
+      if (orderIndex != null) 'order_index': orderIndex,
+      if (label != null) 'label': label,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -2544,12 +2609,16 @@ class NotesTableCompanion extends UpdateCompanion<NotesTableData> {
       Value<String>? storyId,
       Value<String>? content,
       Value<DateTime>? createdAt,
+      Value<int>? orderIndex,
+      Value<String?>? label,
       Value<int>? rowid}) {
     return NotesTableCompanion(
       id: id ?? this.id,
       storyId: storyId ?? this.storyId,
       content: content ?? this.content,
       createdAt: createdAt ?? this.createdAt,
+      orderIndex: orderIndex ?? this.orderIndex,
+      label: label ?? this.label,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -2569,6 +2638,12 @@ class NotesTableCompanion extends UpdateCompanion<NotesTableData> {
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
+    if (orderIndex.present) {
+      map['order_index'] = Variable<int>(orderIndex.value);
+    }
+    if (label.present) {
+      map['label'] = Variable<String>(label.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -2582,6 +2657,8 @@ class NotesTableCompanion extends UpdateCompanion<NotesTableData> {
           ..write('storyId: $storyId, ')
           ..write('content: $content, ')
           ..write('createdAt: $createdAt, ')
+          ..write('orderIndex: $orderIndex, ')
+          ..write('label: $label, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -5520,6 +5597,8 @@ typedef $$NotesTableTableCreateCompanionBuilder = NotesTableCompanion Function({
   required String storyId,
   required String content,
   required DateTime createdAt,
+  Value<int> orderIndex,
+  Value<String?> label,
   Value<int> rowid,
 });
 typedef $$NotesTableTableUpdateCompanionBuilder = NotesTableCompanion Function({
@@ -5527,6 +5606,8 @@ typedef $$NotesTableTableUpdateCompanionBuilder = NotesTableCompanion Function({
   Value<String> storyId,
   Value<String> content,
   Value<DateTime> createdAt,
+  Value<int> orderIndex,
+  Value<String?> label,
   Value<int> rowid,
 });
 
@@ -5568,6 +5649,12 @@ class $$NotesTableTableFilterComposer
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnFilters(column));
 
+  ColumnFilters<int> get orderIndex => $composableBuilder(
+      column: $table.orderIndex, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get label => $composableBuilder(
+      column: $table.label, builder: (column) => ColumnFilters(column));
+
   $$StoriesTableTableFilterComposer get storyId {
     final $$StoriesTableTableFilterComposer composer = $composerBuilder(
         composer: this,
@@ -5607,6 +5694,12 @@ class $$NotesTableTableOrderingComposer
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<int> get orderIndex => $composableBuilder(
+      column: $table.orderIndex, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get label => $composableBuilder(
+      column: $table.label, builder: (column) => ColumnOrderings(column));
+
   $$StoriesTableTableOrderingComposer get storyId {
     final $$StoriesTableTableOrderingComposer composer = $composerBuilder(
         composer: this,
@@ -5645,6 +5738,12 @@ class $$NotesTableTableAnnotationComposer
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get orderIndex => $composableBuilder(
+      column: $table.orderIndex, builder: (column) => column);
+
+  GeneratedColumn<String> get label =>
+      $composableBuilder(column: $table.label, builder: (column) => column);
 
   $$StoriesTableTableAnnotationComposer get storyId {
     final $$StoriesTableTableAnnotationComposer composer = $composerBuilder(
@@ -5694,6 +5793,8 @@ class $$NotesTableTableTableManager extends RootTableManager<
             Value<String> storyId = const Value.absent(),
             Value<String> content = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
+            Value<int> orderIndex = const Value.absent(),
+            Value<String?> label = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               NotesTableCompanion(
@@ -5701,6 +5802,8 @@ class $$NotesTableTableTableManager extends RootTableManager<
             storyId: storyId,
             content: content,
             createdAt: createdAt,
+            orderIndex: orderIndex,
+            label: label,
             rowid: rowid,
           ),
           createCompanionCallback: ({
@@ -5708,6 +5811,8 @@ class $$NotesTableTableTableManager extends RootTableManager<
             required String storyId,
             required String content,
             required DateTime createdAt,
+            Value<int> orderIndex = const Value.absent(),
+            Value<String?> label = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               NotesTableCompanion.insert(
@@ -5715,6 +5820,8 @@ class $$NotesTableTableTableManager extends RootTableManager<
             storyId: storyId,
             content: content,
             createdAt: createdAt,
+            orderIndex: orderIndex,
+            label: label,
             rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0

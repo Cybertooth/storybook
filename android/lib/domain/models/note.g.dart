@@ -11,6 +11,8 @@ _Note _$NoteFromJson(Map<String, dynamic> json) => _Note(
       storyId: json['storyId'] as String,
       content: json['content'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
+      orderIndex: (json['orderIndex'] as num?)?.toInt() ?? 0,
+      label: json['label'] as String?,
     );
 
 Map<String, dynamic> _$NoteToJson(_Note instance) => <String, dynamic>{
@@ -18,4 +20,6 @@ Map<String, dynamic> _$NoteToJson(_Note instance) => <String, dynamic>{
       'storyId': instance.storyId,
       'content': instance.content,
       'createdAt': instance.createdAt.toIso8601String(),
+      'orderIndex': instance.orderIndex,
+      'label': instance.label,
     };
