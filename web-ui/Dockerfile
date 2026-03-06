@@ -11,7 +11,7 @@ COPY web-ui/package.json ./web-ui/
 COPY api/package.json ./api/
 
 # Install dependencies (workspaces)
-RUN npm ci
+RUN npm install
 
 # Copy full source
 COPY api ./api

@@ -6,9 +6,12 @@ export class StoriesService {
     constructor(private prisma: PrismaService) { }
 
     async create(userId: string, data: any) {
+        // Strip out any frontend-provided timestamps which come in as Ints instead of Dates
+        const { createdAt, updatedAt, ...safeData } = data;
+
         return this.prisma.story.create({
             data: {
-                ...data,
+                ...safeData,
                 user: { connectOrCreate: { where: { id: userId }, create: { id: userId, email: `${userId}@example.com`, password: 'pwd' } } },
             },
         });

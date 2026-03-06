@@ -1,0 +1,13 @@
+node_modules
+.git
+.gitignore
+*.md
+backend/node_modules
+backend/dist
+web-ui/node_modules
+web-ui/dist
+api/node_modules
+api/dist
+docs
+.agent
+.claude

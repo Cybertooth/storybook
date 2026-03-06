@@ -1,0 +1,116 @@
+ Image storybook_v1-backend-backend Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 568B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 1.46kB 0.0s done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/node:20-alpine
+#3 ...
+
+#4 [auth] library/node:pull token for registry-1.docker.io
+#4 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/node:20-alpine
+#3 DONE 1.9s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 33B
+#5 transferring context: 201B 0.2s done
+#5 DONE 0.2s
+
+#6 [builder  1/11] FROM docker.io/library/node:20-alpine@sha256:09e2b3d9726018aecf269bd35325f46bf75046a643a66d28360ec71132750ec8
+#6 DONE 0.0s
+
+#7 [internal] load build context
+#7 transferring context: 3.42kB 0.0s done
+#7 DONE 1.0s
+
+#8 [builder  4/11] COPY backend/package.json ./backend/
+#8 CACHED
+
+#9 [builder  5/11] COPY api/package.json ./api/
+#9 CACHED
+
+#10 [builder  6/11] RUN npm ci
+#10 CACHED
+
+#11 [builder  2/11] WORKDIR /app
+#11 CACHED
+
+#12 [builder  3/11] COPY package.json package-lock.json ./
+#12 CACHED
+
+#13 [builder  7/11] COPY api ./api
+#13 CACHED
+
+#14 [builder  8/11] COPY backend ./backend
+#14 CACHED
+
+#15 [builder  9/11] RUN cd api && npm run build
+#15 CACHED
+
+#16 [builder 10/11] RUN cd backend && ls -la && npx prisma generate
+#16 0.613 total 64
+#16 0.613 drwxr-xr-x    1 root     root          4096 Mar  6 01:55 .
+#16 0.613 drwxr-xr-x    1 root     root          4096 Mar  6 01:34 ..
+#16 0.613 -rwxr-xr-x    1 root     root           688 Mar  1 11:26 .eslintrc.js
+#16 0.613 -rwxr-xr-x    1 root     root            94 Mar  1 11:26 .gitignore
+#16 0.613 -rwxr-xr-x    1 root     root            54 Mar  1 11:26 .prettierrc
+#16 0.613 -rwxr-xr-x    1 root     root          1420 Mar  6 01:55 Dockerfile
+#16 0.613 -rwxr-xr-x    1 root     root          5304 Mar  1 11:26 README.md
+#16 0.613 -rwxr-xr-x    1 root     root           179 Mar  1 11:26 nest-cli.json
+#16 0.613 -rwxr-xr-x    1 root     root          2323 Mar  1 11:26 package.json
+#16 0.613 drwxr-xr-x    2 root     root          4096 Mar  6 01:50 prisma
+#16 0.613 drwxr-xr-x    9 root     root          4096 Mar  1 11:26 src
+#16 0.613 drwxr-xr-x    2 root     root          4096 Mar  1 11:26 test
+#16 0.613 -rwxr-xr-x    1 root     root           101 Mar  1 11:26 tsconfig.build.json
+#16 0.613 -rwxr-xr-x    1 root     root           562 Mar  1 11:26 tsconfig.json
+#16 5.250 Prisma schema loaded from prisma/schema.prisma.
+#16 5.261 Error: Prisma schema validation - (get-config wasm)
+#16 5.261 Error code: P1012
+#16 5.261 error: The datasource property `url` is no longer supported in schema files. Move connection URLs for Migrate to `prisma.config.ts` and pass either `adapter` for a direct database connection or `accelerateUrl` for Accelerate to the `PrismaClient` constructor. See https://pris.ly/d/config-datasource and https://pris.ly/d/prisma7-client-config
+#16 5.261   -->  prisma/schema.prisma:8
+#16 5.261    | 
+#16 5.261  7 |   provider = "postgresql"
+#16 5.261  8 |   url      = env("DATABASE_URL")
+#16 5.261    | 
+#16 5.261 
+#16 5.261 Validation Error Count: 1
+#16 5.261 [Context: getConfig]
+#16 5.261 
+#16 5.261 Prisma CLI Version : 7.4.1
+#16 ERROR: process "/bin/sh -c cd backend && ls -la && npx prisma generate" did not complete successfully: exit code: 1
+------
+ > [builder 10/11] RUN cd backend && ls -la && npx prisma generate:
+5.261   -->  prisma/schema.prisma:8
+5.261    | 
+5.261  7 |   provider = "postgresql"
+5.261  8 |   url      = env("DATABASE_URL")
+5.261    | 
+5.261 
+5.261 Validation Error Count: 1
+5.261 [Context: getConfig]
+5.261 
+5.261 Prisma CLI Version : 7.4.1
+------
+Dockerfile:29
+
+--------------------
+
+  27 |     
+
+  28 |     # Generate Prisma client and build backend
+
+  29 | >>> RUN cd backend && ls -la && npx prisma generate
+
+  30 |     RUN cd backend && npm run build
+
+  31 |     
+
+--------------------
+
+failed to solve: process "/bin/sh -c cd backend && ls -la && npx prisma generate" did not complete successfully: exit code: 1
+

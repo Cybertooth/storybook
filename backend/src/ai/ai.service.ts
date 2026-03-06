@@ -5,6 +5,10 @@ export class AiService {
     private readonly GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
 
     private async callGemini(prompt: string, systemInstruction?: string): Promise<string> {
+        if (process.env.MOCK_LLM === 'true') {
+            return JSON.stringify({ "mocked": true, "response": "This is a mocked LLM response for testing purposes." });
+        }
+
         if (!this.GEMINI_API_KEY) throw new BadRequestException('Gemini API Key is not configured on the server.');
 
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${this.GEMINI_API_KEY}`;

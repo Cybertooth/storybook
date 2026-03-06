@@ -8,10 +8,11 @@ import { LocationsModule } from './locations/locations.module';
 import { EventsModule } from './events/events.module';
 import { AiModule } from './ai/ai.module';
 import { AuthModule } from './auth/auth.module';
+import { NotesModule } from './notes/notes.module';
 
 @Module({
-  imports: [PrismaModule, StoriesModule, CharactersModule, LocationsModule, EventsModule, AiModule, AuthModule],
+  imports: [PrismaModule, StoriesModule, CharactersModule, LocationsModule, EventsModule, AiModule, AuthModule, NotesModule],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
