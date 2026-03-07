@@ -21,11 +21,12 @@ COPY web-ui ./web-ui
 RUN cd api && npm run build
 
 # Build the Vite React app
-ENV VITE_API_URL=/api/v1
+ARG VITE_API_URL=/api/v1
+ENV VITE_API_URL=$VITE_API_URL
 RUN cd web-ui && npm run build
 
 # Stage 2: Serve the app with Nginx
-FROM nginx:alpine
+FROM nginxinc/nginx-unprivileged:alpine
 
 # Copy the built assets
 COPY --from=build /app/web-ui/dist /usr/share/nginx/html
