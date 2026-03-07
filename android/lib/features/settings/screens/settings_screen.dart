@@ -5,6 +5,7 @@ import '../../../core/providers/export_provider.dart';
 import '../../../core/providers/repository_providers.dart';
 import '../../../core/providers/settings_provider.dart';
 import '../../../core/providers/theme_provider.dart';
+import '../../../core/providers/auth_provider.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -15,6 +16,7 @@ class SettingsScreen extends ConsumerStatefulWidget {
 class _State extends ConsumerState<SettingsScreen> {
   final _geminiCtrl = TextEditingController();
   final _openAiCtrl = TextEditingController();
+  final _backendUrlCtrl = TextEditingController();
   bool _showGemini = false;
   bool _showOpenAi = false;
   bool _saving = false;
@@ -24,6 +26,7 @@ class _State extends ConsumerState<SettingsScreen> {
   void dispose() {
     _geminiCtrl.dispose();
     _openAiCtrl.dispose();
+    _backendUrlCtrl.dispose();
     super.dispose();
   }
 
@@ -35,6 +38,7 @@ class _State extends ConsumerState<SettingsScreen> {
         if (mounted) {
           _geminiCtrl.text = s.geminiApiKey;
           _openAiCtrl.text = s.openAiApiKey;
+          _backendUrlCtrl.text = s.backendUrl;
         }
       });
     }
@@ -46,6 +50,7 @@ class _State extends ConsumerState<SettingsScreen> {
     await ref.read(settingsProvider.notifier).updateSettings(
           geminiKey: _geminiCtrl.text.trim(),
           openAiKey: _openAiCtrl.text.trim(),
+          backendUrl: _backendUrlCtrl.text.trim(),
         );
     setState(() => _saving = false);
     sm.showSnackBar(const SnackBar(content: Text('API keys saved.')));
@@ -55,6 +60,8 @@ class _State extends ConsumerState<SettingsScreen> {
   Widget build(BuildContext context) {
     final settingsAsync = ref.watch(settingsProvider);
     final themeMode = ref.watch(appThemeModeProvider);
+    final authState = ref.watch(authProvider).value;
+    final isOffline = authState?.isOfflineMode == true;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
@@ -73,6 +80,36 @@ class _State extends ConsumerState<SettingsScreen> {
                 value: themeMode == ThemeMode.dark,
                 onChanged: (_) =>
                     ref.read(appThemeModeProvider.notifier).toggle(),
+              ),
+              const SizedBox(height: 8),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Theme Color',
+                        style: Theme.of(context).textTheme.titleSmall),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 12,
+                      runSpacing: 12,
+                      children: [
+                        _buildColorSwatch(
+                            0xFF6366F1, settings.seedColorValue, 'Indigo'),
+                        _buildColorSwatch(
+                            0xFF0EA5E9, settings.seedColorValue, 'Sky Blue'),
+                        _buildColorSwatch(
+                            0xFF10B981, settings.seedColorValue, 'Emerald'),
+                        _buildColorSwatch(
+                            0xFFF59E0B, settings.seedColorValue, 'Amber'),
+                        _buildColorSwatch(
+                            0xFFEF4444, settings.seedColorValue, 'Rose'),
+                        _buildColorSwatch(
+                            0xFF8B5CF6, settings.seedColorValue, 'Purple'),
+                      ],
+                    ),
+                  ],
+                ),
               ),
               const Divider(height: 24),
 
@@ -143,6 +180,20 @@ class _State extends ConsumerState<SettingsScreen> {
                 ),
               ),
               const SizedBox(height: 16),
+
+              // ── Backend Sync Config ──────────────────────────────
+              const _SectionHeader('Backend Sync Config'),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _backendUrlCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Backend API URL',
+                  border: OutlineInputBorder(),
+                  hintText: 'http://localhost:3000/api/v1',
+                ),
+              ),
+              const SizedBox(height: 16),
+
               FilledButton(
                 onPressed: _saving ? null : _saveKeys,
                 child: _saving
@@ -155,6 +206,55 @@ class _State extends ConsumerState<SettingsScreen> {
                         ),
                       )
                     : const Text('Save API Keys'),
+              ),
+              const Divider(height: 32),
+
+              // ── Account ──────────────────────────────────────────
+              const _SectionHeader('Account'),
+              const SizedBox(height: 8),
+              ListTile(
+                leading: Icon(isOffline ? Icons.login : Icons.logout,
+                    color: isOffline
+                        ? Theme.of(context).colorScheme.primary
+                        : Colors.red),
+                title: Text(isOffline ? 'Login to Sync' : 'Logout',
+                    style: TextStyle(
+                        color: isOffline
+                            ? Theme.of(context).colorScheme.primary
+                            : Colors.red)),
+                subtitle: Text(isOffline
+                    ? 'Sign in or register to enable backend sync'
+                    : 'Clear local credentials and return to login'),
+                contentPadding: EdgeInsets.zero,
+                onTap: () async {
+                  if (isOffline) {
+                    // Transition back to login screen easily
+                    await ref.read(authProvider.notifier).logout();
+                    return;
+                  }
+
+                  final confirm = await showDialog<bool>(
+                    context: context,
+                    builder: (c) => AlertDialog(
+                      title: const Text('Logout'),
+                      content: const Text('Are you sure you want to logout?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(c, false),
+                          child: const Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.pop(c, true),
+                          child: const Text('Logout',
+                              style: TextStyle(color: Colors.red)),
+                        ),
+                      ],
+                    ),
+                  );
+                  if (confirm == true && context.mounted) {
+                    await ref.read(authProvider.notifier).logout();
+                  }
+                },
               ),
               const Divider(height: 32),
 
@@ -253,6 +353,37 @@ class _State extends ConsumerState<SettingsScreen> {
             ],
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildColorSwatch(int colorValue, int currentValue, String tooltip) {
+    final isSelected = colorValue == currentValue;
+    return Tooltip(
+      message: tooltip,
+      child: GestureDetector(
+        onTap: () {
+          ref
+              .read(settingsProvider.notifier)
+              .updateSettings(seedColorValue: colorValue);
+        },
+        child: Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: Color(colorValue),
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: isSelected
+                  ? Theme.of(context).colorScheme.onSurface
+                  : Colors.transparent,
+              width: 3,
+            ),
+          ),
+          child: isSelected
+              ? const Icon(Icons.check, color: Colors.white, size: 20)
+              : null,
+        ),
       ),
     );
   }

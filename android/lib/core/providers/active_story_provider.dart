@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../domain/models/story.dart';
 import 'repository_providers.dart';
+import '../../data/sync/sync_service.dart';
 
 part 'active_story_provider.g.dart';
 
@@ -12,8 +13,11 @@ class StoryList extends _$StoryList {
   }
 
   Future<void> createStory(String title) async {
-    await ref.read(storyRepositoryProvider).create(title);
+    final story = await ref.read(storyRepositoryProvider).create(title);
     ref.invalidateSelf();
+
+    // Background sync
+    ref.read(syncServiceProvider).pushStoryToRemote(story);
   }
 
   Future<void> deleteStory(String id) async {

@@ -4,16 +4,62 @@ import 'package:go_router/go_router.dart';
 import '../../../core/providers/active_story_provider.dart';
 import '../widgets/project_card.dart';
 
-class ProjectsScreen extends ConsumerWidget {
+import '../../../data/sync/sync_service.dart';
+
+class ProjectsScreen extends ConsumerStatefulWidget {
   const ProjectsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ProjectsScreen> createState() => _ProjectsScreenState();
+}
+
+class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
+  bool _isSyncing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _performSync();
+    });
+  }
+
+  Future<void> _performSync() async {
+    if (_isSyncing) return;
+    setState(() => _isSyncing = true);
+    try {
+      await ref.read(syncServiceProvider).pullAllStories();
+      // Optionally refresh the local story list if it doesn't auto-refresh.
+      // Assuming storyListProvider auto-refreshes if we just listen to DB changes,
+      // but let's be safe and invalidate it if needed, or rely on Drift streams.
+    } finally {
+      if (mounted) {
+        setState(() => _isSyncing = false);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final stories = ref.watch(storyListProvider);
     final active = ref.watch(activeStoryProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Projects')),
+      appBar: AppBar(
+        title: const Text('Projects'),
+        actions: [
+          IconButton(
+            icon: _isSyncing
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2))
+                : const Icon(Icons.sync),
+            tooltip: 'Sync with Backend',
+            onPressed: _isSyncing ? null : _performSync,
+          ),
+        ],
+      ),
       body: Column(
         children: [
           const Padding(
