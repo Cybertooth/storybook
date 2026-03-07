@@ -2,35 +2,38 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
-export class ChaptersService {
+export class RelationshipsService {
     constructor(private prisma: PrismaService) { }
 
     async findAll(storyId: string, userId: string) {
-        return this.prisma.chapter.findMany({
+        return this.prisma.relationship.findMany({
             where: { storyId, userId },
-            orderBy: { order: 'asc' },
         });
     }
 
     async findOne(id: string, userId: string) {
-        const chapter = await this.prisma.chapter.findFirst({
+        const relationship = await this.prisma.relationship.findFirst({
             where: { id, userId },
         });
-        if (!chapter) throw new NotFoundException('Chapter not found');
-        return chapter;
+        if (!relationship) throw new NotFoundException('Relationship not found');
+        return relationship;
     }
 
     async create(storyId: string, userId: string, data: any) {
-        const { createdAt, updatedAt, id, storyId: _s, userId: _u, ...rest } = data;
-        return this.prisma.chapter.create({
-            data: { ...rest, userId, storyId },
+        const { createdAt, updatedAt, ...rest } = data;
+        return this.prisma.relationship.create({
+            data: {
+                ...rest,
+                storyId,
+                userId,
+            },
         });
     }
 
     async update(id: string, userId: string, data: any) {
         const { createdAt, updatedAt, ...rest } = data;
         await this.findOne(id, userId);
-        return this.prisma.chapter.update({
+        return this.prisma.relationship.update({
             where: { id },
             data: rest,
         });
@@ -38,7 +41,7 @@ export class ChaptersService {
 
     async delete(id: string, userId: string) {
         await this.findOne(id, userId);
-        return this.prisma.chapter.delete({
+        return this.prisma.relationship.delete({
             where: { id },
         });
     }

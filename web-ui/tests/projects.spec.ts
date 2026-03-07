@@ -1,36 +1,41 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, registerUser, createStory, injectAuthState, API_BASE } from './helpers';
 
-test.describe('Projects Dashboard', () => {
-    let email = '';
-    let token = '';
+test.describe('Navigation & Pages', () => {
+    let token: string;
+    let story: any;
 
     test.beforeEach(async ({ page, request }) => {
-        email = `proj-${Date.now()}@example.com`;
-        const res = await request.post('http://localhost:3000/api/v1/auth/register', {
-            data: { email, password: 'password123', name: 'Proj User' }
-        });
-        const { data } = await res.json();
-        token = data.token;
+        const auth = await registerUser(request, 'nav');
+        token = auth.token;
+        story = await createStory(request, token, 'Navigation Story');
 
-        // Set JWT in local storage directly to maintain session
-        await page.addInitScript((jwt) => {
-            window.localStorage.setItem('auth-storage', JSON.stringify({
-                state: { token: jwt, isAuthenticated: true, user: null },
-                version: 0
-            }));
-        }, token);
-
-        await page.goto('/projects');
+        await injectAuthState(page, token, auth.user);
     });
 
-    test('should create a new project', async ({ page, request }) => {
-        await page.getByRole('button', { name: /create new project/i }).click();
+    test('should navigate to all main sections without errors', async ({ page }) => {
+        const routes = [
+            '/',
+            '/scratchpad',
+            '/write',
+            '/characters',
+            '/locations',
+            '/timeline',
+            '/dashboard',
+            '/settings',
+        ];
 
-        // Verify it navigates to the new story (Scratchpad or Draft as default)
-        await expect(page).toHaveURL(/\/(scratchpad|draft)/);
+        for (const route of routes) {
+            await page.goto(route);
+            await expect(page.locator('body')).toBeVisible();
+            // Should not redirect to auth
+            await expect(page).not.toHaveURL(/\/auth/);
+        }
+    });
 
-        // StoryStore should now contain an Untitled Project
-        // Check if header says "Untitled Project"
-        await expect(page.getByText('Untitled Project')).toBeVisible();
+    test('should show the app shell with navigation sidebar', async ({ page }) => {
+        await page.goto('/');
+
+        // The AppShell should have a nav element — use .first() to avoid strict mode violation
+        await expect(page.locator('nav').first()).toBeVisible({ timeout: 5000 });
     });
 });

@@ -55,7 +55,7 @@ class StorageService implements IStorageService {
 
     async getAllStories(): Promise<Story[]> {
         const res = await apiClient.get<{ success: boolean, data: Story[] }>(`/stories`);
-        return res.data.data.sort((a, b) => b.updatedAt - a.updatedAt);
+        return res.data.data.sort((a: Story, b: Story) => b.updatedAt - a.updatedAt);
     }
 
     async createStory(title: string): Promise<Story> {
@@ -123,7 +123,7 @@ class StorageService implements IStorageService {
     // -- Events --
     async getEvents(storyId: string): Promise<PlotEvent[]> {
         const res = await apiClient.get<{ success: boolean, data: PlotEvent[] }>(`/stories/${storyId}/events`);
-        return res.data.data.sort((a, b) => a.order - b.order);
+        return res.data.data.sort((a: PlotEvent, b: PlotEvent) => a.order - b.order);
     }
 
     async saveEvent(item: PlotEvent): Promise<void> {
@@ -143,7 +143,7 @@ class StorageService implements IStorageService {
     // -- Chapters --
     async getChapters(storyId: string): Promise<Chapter[]> {
         const res = await apiClient.get<{ success: boolean, data: Chapter[] }>(`/stories/${storyId}/chapters`);
-        return res.data.data.sort((a, b) => a.order - b.order);
+        return res.data.data.sort((a: Chapter, b: Chapter) => a.order - b.order);
     }
 
     async saveChapter(item: Chapter): Promise<void> {
@@ -163,7 +163,7 @@ class StorageService implements IStorageService {
     // -- Notes --
     async getNotes(storyId: string): Promise<Note[]> {
         const res = await apiClient.get<{ success: boolean, data: Note[] }>(`/stories/${storyId}/notes`);
-        return res.data.data.sort((a, b) => b.createdAt - a.createdAt);
+        return res.data.data.sort((a: Note, b: Note) => b.createdAt - a.createdAt);
     }
 
     async saveNote(item: Note): Promise<void> {
@@ -183,7 +183,7 @@ class StorageService implements IStorageService {
     // -- Unresolved Questions --
     async getUnresolvedQuestions(storyId: string): Promise<UnresolvedQuestion[]> {
         const res = await apiClient.get<{ success: boolean, data: UnresolvedQuestion[] }>(`/stories/${storyId}/questions`);
-        return res.data.data.sort((a, b) => a.createdAt - b.createdAt);
+        return res.data.data.sort((a: UnresolvedQuestion, b: UnresolvedQuestion) => a.createdAt - b.createdAt);
     }
 
     async saveUnresolvedQuestion(item: UnresolvedQuestion): Promise<void> {

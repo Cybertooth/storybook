@@ -9,5 +9,8 @@
     "scripts": {
         "dev": "npm run dev --workspace=@storybook/web-ui",
         "build": "npm run build --workspace=@storybook/web-ui"
+    },
+    "devDependencies": {
+        "@prisma/client": "^7.4.1"
     }
 }

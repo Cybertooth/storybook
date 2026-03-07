@@ -2,27 +2,27 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
-export class ChaptersService {
+export class QuestionsService {
     constructor(private prisma: PrismaService) { }
 
     async findAll(storyId: string, userId: string) {
-        return this.prisma.chapter.findMany({
+        return this.prisma.unresolvedQuestion.findMany({
             where: { storyId, userId },
-            orderBy: { order: 'asc' },
+            orderBy: { createdAt: 'desc' },
         });
     }
 
     async findOne(id: string, userId: string) {
-        const chapter = await this.prisma.chapter.findFirst({
+        const question = await this.prisma.unresolvedQuestion.findFirst({
             where: { id, userId },
         });
-        if (!chapter) throw new NotFoundException('Chapter not found');
-        return chapter;
+        if (!question) throw new NotFoundException('Question not found');
+        return question;
     }
 
     async create(storyId: string, userId: string, data: any) {
         const { createdAt, updatedAt, id, storyId: _s, userId: _u, ...rest } = data;
-        return this.prisma.chapter.create({
+        return this.prisma.unresolvedQuestion.create({
             data: { ...rest, userId, storyId },
         });
     }
@@ -30,7 +30,7 @@ export class ChaptersService {
     async update(id: string, userId: string, data: any) {
         const { createdAt, updatedAt, ...rest } = data;
         await this.findOne(id, userId);
-        return this.prisma.chapter.update({
+        return this.prisma.unresolvedQuestion.update({
             where: { id },
             data: rest,
         });
@@ -38,7 +38,7 @@ export class ChaptersService {
 
     async delete(id: string, userId: string) {
         await this.findOne(id, userId);
-        return this.prisma.chapter.delete({
+        return this.prisma.unresolvedQuestion.delete({
             where: { id },
         });
     }

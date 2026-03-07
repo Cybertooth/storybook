@@ -29,7 +29,8 @@ export class StoriesService {
 
     async update(userId: string, id: string, data: any) {
         await this.findOne(userId, id);
-        return this.prisma.story.update({ where: { id }, data });
+        const { createdAt, updatedAt, ...safeData } = data;
+        return this.prisma.story.update({ where: { id }, data: safeData });
     }
 
     async remove(userId: string, id: string) {

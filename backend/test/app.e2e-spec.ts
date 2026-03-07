@@ -61,6 +61,28 @@ describe('App Integration (e2e)', () => {
     expect(response.body.data.content).toBe('My first note');
   });
 
+  it('/api/v1/stories/:storyId/chapters (POST)', async () => {
+    const response = await request(app.getHttpServer())
+      .post(`/api/v1/stories/${storyId}/chapters`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ title: 'Chapter 1', content: 'Once...', order: 1, status: 'draft' })
+      .expect(201);
+
+    expect(response.body.success).toBe(true);
+    expect(response.body.data.title).toBe('Chapter 1');
+  });
+
+  it('/api/v1/stories/:storyId/questions (POST)', async () => {
+    const response = await request(app.getHttpServer())
+      .post(`/api/v1/stories/${storyId}/questions`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ question: 'Who is the killer?', details: 'Important mystery.' })
+      .expect(201);
+
+    expect(response.body.success).toBe(true);
+    expect(response.body.data.question).toBe('Who is the killer?');
+  });
+
   it('/api/v1/ai/suggest-next (POST) - LLM Mock Trigger', async () => {
     // If MOCK_LLM is true, this should return a mock response extremely fast
     const response = await request(app.getHttpServer())
