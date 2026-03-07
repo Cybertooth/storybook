@@ -164,3 +164,10 @@ model AppSettings {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
+
+model Tombstone {
+  id         String   @id @default(uuid())
+  entityId   String
+  entityType String
+  deletedAt  DateTime @default(now())
+}

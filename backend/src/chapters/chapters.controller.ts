@@ -25,9 +25,21 @@ export class ChaptersController {
         return { success: true, data };
     }
 
+    @Get('api/v1/chapters/:id/draft')
+    async getDraft(@Param('id') id: string, @Request() req: any) {
+        const data = await this.chaptersService.getDraft(id, req.user.id);
+        return { success: true, data };
+    }
+
     @Put('api/v1/chapters/:id')
     async update(@Param('id') id: string, @Body() body: any, @Request() req: any) {
         const data = await this.chaptersService.update(id, req.user.id, body);
+        return { success: true, data };
+    }
+
+    @Put('api/v1/chapters/:id/draft')
+    async updateDraft(@Param('id') id: string, @Body() body: any, @Request() req: any) {
+        const data = await this.chaptersService.updateDraft(id, req.user.id, body.content);
         return { success: true, data };
     }
 

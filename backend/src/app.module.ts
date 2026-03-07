@@ -14,6 +14,7 @@ import { NotesModule } from './notes/notes.module';
 import { ChaptersModule } from './chapters/chapters.module';
 import { RelationshipsModule } from './relationships/relationships.module';
 import { QuestionsModule } from './questions/questions.module';
+import { SyncModule } from './sync/sync.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { QuestionsModule } from './questions/questions.module';
     ChaptersModule,
     RelationshipsModule,
     QuestionsModule,
+    SyncModule,
   ],
   controllers: [AppController],
   providers: [

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -28,7 +28,16 @@ export class StoriesService {
     }
 
     async update(userId: string, id: string, data: any) {
-        await this.findOne(userId, id);
+        const story = await this.findOne(userId, id);
+
+        // Conflict resolution
+        if (data.updatedAt) {
+            const clientDate = new Date(data.updatedAt);
+            if (story.updatedAt > clientDate) {
+                throw new ConflictException('Story was modified after the provided timestamp');
+            }
+        }
+
         const { createdAt, updatedAt, ...safeData } = data;
         return this.prisma.story.update({ where: { id }, data: safeData });
     }

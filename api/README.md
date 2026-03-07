@@ -5,7 +5,7 @@ This folder (`api/`) contains the shared TypeScript types (`src/index.ts`) and t
 This API is designed to be consumed by the Web UI, Android apps, and any other future clients.
 
 ## Base URLs
-- **Production (Google Cloud Run):** `https://storybook-backend-66224741815.us-central1.run.app/api/v1`
+- **Production (Google Cloud Run):** `https://storybook-backend-sfknzwjwga-uc.a.run.app/api/v1`
 - **Local Development:** `http://localhost:3000/api/v1`
 
 ## Standard Response Format
@@ -45,7 +45,8 @@ A "Story" is the root entity for all related relational data.
 - `POST /stories` - Create a new story. Payload: `{ title: string, summary: string }`
 - `GET /stories` - List all stories for the authenticated user.
 - `GET /stories/:id` - Get full story details.
-- `PUT /stories/:id` - Update story metadata (title, summary, theme, coreQuestion).
+- `PUT /stories/:id` - Update story metadata (title, summary, theme, coreQuestion). 
+  - **Conflict Resolution**: This endpoint checks the `updatedAt` field in the payload. If the server's record is newer than the provided timestamp, it returns a `409 Conflict`.
 - `DELETE /stories/:id` - Delete a story strictly owned by the user.
 
 ## 3. Characters
@@ -70,11 +71,13 @@ A "Story" is the root entity for all related relational data.
 - `DELETE /events/:id` - Delete an event.
 
 ## 6. Chapters & Drafting
-- `GET /stories/:storyId/chapters` - List all chapters.
+- `GET /stories/:storyId/chapters` - List all chapters (excludes `content` field for performance).
 - `POST /stories/:storyId/chapters` - Create a chapter. Payload: `{ title, content, order, status }`.
-- `GET /chapters/:id` - Get chapter details.
-- `PUT /chapters/:id` - Update chapter text. Payload: `{ title, content, order, status }`.
+- `GET /chapters/:id` - Get chapter details (excludes `content` field).
+- `PUT /chapters/:id` - Update chapter metadata. Payload: `{ title, order, status }`.
 - `DELETE /chapters/:id` - Delete a chapter.
+- `GET /chapters/:id/draft` - **NEW**: Fetch solely the `content` (heavy text draft) of a chapter.
+- `PUT /chapters/:id/draft` - **NEW**: Update solely the `content` of a chapter.
 
 ## 7. Notes (Scratchpad)
 - `GET /stories/:storyId/notes` - List all notes.
@@ -99,7 +102,15 @@ A "Story" is the root entity for all related relational data.
 
 ---
 
-## 10. AI Proxy Endpoints
+## 10. Sync (Offline-First)
+To support offline-first operation, the following endpoints allow for batch processing and delta synchronization.
+
+- `POST /sync/push` - Atomic batch update. Payload: `{ changes: { stories: [], chapters: [], ... } }`.
+- `POST /sync/pull` - Fetch deltas since a timestamp. Payload: `{ last_sync_timestamp: string }`.
+
+---
+
+## 11. AI Proxy Endpoints
 The Android client must not hold Gemini/OpenAI API keys directly. Use these backend endpoints to proxy AI requests.
 All endpoints require `POST` with a JSON payload.
 

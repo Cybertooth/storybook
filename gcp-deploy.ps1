@@ -25,10 +25,10 @@ gcloud builds submit --config cloudbuild-backend.yaml .
 
 Write-Host "5. Deploying Backend to Cloud Run..."
 gcloud run deploy storybook-backend `
-    --image "gcr.io/$PROJECT_ID/storybook-backend" `
-    --region $REGION `
-    --add-cloudsql-instances "$PROJECT_ID:$REGION:$DB_INSTANCE" `
-    --set-env-vars DATABASE_URL="postgresql://$DB_USER:$DB_PASS@localhost/$DB_NAME?host=/cloudsql/$PROJECT_ID:$REGION:$DB_INSTANCE" `
+    --image "gcr.io/${PROJECT_ID}/storybook-backend" `
+    --region ${REGION} `
+    --add-cloudsql-instances "${PROJECT_ID}:${REGION}:${DB_INSTANCE}" `
+    --set-env-vars DATABASE_URL="postgresql://${DB_USER}:${DB_PASS}@localhost/${DB_NAME}?host=/cloudsql/${PROJECT_ID}:${REGION}:${DB_INSTANCE}" `
     --allow-unauthenticated
 
 Write-Host "6. Retrieving Backend URL..."
