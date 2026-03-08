@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 import '../../../core/providers/active_story_provider.dart';
 import '../../../core/providers/repository_providers.dart';
+import '../../../data/sync/sync_service.dart';
 import '../../../domain/models/relationship.dart';
 
 part 'relationship_providers.g.dart';
@@ -33,10 +34,12 @@ class RelationshipList extends _$RelationshipList {
     );
     await ref.read(relationshipRepositoryProvider).create(rel);
     ref.invalidateSelf();
+    ref.read(syncServiceProvider).pushRelationshipCreate(rel).ignore();
   }
 
   Future<void> deleteRelationship(String id) async {
     await ref.read(relationshipRepositoryProvider).delete(id);
     ref.invalidateSelf();
+    ref.read(syncServiceProvider).pushRelationshipDelete(id).ignore();
   }
 }

@@ -78,7 +78,7 @@ final class NoteListProvider
   NoteList create() => NoteList();
 }
 
-String _$noteListHash() => r'eda80cf8ed33f444b099557bdb33f10fbf31b434';
+String _$noteListHash() => r'b368b1138a80d1167faa0652c959abb8efe111c1';
 
 abstract class _$NoteList extends $AsyncNotifier<List<Note>> {
   FutureOr<List<Note>> build();
