@@ -15,6 +15,13 @@ export default function Auth() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
+
+        // Registration requires a stronger password (12+ chars) than login.
+        if (!isLogin && password.length < 12) {
+            setError('Password must be at least 12 characters for new accounts.');
+            return;
+        }
+
         setLoading(true);
 
         try {

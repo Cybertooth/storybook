@@ -167,7 +167,12 @@ model AppSettings {
 
 model Tombstone {
   id         String   @id @default(uuid())
+  userId     String
   entityId   String
   entityType String
   deletedAt  DateTime @default(now())
+
+  @@unique([userId, entityId, entityType])
+  @@index([userId, deletedAt])
 }
+

@@ -15,7 +15,7 @@ interface MarkdownEditorProps {
 }
 
 export const MarkdownEditor = ({ chapter, onUpdate }: MarkdownEditorProps) => {
-    const [content, setContent] = useState(chapter.content);
+    const [content, setContent] = useState(chapter.content ?? '');
     const [title, setTitle] = useState(chapter.title);
     const [isDirty, setIsDirty] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
@@ -28,7 +28,7 @@ export const MarkdownEditor = ({ chapter, onUpdate }: MarkdownEditorProps) => {
     const { currentStory } = useStoryStore();
 
     useEffect(() => {
-        setContent(chapter.content);
+        setContent(chapter.content ?? '');
         setTitle(chapter.title);
         // Do not immediately trigger an auto-save upon switching chapters
         setIsDirty(false);

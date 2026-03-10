@@ -3,85 +3,92 @@ import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class ChaptersService {
-    constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) { }
 
-    async findAll(storyId: string, userId: string) {
-        return this.prisma.chapter.findMany({
-            where: { storyId, userId },
-            orderBy: { order: 'asc' },
-            select: {
-                id: true,
-                userId: true,
-                storyId: true,
-                title: true,
-                order: true,
-                status: true,
-            }
-        });
-    }
+  private async assertStoryOwnership(storyId: string, userId: string) {
+    const story = await this.prisma.story.findFirst({ where: { id: storyId, userId }, select: { id: true } });
+    if (!story) throw new NotFoundException('Story not found');
+  }
 
-    async findOne(id: string, userId: string) {
-        const chapter = await this.prisma.chapter.findFirst({
-            where: { id, userId },
-            select: {
-                id: true,
-                userId: true,
-                storyId: true,
-                title: true,
-                order: true,
-                status: true,
-            }
-        });
-        if (!chapter) throw new NotFoundException('Chapter not found');
-        return chapter;
-    }
+  private chapterProjection = {
+    id: true,
+    userId: true,
+    storyId: true,
+    title: true,
+    order: true,
+    status: true,
+  };
 
-    async getDraft(id: string, userId: string) {
-        const chapter = await this.prisma.chapter.findFirst({
-            where: { id, userId },
-            select: { content: true }
-        });
-        if (!chapter) throw new NotFoundException('Chapter not found');
-        return chapter;
-    }
+  private toData(data: any) {
+    return {
+      title: data?.title,
+      content: data?.content,
+      order: data?.order,
+      status: data?.status,
+    };
+  }
 
-    async create(storyId: string, userId: string, data: any) {
-        const { createdAt, updatedAt, id, storyId: _s, userId: _u, ...rest } = data;
-        return this.prisma.chapter.create({
-            data: { ...rest, userId, storyId },
-        });
-    }
+  async findAll(storyId: string, userId: string) {
+    await this.assertStoryOwnership(storyId, userId);
+    return this.prisma.chapter.findMany({
+      where: { storyId, userId },
+      orderBy: { order: 'asc' },
+      select: this.chapterProjection,
+    });
+  }
 
-    async update(id: string, userId: string, data: any) {
-        const { createdAt, updatedAt, ...rest } = data;
-        await this.findOne(id, userId); // verify existence
-        return this.prisma.chapter.update({
-            where: { id },
-            data: rest,
-            select: {
-                id: true,
-                userId: true,
-                storyId: true,
-                title: true,
-                order: true,
-                status: true,
-            }
-        });
-    }
+  async findOne(id: string, userId: string) {
+    const chapter = await this.prisma.chapter.findFirst({
+      where: { id, userId },
+      select: this.chapterProjection,
+    });
+    if (!chapter) throw new NotFoundException('Chapter not found');
+    return chapter;
+  }
 
-    async updateDraft(id: string, userId: string, content: string) {
-        await this.findOne(id, userId); // verify existence
-        return this.prisma.chapter.update({
-            where: { id },
-            data: { content },
-            select: { content: true }
-        });
-    }
+  async getDraft(id: string, userId: string) {
+    const chapter = await this.prisma.chapter.findFirst({
+      where: { id, userId },
+      select: { content: true },
+    });
+    if (!chapter) throw new NotFoundException('Chapter not found');
+    return chapter;
+  }
 
-    async delete(id: string, userId: string) {
-        await this.findOne(id, userId); // verify existence
-        return this.prisma.chapter.delete({
-            where: { id },
-        });
-    }
+  async create(storyId: string, userId: string, data: any) {
+    await this.assertStoryOwnership(storyId, userId);
+    return this.prisma.chapter.create({
+      data: { ...this.toData(data), userId, storyId },
+      select: this.chapterProjection,
+    });
+  }
+
+  async update(id: string, userId: string, data: any) {
+    await this.findOne(id, userId);
+
+    const updated = await this.prisma.chapter.updateMany({
+      where: { id, userId },
+      data: this.toData(data),
+    });
+
+    if (updated.count === 0) throw new NotFoundException('Chapter not found');
+    return this.findOne(id, userId);
+  }
+
+  async updateDraft(id: string, userId: string, content: string) {
+    await this.findOne(id, userId);
+
+    const updated = await this.prisma.chapter.updateMany({
+      where: { id, userId },
+      data: { content },
+    });
+
+    if (updated.count === 0) throw new NotFoundException('Chapter not found');
+    return this.getDraft(id, userId);
+  }
+
+  async delete(id: string, userId: string) {
+    const deleted = await this.prisma.chapter.deleteMany({ where: { id, userId } });
+    if (deleted.count === 0) throw new NotFoundException('Chapter not found');
+  }
 }

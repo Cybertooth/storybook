@@ -55,17 +55,13 @@ class StorageService implements IStorageService {
 
     async getAllStories(): Promise<Story[]> {
         const res = await apiClient.get<{ success: boolean, data: Story[] }>(`/stories`);
-        return res.data.data.sort((a: Story, b: Story) => b.updatedAt - a.updatedAt);
+        return res.data.data.sort((a: Story, b: Story) =>
+            new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+        );
     }
 
     async createStory(title: string): Promise<Story> {
-        const payload: Partial<Story> = {
-            id: uuidv4(),
-            title,
-            summary: '',
-            createdAt: Date.now(),
-            updatedAt: Date.now(),
-        };
+        const payload = { id: uuidv4(), title, summary: '' };
         const res = await apiClient.post<{ success: boolean, data: Story }>(`/stories`, payload);
         return res.data.data;
     }
@@ -163,7 +159,9 @@ class StorageService implements IStorageService {
     // -- Notes --
     async getNotes(storyId: string): Promise<Note[]> {
         const res = await apiClient.get<{ success: boolean, data: Note[] }>(`/stories/${storyId}/notes`);
-        return res.data.data.sort((a: Note, b: Note) => b.createdAt - a.createdAt);
+        return res.data.data.sort((a: Note, b: Note) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
     }
 
     async saveNote(item: Note): Promise<void> {
@@ -183,7 +181,9 @@ class StorageService implements IStorageService {
     // -- Unresolved Questions --
     async getUnresolvedQuestions(storyId: string): Promise<UnresolvedQuestion[]> {
         const res = await apiClient.get<{ success: boolean, data: UnresolvedQuestion[] }>(`/stories/${storyId}/questions`);
-        return res.data.data.sort((a: UnresolvedQuestion, b: UnresolvedQuestion) => a.createdAt - b.createdAt);
+        return res.data.data.sort((a: UnresolvedQuestion, b: UnresolvedQuestion) =>
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
     }
 
     async saveUnresolvedQuestion(item: UnresolvedQuestion): Promise<void> {

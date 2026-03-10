@@ -3,43 +3,59 @@ import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class QuestionsService {
-    constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) { }
 
-    async findAll(storyId: string, userId: string) {
-        return this.prisma.unresolvedQuestion.findMany({
-            where: { storyId, userId },
-            orderBy: { createdAt: 'desc' },
-        });
-    }
+  private async assertStoryOwnership(storyId: string, userId: string) {
+    const story = await this.prisma.story.findFirst({ where: { id: storyId, userId }, select: { id: true } });
+    if (!story) throw new NotFoundException('Story not found');
+  }
 
-    async findOne(id: string, userId: string) {
-        const question = await this.prisma.unresolvedQuestion.findFirst({
-            where: { id, userId },
-        });
-        if (!question) throw new NotFoundException('Question not found');
-        return question;
-    }
+  private toData(data: any) {
+    return {
+      question: data?.question,
+      details: data?.details,
+      isResolved: data?.isResolved,
+      answer: data?.answer,
+    };
+  }
 
-    async create(storyId: string, userId: string, data: any) {
-        const { createdAt, updatedAt, id, storyId: _s, userId: _u, ...rest } = data;
-        return this.prisma.unresolvedQuestion.create({
-            data: { ...rest, userId, storyId },
-        });
-    }
+  async findAll(storyId: string, userId: string) {
+    await this.assertStoryOwnership(storyId, userId);
+    return this.prisma.unresolvedQuestion.findMany({
+      where: { storyId, userId },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
 
-    async update(id: string, userId: string, data: any) {
-        const { createdAt, updatedAt, ...rest } = data;
-        await this.findOne(id, userId);
-        return this.prisma.unresolvedQuestion.update({
-            where: { id },
-            data: rest,
-        });
-    }
+  async findOne(id: string, userId: string) {
+    const question = await this.prisma.unresolvedQuestion.findFirst({
+      where: { id, userId },
+    });
+    if (!question) throw new NotFoundException('Question not found');
+    return question;
+  }
 
-    async delete(id: string, userId: string) {
-        await this.findOne(id, userId);
-        return this.prisma.unresolvedQuestion.delete({
-            where: { id },
-        });
-    }
+  async create(storyId: string, userId: string, data: any) {
+    await this.assertStoryOwnership(storyId, userId);
+    return this.prisma.unresolvedQuestion.create({
+      data: { ...this.toData(data), userId, storyId },
+    });
+  }
+
+  async update(id: string, userId: string, data: any) {
+    await this.findOne(id, userId);
+
+    const updated = await this.prisma.unresolvedQuestion.updateMany({
+      where: { id, userId },
+      data: this.toData(data),
+    });
+
+    if (updated.count === 0) throw new NotFoundException('Question not found');
+    return this.findOne(id, userId);
+  }
+
+  async delete(id: string, userId: string) {
+    const deleted = await this.prisma.unresolvedQuestion.deleteMany({ where: { id, userId } });
+    if (deleted.count === 0) throw new NotFoundException('Question not found');
+  }
 }

@@ -1,126 +1,363 @@
 # Storybook API Documentation
 
-This folder (`api/`) contains the shared TypeScript types (`src/index.ts`) and the documentation for the Storybook backend API. 
+This folder (`api/`) contains the shared TypeScript types (`src/index.ts`) and the documentation for the Storybook backend REST API.
 
-This API is designed to be consumed by the Web UI, Android apps, and any other future clients.
+The API is consumed by:
+- **Web UI** (React/Vite — `web-ui/`)
+- **Android app** (Flutter)
+- **Windows desktop app** (Flutter)
+
+TypeScript consumers should import types from `@storybook/api` (see `src/index.ts`). Flutter/Dart consumers should implement equivalent data classes that match the JSON shapes described below.
+
+---
 
 ## Base URLs
-- **Production (Google Cloud Run):** `https://storybook-backend-sfknzwjwga-uc.a.run.app/api/v1`
-- **Local Development:** `http://localhost:3000/api/v1`
+| Environment | URL |
+|---|---|
+| Production (Google Cloud Run) | `https://storybook-backend-sfknzwjwga-uc.a.run.app/api/v1` |
+| Local Development | `http://localhost:3000/api/v1` |
 
-## Standard Response Format
-All successful API responses return a generic `ApiResponse<T>` wrapper:
+---
+
+## Standard Response Envelopes
+
+**Success:**
+```json
+{ "success": true, "data": { ... } }
+```
+
+**Error:**
+```json
+{ "statusCode": 400, "message": ["Validation error detail"], "error": "Bad Request" }
+```
+
+Common HTTP status codes:
+- `400 Bad Request` — validation failure or malformed payload
+- `401 Unauthorized` — missing or invalid/expired JWT
+- `403 Forbidden` — authenticated but not owner of the resource
+- `404 Not Found` — entity does not exist (or does not belong to you)
+- `409 Conflict` — optimistic concurrency conflict (see Stories `PUT`)
+- `429 Too Many Requests` — rate limit exceeded (60 req / 60 s global)
+
+---
+
+## Security & Authentication
+
+- **All endpoints except `/auth/login` and `/auth/register` require a JWT.**
+- Send the token in every request: `Authorization: Bearer <token>`
+- Tokens expire in **15 minutes**. Re-authenticate when a `401` is received.
+- Every entity is strictly scoped to the authenticated user's `userId`. Cross-user access returns `403` or `404`.
+
+---
+
+## 1. Authentication — `/auth`
+
+### POST `/auth/register`
+Create a new account.
+
+**Request:**
+```json
+{ "email": "user@example.com", "password": "strongPassword123!" }
+```
+*Constraints: email ≤ 254 chars; password 12–128 chars.*
+
+**Response `201`:**
 ```json
 {
   "success": true,
-  "data": { ... } // the actual entity payload
+  "data": {
+    "token": "<jwt>",
+    "user": { "id": "uuid", "email": "user@example.com" }
+  }
 }
 ```
 
-Errors return standard HTTP status codes (400, 401, 403, 404, 500) and a typical NestJS error payload:
+---
+
+### POST `/auth/login`
+Authenticate an existing account.
+
+**Request:**
+```json
+{ "email": "user@example.com", "password": "yourPassword" }
+```
+*Constraints: email ≤ 254 chars; password 8–128 chars.*
+
+**Response `200`:**
 ```json
 {
-  "statusCode": 400,
-  "message": ["Validation error"],
-  "error": "Bad Request"
+  "success": true,
+  "data": {
+    "token": "<jwt>",
+    "user": { "id": "uuid", "email": "user@example.com" }
+  }
 }
 ```
 
-## Security & Authentication
-- **JWT:** All requests (except login/register) REQUIRE a valid JWT in the `Authorization: Bearer <token>` header.
-- **Tenant Isolation:** Every core entity is scoped to the authenticated `user.id`. You cannot fetch or mutate data belonging to another user.
+> **Note for mobile clients:** Store the JWT securely (Android Keystore / Windows DPAPI). Tokens expire in 15 minutes. When a `401` is returned, prompt the user to log in again or implement silent re-authentication if credentials are securely cached.
 
 ---
 
-## 1. Authentication
-- `POST /auth/register` - Create an account. Payload: `{ email, password }`
-- `POST /auth/login` - Authenticate. Payload: `{ email, password }`. Returns `{ success: true, data: { access_token: "..." } }`.
-- `POST /auth/refresh` - Rotate the access token. (Currently not mocked/implemented robustly, use standard login)
-- `POST /auth/logout` - Invalidate the refresh token.
-- `GET /auth/me` - Get current user profile and preferences.
+## 2. Stories — `/stories`
 
-## 2. Projects / Stories
-A "Story" is the root entity for all related relational data.
+A **Story** is the root entity for all related data.
 
-- `POST /stories` - Create a new story. Payload: `{ title: string, summary: string }`
-- `GET /stories` - List all stories for the authenticated user.
-- `GET /stories/:id` - Get full story details.
-- `PUT /stories/:id` - Update story metadata (title, summary, theme, coreQuestion). 
-  - **Conflict Resolution**: This endpoint checks the `updatedAt` field in the payload. If the server's record is newer than the provided timestamp, it returns a `409 Conflict`.
-- `DELETE /stories/:id` - Delete a story strictly owned by the user.
-
-## 3. Characters
-- `GET /stories/:storyId/characters` - List all characters for a specific story.
-- `POST /stories/:storyId/characters` - Create a character. Payload: `{ name, role, description, traits: [] }`.
-- `GET /characters/:id` - Get single character details.
-- `PUT /characters/:id` - Update character.
-- `DELETE /characters/:id` - Delete a character.
-
-## 4. Locations
-- `GET /stories/:storyId/locations` - List all locations.
-- `POST /stories/:storyId/locations` - Create a location. Payload: `{ name, description }`.
-- `GET /locations/:id` - Get location details.
-- `PUT /locations/:id` - Update location.
-- `DELETE /locations/:id` - Delete a location.
-
-## 5. Plot Events (Timeline)
-- `GET /stories/:storyId/events` - List all events.
-- `POST /stories/:storyId/events` - Create an event. Payload: `{ title, description, order }`.
-- `GET /events/:id` - Get event details.
-- `PUT /events/:id` - Update event.
-- `DELETE /events/:id` - Delete an event.
-
-## 6. Chapters & Drafting
-- `GET /stories/:storyId/chapters` - List all chapters (excludes `content` field for performance).
-- `POST /stories/:storyId/chapters` - Create a chapter. Payload: `{ title, content, order, status }`.
-- `GET /chapters/:id` - Get chapter details (excludes `content` field).
-- `PUT /chapters/:id` - Update chapter metadata. Payload: `{ title, order, status }`.
-- `DELETE /chapters/:id` - Delete a chapter.
-- `GET /chapters/:id/draft` - **NEW**: Fetch solely the `content` (heavy text draft) of a chapter.
-- `PUT /chapters/:id/draft` - **NEW**: Update solely the `content` of a chapter.
-
-## 7. Notes (Scratchpad)
-- `GET /stories/:storyId/notes` - List all notes.
-- `POST /stories/:storyId/notes` - Create a note. Payload: `{ content }`.
-- `GET /notes/:id` - Get note details.
-- `PUT /notes/:id` - Update note content.
-- `DELETE /notes/:id` - Delete a note.
-
-## 8. Relationships (Node Graph Data)
-- `GET /stories/:storyId/relationships` - Get all relationship edges.
-- `POST /stories/:storyId/relationships` - Create a new relationship. Payload: `{ sourceId, targetId, type, description }`.
-- `GET /relationships/:id` - Get relationship.
-- `PUT /relationships/:id` - Update relationship.
-- `DELETE /relationships/:id` - Remove relationship edge.
-
-## 9. Unresolved Questions
-- `GET /stories/:storyId/questions` - List all questions and mysteries.
-- `POST /stories/:storyId/questions` - Create a new question. Payload: `{ question, details }`.
-- `GET /questions/:id` - Get question.
-- `PUT /questions/:id` - Update question status. Payload: `{ isResolved, answer }`.
-- `DELETE /questions/:id` - Delete question.
+### POST `/stories`
+```json
+{ "title": "My Novel", "summary": "A story about..." }
+```
+Response `201`: `{ "success": true, "data": <Story> }`
 
 ---
 
-## 10. Sync (Offline-First)
-To support offline-first operation, the following endpoints allow for batch processing and delta synchronization.
+### GET `/stories`
+List all stories for the authenticated user.
 
-- `POST /sync/push` - Atomic batch update. Payload: `{ changes: { stories: [], chapters: [], ... } }`.
-- `POST /sync/pull` - Fetch deltas since a timestamp. Payload: `{ last_sync_timestamp: string }`.
+Response `200`: `{ "success": true, "data": [<Story>] }`
 
 ---
 
-## 11. AI Proxy Endpoints
-The Android client must not hold Gemini/OpenAI API keys directly. Use these backend endpoints to proxy AI requests.
-All endpoints require `POST` with a JSON payload.
+### GET `/stories/:id`
+Response `200`: `{ "success": true, "data": <Story> }`
 
-- `POST /ai/generate-portrait` - `{ characterDescription: string }`
-- `POST /ai/analyze-tropes` - `{ storyContext: string }`
-- `POST /ai/plot-hole-check` - `{ storyContext: string }`
-- `POST /ai/expand-plot` - `{ currentPlot: string }`
-- `POST /ai/critique` - `{ draft: string, context: string }`
-- `POST /ai/revise-draft` - `{ draft: string, maxims: string[] }`
-- `POST /ai/show-dont-tell` - `{ prose: string }`
-- `POST /ai/suggest-next` - `{ priorText: string, plotContext: string }`
+---
 
-*For exact TypeScript payload and response shapes, please refer to the exported interfaces in `src/index.ts` within this `api` folder!*
+### PUT `/stories/:id`
+Update story metadata. Supports **optimistic concurrency control**.
+
+**Request:**
+```json
+{
+  "title": "Updated Title",
+  "summary": "...",
+  "theme": "...",
+  "coreQuestion": "...",
+  "updatedAt": "2026-03-10T12:00:00.000Z"
+}
+```
+
+If `updatedAt` is provided and the server's record has been modified _after_ that timestamp, the server returns **`409 Conflict`**. Fetch the latest version and re-apply changes before retrying.
+
+---
+
+### DELETE `/stories/:id`
+Response `200`: `{ "success": true }`
+
+---
+
+## 3. Characters — `/stories/:storyId/characters` & `/characters`
+
+### GET `/stories/:storyId/characters`
+### POST `/stories/:storyId/characters`
+```json
+{ "name": "Alice", "role": "protagonist", "description": "...", "traits": ["brave"] }
+```
+
+### GET `/characters/:id`
+### PUT `/characters/:id`
+### DELETE `/characters/:id`
+
+**Character fields:** `id`, `userId`, `storyId`, `name`, `role`, `description`, `traits[]`, `arcLie?`, `arcTruth?`, `arcGhost?`, `avatarUrl?`
+
+---
+
+## 4. Locations — `/stories/:storyId/locations` & `/locations`
+
+### GET `/stories/:storyId/locations`
+### POST `/stories/:storyId/locations`
+```json
+{ "name": "The Forest", "description": "A dark wood..." }
+```
+
+### GET `/locations/:id`
+### PUT `/locations/:id`
+### DELETE `/locations/:id`
+
+**Location fields:** `id`, `userId`, `storyId`, `name`, `description`, `sensorySight?`, `sensorySound?`, `sensorySmell?`, `sensoryTouch?`, `sensoryTaste?`
+
+---
+
+## 5. Plot Events (Timeline) — `/stories/:storyId/events` & `/events`
+
+### GET `/stories/:storyId/events`
+### POST `/stories/:storyId/events`
+```json
+{ "title": "Opening scene", "description": "...", "order": 1 }
+```
+
+### GET `/events/:id`
+### PUT `/events/:id`
+### DELETE `/events/:id`
+
+**PlotEvent fields:** `id`, `userId`, `storyId`, `title`, `description`, `order`, `chapterId?`, `locationId?`, `status?`, `plotThread?`, `emotionalValue?`
+
+---
+
+## 6. Chapters — `/stories/:storyId/chapters` & `/chapters`
+
+Chapter **metadata** (title, order, status) and chapter **content** (full markdown draft) are handled separately for performance.
+
+### GET `/stories/:storyId/chapters`
+Returns metadata only — `content` field is excluded.
+
+### POST `/stories/:storyId/chapters`
+```json
+{ "title": "Chapter 1", "content": "Once upon a time...", "order": 1, "status": "drafting" }
+```
+
+### GET `/chapters/:id`
+Returns metadata only — `content` field excluded.
+
+### PUT `/chapters/:id`
+Update metadata: `{ "title": "...", "order": 2, "status": "completed" }`
+
+### DELETE `/chapters/:id`
+
+### GET `/chapters/:id/draft`
+Fetch the full `content` text of a chapter.
+
+Response `200`: `{ "content": "..." }`
+
+### PUT `/chapters/:id/draft`
+Update only the content of a chapter.
+
+**Request:** `{ "content": "Updated markdown text..." }`
+
+---
+
+## 7. Notes (Scratchpad) — `/stories/:storyId/notes` & `/notes`
+
+### GET `/stories/:storyId/notes`
+### POST `/stories/:storyId/notes`
+```json
+{ "content": "Note text..." }
+```
+### GET `/notes/:id`
+### PUT `/notes/:id`
+### DELETE `/notes/:id`
+
+---
+
+## 8. Relationships (Node Graph) — `/stories/:storyId/relationships` & `/relationships`
+
+### GET `/stories/:storyId/relationships`
+### POST `/stories/:storyId/relationships`
+```json
+{ "sourceId": "char-uuid", "targetId": "char-uuid", "type": "Enemy", "description": "..." }
+```
+### GET `/relationships/:id`
+### PUT `/relationships/:id`
+### DELETE `/relationships/:id`
+
+---
+
+## 9. Unresolved Questions — `/stories/:storyId/questions` & `/questions`
+
+### GET `/stories/:storyId/questions`
+### POST `/stories/:storyId/questions`
+```json
+{ "question": "Why did X happen?", "details": "Context..." }
+```
+### GET `/questions/:id`
+### PUT `/questions/:id`
+```json
+{ "isResolved": true, "answer": "Because..." }
+```
+### DELETE `/questions/:id`
+
+---
+
+## 10. Sync (Offline-First) — `/sync`
+
+The sync API enables offline-first operation across devices. Use **push** to upload local changes and **pull** to download server-side changes since a given timestamp.
+
+### POST `/sync/push`
+Upload local changes atomically. All changes are applied in a single database transaction. If any change fails (e.g. wrong owner), the **entire push is rolled back**.
+
+**Request:**
+```json
+{
+  "changes": {
+    "stories": [
+      { "_status": "created", "id": "client-uuid", "title": "New Story", "summary": "..." },
+      { "_status": "updated", "id": "existing-uuid", "title": "Renamed" },
+      { "_status": "deleted", "id": "old-uuid" }
+    ],
+    "characters": [ ... ],
+    "locations": [ ... ],
+    "events": [ ... ],
+    "notes": [ ... ],
+    "chapters": [ ... ],
+    "relationships": [ ... ],
+    "unresolvedQuestions": [ ... ]
+  }
+}
+```
+
+**Rules:**
+- `id` is required for every record and must be a stable client-generated UUID.
+- `_status` must be `"created"`, `"updated"`, or `"deleted"`.
+- For `created` records that don't yet exist on the server, the server creates them with the provided `id`. If the `id` already exists and belongs to another user, the push fails with `403`.
+- The `userId`, `createdAt`, and `updatedAt` fields are managed by the server and will be ignored / stripped from the payload even if provided.
+- For entities that belong to a story (`characters`, `locations`, etc.), `storyId` must be provided for new records.
+
+**Response `200`:** `{ "success": true }`
+
+---
+
+### POST `/sync/pull`
+Fetch all records modified since a given timestamp.
+
+**Request:**
+```json
+{ "last_sync_timestamp": "2026-03-01T00:00:00.000Z" }
+```
+Pass `last_sync_timestamp` as an ISO 8601 string. Omit the field (or pass `"1970-01-01T00:00:00.000Z"`) to fetch everything.
+
+**Response `200`:**
+```json
+{
+  "success": true,
+  "data": {
+    "changes": {
+      "stories": [ <Story> ],
+      "characters": [ <Character> ],
+      "locations": [ <Location> ],
+      "events": [ <PlotEvent> ],
+      "notes": [ <Note> ],
+      "chapters": [ <Chapter> ],
+      "relationships": [ <Relationship> ],
+      "unresolvedQuestions": [ <UnresolvedQuestion> ],
+      "tombstones": [
+        { "id": "...", "userId": "...", "entityId": "deleted-uuid", "entityType": "character", "deletedAt": "2026-03-10T..." }
+      ]
+    }
+  }
+}
+```
+
+**Tombstone handling:** For each tombstone, delete the local record with `entityId` of the given `entityType` from the local store. This ensures deletions propagate to all devices.
+
+---
+
+## 11. AI Proxy Endpoints — `/ai`
+
+All endpoints require a valid JWT. The server holds the Gemini API key; clients do **not** need their own keys for server-routed AI calls.
+
+All endpoints are `POST` with `Content-Type: application/json`.
+
+| Endpoint | Request Fields | Response Shape |
+|---|---|---|
+| `POST /ai/generate-portrait` | `characterDescription` (max 4000) | `{ imageUrl: string }` |
+| `POST /ai/analyze-tropes` | `storyContext` (max 20000) | `[{ name, description }]` |
+| `POST /ai/plot-hole-check` | `storyContext` (max 20000) | `[{ issue, suggestion }]` |
+| `POST /ai/expand-plot` | `currentPlot` (max 20000) | `{ expansion: string }` |
+| `POST /ai/critique` | `draft` (max 30000), `context` (max 20000) | `[{ point, detail }]` |
+| `POST /ai/revise-draft` | `draft` (max 30000), `maxims: string[]` (max 30 items × 200 chars) | `{ revisions: string[] }` |
+| `POST /ai/show-dont-tell` | `prose` (max 30000) | `[{ original, suggestion }]` |
+| `POST /ai/suggest-next` | `priorText` (max 30000), `plotContext` (max 20000) | `{ suggestions: string[] }` |
+| `POST /ai/generic` | `prompt` (max 30000), `context?` (max 20000) | `{ text: string }` |
+
+---
+
+*For TypeScript type definitions of all request and response payloads, see `src/index.ts` in this folder.*

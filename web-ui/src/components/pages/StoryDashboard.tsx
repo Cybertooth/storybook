@@ -48,7 +48,8 @@ export const StoryDashboard = () => {
     // Writing stats for current story
     const totalWords = useMemo(() => {
         return chapters.reduce((total, ch) => {
-            return total + (ch.content.trim() ? ch.content.trim().split(/\s+/).length : 0);
+            const c = ch.content ?? '';
+            return total + (c.trim() ? c.trim().split(/\s+/).length : 0);
         }, 0);
     }, [chapters]);
 
@@ -56,7 +57,7 @@ export const StoryDashboard = () => {
 
     // Simple streak calculation based on story updatedAt
     const daysSinceUpdate = currentStory
-        ? Math.floor((Date.now() - currentStory.updatedAt) / (1000 * 60 * 60 * 24))
+        ? Math.floor((Date.now() - new Date(currentStory.updatedAt).getTime()) / (1000 * 60 * 60 * 24))
         : 0;
 
     const streakEmoji = daysSinceUpdate === 0 ? '🔥' : daysSinceUpdate === 1 ? '✨' : daysSinceUpdate < 7 ? '💪' : '😴';
@@ -174,9 +175,9 @@ export const StoryDashboard = () => {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {stories.sort((a, b) => b.updatedAt - a.updatedAt).map(story => {
+                        {stories.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()).map(story => {
                             const isActive = currentStory?.id === story.id;
-                            const ago = Math.floor((Date.now() - story.updatedAt) / (1000 * 60 * 60 * 24));
+                            const ago = Math.floor((Date.now() - new Date(story.updatedAt).getTime()) / (1000 * 60 * 60 * 24));
                             return (
                                 <div
                                     key={story.id}

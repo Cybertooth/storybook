@@ -15,3 +15,16 @@ apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
     }
     return config;
 });
+
+// When the server returns 401 (token expired or invalid), clear local auth
+// state and redirect to the login page so the user can re-authenticate.
+apiClient.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response?.status === 401) {
+            useAuthStore.getState().logout();
+            window.location.href = '/auth';
+        }
+        return Promise.reject(error);
+    }
+);

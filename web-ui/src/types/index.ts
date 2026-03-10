@@ -6,9 +6,8 @@ export interface Story {
     summary: string; // The "Seed"
     theme?: string;
     coreQuestion?: string;
-    createdAt: number;
-    updatedAt: number;
-    // potentially more metadata
+    createdAt: string; // ISO 8601 timestamp
+    updatedAt: string; // ISO 8601 timestamp
 }
 
 export interface Character {
@@ -63,7 +62,7 @@ export interface PlotEvent {
 export interface Chapter {
     id: EntityId;
     title: string;
-    content: string; // Markdown content
+    content?: string; // Only present when fetched via GET /chapters/:id/draft
     order: number;
     storyId: EntityId;
     status: 'planned' | 'drafting' | 'completed';
@@ -80,7 +79,7 @@ export interface AppSettings {
 export interface Note {
     id: EntityId;
     content: string;
-    createdAt: number;
+    createdAt: string; // ISO 8601 timestamp
     storyId: EntityId;
 }
 
@@ -91,13 +90,13 @@ export interface UnresolvedQuestion {
     isResolved: boolean;
     answer?: string;
     storyId: EntityId;
-    createdAt: number;
+    createdAt: string; // ISO 8601 timestamp
 }
 
 export interface ProjectBundle {
     version: number;
     appName: 'storybook';
-    savedAt: number;
+    savedAt: string; // ISO 8601 timestamp
     story: Story;
     characters: Character[];
     locations: Location[];

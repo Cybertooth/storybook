@@ -21,7 +21,8 @@ export const DraftPage = () => {
 
     // Calculate total word count
     const totalWords = chapters.reduce((total, chapter) => {
-        return total + (chapter.content.trim() ? chapter.content.trim().split(/\s+/).length : 0);
+        const c = chapter.content ?? '';
+        return total + (c.trim() ? c.trim().split(/\s+/).length : 0);
     }, 0);
     const dailyGoal = 1667; // standard nanowrimo goal
     const goalProgress = Math.min((totalWords / dailyGoal) * 100, 100);
@@ -237,9 +238,9 @@ export const DraftPage = () => {
                             })}
                             {referenceType === 'prose' && activeChapter && (
                                 <ShowDontTell
-                                    draftText={activeChapter.content}
+                                    draftText={activeChapter.content ?? ''}
                                     onApplySuggestion={(original, replacement) => {
-                                        const newContent = activeChapter.content.replace(original, replacement);
+                                        const newContent = (activeChapter.content ?? '').replace(original, replacement);
                                         updateChapter(activeChapter.id, { content: newContent });
                                     }}
                                 />

@@ -132,7 +132,7 @@ export const useStoryStore = create<StoryState>()(
             const { currentStory } = get();
             if (!currentStory) return;
 
-            const updatedStory = { ...currentStory, summary, theme, coreQuestion, updatedAt: Date.now() };
+            const updatedStory = { ...currentStory, summary, theme, coreQuestion, updatedAt: new Date().toISOString() };
             set({ currentStory: updatedStory, isSaving: true });
 
             try {
@@ -375,9 +375,9 @@ export const useStoryStore = create<StoryState>()(
 
             const newNote: Note = {
                 id: uuidv4(),
-            userId: 'local-user',
+                userId: 'local-user',
                 content,
-                createdAt: Date.now(),
+                createdAt: new Date().toISOString(),
                 storyId: currentStory.id
             };
 
@@ -424,11 +424,11 @@ export const useStoryStore = create<StoryState>()(
 
             const newQuestion: UnresolvedQuestion = {
                 id: uuidv4(),
-            userId: 'local-user',
+                userId: 'local-user',
                 question,
                 details,
                 isResolved: false,
-                createdAt: Date.now(),
+                createdAt: new Date().toISOString(),
                 storyId: currentStory.id
             };
 
