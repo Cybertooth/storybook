@@ -33,7 +33,7 @@ final class ChapterListProvider
   ChapterList create() => ChapterList();
 }
 
-String _$chapterListHash() => r'dfbea948e9bc4e9073ec92bcdb30b5edeb23c708';
+String _$chapterListHash() => r'1850014087c83271365f13ee7e1321dd0bfc7f4e';
 
 abstract class _$ChapterList extends $AsyncNotifier<List<Chapter>> {
   FutureOr<List<Chapter>> build();

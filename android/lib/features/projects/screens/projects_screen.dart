@@ -29,9 +29,8 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
     setState(() => _isSyncing = true);
     try {
       await ref.read(syncServiceProvider).pullAllStories();
-      // Optionally refresh the local story list if it doesn't auto-refresh.
-      // Assuming storyListProvider auto-refreshes if we just listen to DB changes,
-      // but let's be safe and invalidate it if needed, or rely on Drift streams.
+      // Invalidate so the UI picks up any newly-pulled stories.
+      ref.invalidate(storyListProvider);
     } finally {
       if (mounted) {
         setState(() => _isSyncing = false);
@@ -84,7 +83,13 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
                         story: list[i],
                         isActive: list[i].id == active?.id,
                         onTap: () {
-                          ref.read(activeStoryProvider.notifier).set(list[i]);
+                          final story = list[i];
+                          ref.read(activeStoryProvider.notifier).set(story);
+                          // Pull child entities in background when going online.
+                          ref
+                              .read(syncServiceProvider)
+                              .pullStoryData(story.id)
+                              .ignore();
                           context.go('/scratchpad');
                         },
                         onDelete: () => _confirmDelete(ctx, ref, list[i].id),

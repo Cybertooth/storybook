@@ -33,7 +33,7 @@ final class LocationListProvider
   LocationList create() => LocationList();
 }
 
-String _$locationListHash() => r'ba022c1a18333e50130b48aaa9583b7f07d90a32';
+String _$locationListHash() => r'ef06dd8b6a54e27c9985d842ae545b49fa35da4a';
 
 abstract class _$LocationList extends $AsyncNotifier<List<Location>> {
   FutureOr<List<Location>> build();

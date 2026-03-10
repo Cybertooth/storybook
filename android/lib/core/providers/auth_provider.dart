@@ -111,6 +111,10 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
   }
 
   Future<void> logout() async {
+    // Notify the backend to invalidate the refresh token (best-effort).
+    try {
+      await ref.read(apiClientProvider).logout();
+    } catch (_) {}
     final storage = ref.read(secureStorageProvider);
     await storage.delete(key: _tokenKey);
     state = const AsyncData(AuthState());

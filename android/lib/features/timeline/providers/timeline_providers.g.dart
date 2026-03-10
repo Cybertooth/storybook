@@ -33,7 +33,7 @@ final class EventListProvider
   EventList create() => EventList();
 }
 
-String _$eventListHash() => r'83c44c438effc3afa63fa90e0ec55176ea386459';
+String _$eventListHash() => r'19af4aef6983a378e6212dcfb81295eb0ee40986';
 
 abstract class _$EventList extends $AsyncNotifier<List<PlotEvent>> {
   FutureOr<List<PlotEvent>> build();

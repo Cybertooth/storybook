@@ -15,9 +15,14 @@ class StoryList extends _$StoryList {
   Future<void> createStory(String title) async {
     final story = await ref.read(storyRepositoryProvider).create(title);
     ref.invalidateSelf();
+    // Background sync: fire-and-forget; offline mode silently skips.
+    ref.read(syncServiceProvider).pushStoryCreate(story).ignore();
+  }
 
-    // Background sync
-    ref.read(syncServiceProvider).pushStoryToRemote(story);
+  Future<void> updateStory(Story story) async {
+    final updated = await ref.read(storyRepositoryProvider).update(story);
+    ref.invalidateSelf();
+    ref.read(syncServiceProvider).pushStoryUpdate(updated).ignore();
   }
 
   Future<void> deleteStory(String id) async {
@@ -26,6 +31,7 @@ class StoryList extends _$StoryList {
     if (ref.read(activeStoryProvider)?.id == id) {
       ref.read(activeStoryProvider.notifier).clear();
     }
+    ref.read(syncServiceProvider).pushStoryDelete(id).ignore();
   }
 }
 

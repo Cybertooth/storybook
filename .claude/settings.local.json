@@ -8,7 +8,11 @@
       "Bash(/g/code/gen-ai/storybook_v1/android/lib/main.dart:*)",
       "Bash(cd G:/code/gen-ai/storybook_v1/android && dart run build_runner build --delete-conflicting-outputs 2>&1)",
       "Bash(mkdir:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(flutter.bat analyze:*)",
+      "Bash(/mnt/g/TOOLS/flutter/flutter-3.41.2/bin/dart:*)",
+      "Bash(/mnt/g/TOOLS/flutter/flutter-3.41.2/bin/cache/dart-sdk/bin/dart.exe run:*)",
+      "Bash(/mnt/g/TOOLS/flutter/flutter-3.41.2/bin/cache/dart-sdk/bin/dart.exe analyze:*)"
     ]
   }
 }

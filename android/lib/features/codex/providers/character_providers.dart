@@ -3,6 +3,7 @@ import 'package:uuid/uuid.dart';
 import '../../../core/providers/active_story_provider.dart';
 import '../../../core/providers/repository_providers.dart';
 import '../../../core/providers/undo_provider.dart';
+import '../../../data/sync/sync_service.dart';
 import '../../../domain/models/character.dart';
 
 part 'character_providers.g.dart';
@@ -19,24 +20,29 @@ class CharacterList extends _$CharacterList {
   Future<void> createCharacter(String name) async {
     final story = ref.read(activeStoryProvider);
     if (story == null) return;
-    final character = Character(id: const Uuid().v4(), storyId: story.id, name: name);
+    final character =
+        Character(id: const Uuid().v4(), storyId: story.id, name: name);
     await ref.read(characterRepositoryProvider).create(character);
     ref.invalidateSelf();
+    ref.read(syncServiceProvider).pushCharacterCreate(character).ignore();
   }
 
   Future<void> updateCharacter(Character character) async {
     await ref.read(characterRepositoryProvider).update(character);
     ref.invalidateSelf();
+    ref.read(syncServiceProvider).pushCharacterUpdate(character).ignore();
   }
 
   Future<void> deleteCharacter(String id) async {
     final backup = await ref.read(characterRepositoryProvider).getById(id);
     await ref.read(characterRepositoryProvider).delete(id);
     ref.invalidateSelf();
+    ref.read(syncServiceProvider).pushCharacterDelete(id).ignore();
     if (backup != null) {
       ref.read(undoStackProvider.notifier).push(() async {
         await ref.read(characterRepositoryProvider).create(backup);
         ref.invalidateSelf();
+        ref.read(syncServiceProvider).pushCharacterCreate(backup).ignore();
       });
     }
   }

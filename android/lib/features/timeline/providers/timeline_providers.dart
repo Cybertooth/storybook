@@ -3,6 +3,7 @@ import 'package:uuid/uuid.dart';
 import '../../../core/providers/active_story_provider.dart';
 import '../../../core/providers/repository_providers.dart';
 import '../../../core/providers/undo_provider.dart';
+import '../../../data/sync/sync_service.dart';
 import '../../../domain/models/plot_event.dart';
 
 part 'timeline_providers.g.dart';
@@ -34,21 +35,25 @@ class EventList extends _$EventList {
     );
     await ref.read(plotEventRepositoryProvider).create(event);
     ref.invalidateSelf();
+    ref.read(syncServiceProvider).pushEventCreate(event).ignore();
   }
 
   Future<void> updateEvent(PlotEvent event) async {
     await ref.read(plotEventRepositoryProvider).update(event);
     ref.invalidateSelf();
+    ref.read(syncServiceProvider).pushEventUpdate(event).ignore();
   }
 
   Future<void> deleteEvent(String id) async {
     final backup = await ref.read(plotEventRepositoryProvider).getById(id);
     await ref.read(plotEventRepositoryProvider).delete(id);
     ref.invalidateSelf();
+    ref.read(syncServiceProvider).pushEventDelete(id).ignore();
     if (backup != null) {
       ref.read(undoStackProvider.notifier).push(() async {
         await ref.read(plotEventRepositoryProvider).create(backup);
         ref.invalidateSelf();
+        ref.read(syncServiceProvider).pushEventCreate(backup).ignore();
       });
     }
   }
