@@ -14,7 +14,7 @@ TypeScript consumers should import types from `@storybook/api` (see `src/index.t
 ## Base URLs
 | Environment | URL |
 |---|---|
-| Production (Google Cloud Run) | `https://storybook-backend-sfknzwjwga-uc.a.run.app/api/v1` |
+| Production (Google Cloud Run) | `https://storybook-backend-66224741815.us-central1.run.app/api/v1` |
 | Local Development | `http://localhost:3000/api/v1` |
 
 ---

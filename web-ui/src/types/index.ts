@@ -50,7 +50,7 @@ export interface PlotEvent {
     description: string;
     order: number;
     chapterId?: EntityId;
-    characterIds: EntityId[];
+    characters: Character[];
     locationId?: EntityId;
     storyId: EntityId;
     // For Kanban/Timeline
@@ -69,6 +69,8 @@ export interface Chapter {
 }
 
 export interface AppSettings {
+    id: string;
+    userId: string;
     llmProvider: 'gemini' | 'openai';
     geminiKey?: string;
     geminiModel?: string;

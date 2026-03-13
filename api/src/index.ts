@@ -112,6 +112,7 @@ export interface PlotEvent {
     status?: string;
     plotThread?: string;
     emotionalValue?: number;
+    characters: Character[];
 }
 
 /**

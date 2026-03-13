@@ -165,7 +165,7 @@ export const EventBoard = ({ filterCharacterId }: { filterCharacterId?: string |
                                 {Array.from({ length: maxColIndex + 1 }).map((_, c) => {
                                     const cellEvents = events.filter(e => e.plotThread === thread && e.order === c);
                                     const cellId = `${thread}-${c}`;
-                                    const isDimmed = filterCharacterId && cellEvents.length > 0 && !cellEvents.some(e => e.characterIds.includes(filterCharacterId));
+                                    const isDimmed = filterCharacterId && cellEvents.length > 0 && !cellEvents.some(e => e.characters.some(c => c.id === filterCharacterId));
 
                                     return (
                                         <div key={cellId} className={clsx("border-b border-stone-200 dark:border-stone-800 group relative transition-opacity", isDimmed && "opacity-25")}>

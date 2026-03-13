@@ -150,7 +150,7 @@ export const useStoryStore = create<StoryState>()(
 
             const newChar: Character = {
                 id: uuidv4(),
-            userId: 'local-user',
+                userId: 'local-user',
                 name,
                 role,
                 description: '',
@@ -202,7 +202,7 @@ export const useStoryStore = create<StoryState>()(
 
             const newLoc: Location = {
                 id: uuidv4(),
-            userId: 'local-user',
+                userId: 'local-user',
                 name,
                 description: '',
                 storyId: currentStory.id
@@ -253,11 +253,11 @@ export const useStoryStore = create<StoryState>()(
 
             const newEvent: PlotEvent = {
                 id: uuidv4(),
-            userId: 'local-user',
+                userId: 'local-user',
                 title,
                 description: '',
                 order: maxOrder + 1,
-                characterIds: [],
+                characters: [],
                 storyId: currentStory.id,
                 plotThread
             };
@@ -324,7 +324,7 @@ export const useStoryStore = create<StoryState>()(
 
             const newChapter: Chapter = {
                 id: uuidv4(),
-            userId: 'local-user',
+                userId: 'local-user',
                 title,
                 content: '',
                 order: maxOrder + 1,
@@ -475,7 +475,7 @@ export const useStoryStore = create<StoryState>()(
 
             const newRel: Relationship = {
                 id: uuidv4(),
-            userId: 'local-user',
+                userId: 'local-user',
                 sourceId,
                 targetId,
                 type,

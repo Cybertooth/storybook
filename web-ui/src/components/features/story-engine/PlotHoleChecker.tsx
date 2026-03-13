@@ -39,7 +39,7 @@ CHARACTERS:
 ${characters.map(c => `- ${c.name} (${c.role}): ${c.description}${c.arcLie ? ` | Lie: ${c.arcLie}` : ''}${c.arcTruth ? ` | Truth: ${c.arcTruth}` : ''}${c.arcGhost ? ` | Ghost: ${c.arcGhost}` : ''}`).join('\n')}
 
 EVENTS (in order):
-${events.sort((a, b) => a.order - b.order).map(e => `- [${e.order}] ${e.title} (Thread: ${e.plotThread || 'Main'})${e.characterIds.length > 0 ? ` Characters: ${e.characterIds.map(id => characters.find(c => c.id === id)?.name || id).join(', ')}` : ''}: ${e.description}`).join('\n')}
+${events.sort((a, b) => a.order - b.order).map(e => `- [${e.order}] ${e.title} (Thread: ${e.plotThread || 'Main'})${e.characters.length > 0 ? ` Characters: ${e.characters.map(c => c.name).join(', ')}` : ''}: ${e.description}`).join('\n')}
 
 LOCATIONS:
 ${locations.map(l => `- ${l.name}: ${l.description}`).join('\n')}`;

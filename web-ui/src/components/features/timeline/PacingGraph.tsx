@@ -10,7 +10,7 @@ export const PacingGraph = ({ filterCharacterId }: { filterCharacterId?: string 
     const sortedEvents = useMemo(() => {
         let filtered = [...events];
         if (filterCharacterId) {
-            filtered = filtered.filter(e => e.characterIds.includes(filterCharacterId));
+            filtered = filtered.filter(e => e.characters.some(c => c.id === filterCharacterId));
         }
         return filtered.sort((a, b) => a.order - b.order);
     }, [events, filterCharacterId]);

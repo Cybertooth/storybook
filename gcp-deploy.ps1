@@ -12,16 +12,33 @@ $DB_PASS = "storybookpass" # Note: In a real production scenario, this should be
 Write-Host "Project ID: $PROJECT_ID"
 
 Write-Host "1. Provisioning Cloud SQL Instance (This may take ~5-10 minutes)..."
-gcloud sql instances create $DB_INSTANCE --database-version=POSTGRES_15 --tier=db-f1-micro --region=$REGION
+try {
+    gcloud sql instances create $DB_INSTANCE --database-version=POSTGRES_15 --tier=db-f1-micro --region=$REGION --quiet
+}
+catch {
+    Write-Host "Cloud SQL instance may already exist, continuing..."
+}
 
 Write-Host "2. Creating Database..."
-gcloud sql databases create $DB_NAME --instance=$DB_INSTANCE
+try {
+    gcloud sql databases create $DB_NAME --instance=$DB_INSTANCE --quiet
+}
+catch {
+    Write-Host "Database may already exist, continuing..."
+}
 
 Write-Host "3. Creating Database User..."
-gcloud sql users create $DB_USER --instance=$DB_INSTANCE --password=$DB_PASS
+try {
+    gcloud sql users create $DB_USER --instance=$DB_INSTANCE --password=$DB_PASS --quiet
+}
+catch {
+    Write-Host "Database user may already exist, continuing..."
+}
 
 Write-Host "4. Building Backend Docker Image..."
 gcloud builds submit --config cloudbuild-backend.yaml .
+
+$JWT_SECRET = -join ((48..57) + (65..90) + (97..122) | Get-Random -Count 32 | ForEach-Object { [char]$_ })
 
 Write-Host "5. Deploying Backend to Cloud Run..."
 gcloud run deploy storybook-backend `
@@ -29,6 +46,9 @@ gcloud run deploy storybook-backend `
     --region ${REGION} `
     --add-cloudsql-instances "${PROJECT_ID}:${REGION}:${DB_INSTANCE}" `
     --set-env-vars DATABASE_URL="postgresql://${DB_USER}:${DB_PASS}@localhost/${DB_NAME}?host=/cloudsql/${PROJECT_ID}:${REGION}:${DB_INSTANCE}" `
+    --set-env-vars JWT_SECRET="${JWT_SECRET}" `
+    --set-env-vars NODE_ENV="production" `
+    --set-env-vars CORS_ORIGINS="*" `
     --allow-unauthenticated
 
 Write-Host "6. Retrieving Backend URL..."

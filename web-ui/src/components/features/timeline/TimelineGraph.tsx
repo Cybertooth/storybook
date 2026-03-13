@@ -97,7 +97,7 @@ export const TimelineGraph = ({ filterCharacterId: _filterCharacterId }: { filte
                     {characters.map((char, i) => {
                         // Find sequence of nodes for this character
                         const charNodes = graphData.eventNodes
-                            .filter(n => n.event.characterIds?.includes(char.id))
+                            .filter(n => n.event.characters?.some(c => c.id === char.id))
                             .sort((a, b) => a.xIndex - b.xIndex);
 
                         if (charNodes.length < 2) return null;
@@ -181,7 +181,7 @@ export const TimelineGraph = ({ filterCharacterId: _filterCharacterId }: { filte
 
                                 {/* Character Avatars (Mini) */}
                                 <div className="flex -space-x-1 mt-2">
-                                    {characters.filter(c => node.event.characterIds?.includes(c.id)).slice(0, 4).map((c) => (
+                                    {characters.filter(c => node.event.characters?.some(char => char.id === c.id)).slice(0, 4).map((c) => (
                                         <div key={c.id} className="w-4 h-4 rounded-full ring-2 ring-white flex items-center justify-center text-[8px] font-bold shadow-sm" style={{ backgroundColor: `hsl(${characters.indexOf(c) * 137.5 % 360}, 70%, 90%)`, color: `hsl(${characters.indexOf(c) * 137.5 % 360}, 70%, 30%)` }}>
                                             {c.name[0]}
                                         </div>

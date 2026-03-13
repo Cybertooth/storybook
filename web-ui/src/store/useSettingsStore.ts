@@ -9,6 +9,7 @@ interface SettingsState extends AppSettings {
 export const useSettingsStore = create<SettingsState>()(
     persist(
         (set) => ({
+            id: 'local-settings',
             userId: 'local-user',
             llmProvider: 'gemini',
             geminiKey: '',
