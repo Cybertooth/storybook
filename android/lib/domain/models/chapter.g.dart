@@ -10,7 +10,7 @@ _Chapter _$ChapterFromJson(Map<String, dynamic> json) => _Chapter(
       id: json['id'] as String,
       storyId: json['storyId'] as String,
       title: json['title'] as String,
-      content: json['content'] as String? ?? '',
+      content: json['content'] as String?,
       order: (json['order'] as num?)?.toInt() ?? 0,
       status: $enumDecodeNullable(_$ChapterStatusEnumMap, json['status']) ??
           ChapterStatus.planned,

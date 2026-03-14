@@ -17,7 +17,7 @@ mixin _$Chapter {
   String get id;
   String get storyId;
   String get title;
-  String get content;
+  String? get content;
   int get order;
   ChapterStatus get status;
 
@@ -64,7 +64,7 @@ abstract mixin class $ChapterCopyWith<$Res> {
       {String id,
       String storyId,
       String title,
-      String content,
+      String? content,
       int order,
       ChapterStatus status});
 }
@@ -84,7 +84,7 @@ class _$ChapterCopyWithImpl<$Res> implements $ChapterCopyWith<$Res> {
     Object? id = null,
     Object? storyId = null,
     Object? title = null,
-    Object? content = null,
+    Object? content = freezed,
     Object? order = null,
     Object? status = null,
   }) {
@@ -101,10 +101,10 @@ class _$ChapterCopyWithImpl<$Res> implements $ChapterCopyWith<$Res> {
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
-      content: null == content
+      content: freezed == content
           ? _self.content
           : content // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       order: null == order
           ? _self.order
           : order // ignore: cast_nullable_to_non_nullable
@@ -210,7 +210,7 @@ extension ChapterPatterns on Chapter {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(String id, String storyId, String title, String content,
+    TResult Function(String id, String storyId, String title, String? content,
             int order, ChapterStatus status)?
         $default, {
     required TResult orElse(),
@@ -240,7 +240,7 @@ extension ChapterPatterns on Chapter {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(String id, String storyId, String title, String content,
+    TResult Function(String id, String storyId, String title, String? content,
             int order, ChapterStatus status)
         $default,
   ) {
@@ -268,7 +268,7 @@ extension ChapterPatterns on Chapter {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(String id, String storyId, String title, String content,
+    TResult? Function(String id, String storyId, String title, String? content,
             int order, ChapterStatus status)?
         $default,
   ) {
@@ -290,7 +290,7 @@ class _Chapter implements Chapter {
       {required this.id,
       required this.storyId,
       required this.title,
-      this.content = '',
+      this.content,
       this.order = 0,
       this.status = ChapterStatus.planned});
   factory _Chapter.fromJson(Map<String, dynamic> json) =>
@@ -303,8 +303,7 @@ class _Chapter implements Chapter {
   @override
   final String title;
   @override
-  @JsonKey()
-  final String content;
+  final String? content;
   @override
   @JsonKey()
   final int order;
@@ -361,7 +360,7 @@ abstract mixin class _$ChapterCopyWith<$Res> implements $ChapterCopyWith<$Res> {
       {String id,
       String storyId,
       String title,
-      String content,
+      String? content,
       int order,
       ChapterStatus status});
 }
@@ -381,7 +380,7 @@ class __$ChapterCopyWithImpl<$Res> implements _$ChapterCopyWith<$Res> {
     Object? id = null,
     Object? storyId = null,
     Object? title = null,
-    Object? content = null,
+    Object? content = freezed,
     Object? order = null,
     Object? status = null,
   }) {
@@ -398,10 +397,10 @@ class __$ChapterCopyWithImpl<$Res> implements _$ChapterCopyWith<$Res> {
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
-      content: null == content
+      content: freezed == content
           ? _self.content
           : content // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       order: null == order
           ? _self.order
           : order // ignore: cast_nullable_to_non_nullable

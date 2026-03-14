@@ -496,9 +496,9 @@ class SyncService {
           await _api.createChapter(ch.storyId, _chapterMetaToJson(ch));
       if (resp != null && resp['success'] != true) {
         await pushChapterUpdate(ch);
-      } else if (ch.content.isNotEmpty) {
+      } else if (ch.content != null && ch.content!.isNotEmpty) {
         // Push content separately via draft endpoint
-        await _api.saveChapterDraft(ch.id, ch.content);
+        await _api.saveChapterDraft(ch.id, ch.content!);
       }
     } catch (e) {
       debugPrint('SyncService.pushChapterCreate failed: $e');

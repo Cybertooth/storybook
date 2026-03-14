@@ -33,9 +33,9 @@ class _DraftScreenState extends ConsumerState<DraftScreen> {
     final chaptersAsync = ref.watch(chapterListProvider);
 
     // Keep editor in sync with active chapter
-    if (activeChapter != null && _controller.text != activeChapter.content) {
+    if (activeChapter != null && _controller.text != (activeChapter.content ?? '')) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) _controller.text = activeChapter.content;
+        if (mounted) _controller.text = activeChapter.content ?? '';
       });
     }
 

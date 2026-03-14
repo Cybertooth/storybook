@@ -58,6 +58,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       return;
     }
 
+    if (password.length < 12) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Password must be at least 12 characters')),
+      );
+      return;
+    }
+
     final success =
         await ref.read(authProvider.notifier).register(email, password);
     if (!mounted) return;

@@ -11,7 +11,7 @@ abstract class Chapter with _$Chapter {
     required String id,
     required String storyId,
     required String title,
-    @Default('') String content,
+    String? content,
     @Default(0) int order,
     @Default(ChapterStatus.planned) ChapterStatus status,
   }) = _Chapter;

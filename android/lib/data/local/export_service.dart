@@ -164,7 +164,7 @@ class ExportService {
                 id: c.id,
                 storyId: c.storyId,
                 title: c.title,
-                content: Value(c.content),
+                content: Value(c.content ?? ''),
                 order: Value(c.order),
                 status: Value(c.status.name),
               ),

@@ -19,6 +19,27 @@ final dioProvider = Provider<Dio>((ref) {
 
       return handler.next(options);
     },
+    onError: (DioException e, handler) {
+      if (e.response?.statusCode == 401) {
+        // Token expired or invalid - force logout.
+        ref.read(authProvider.notifier).logout();
+        // Return a clear error down the stack rather than letting it silently fail or retry
+        return handler.reject(DioException(
+            requestOptions: e.requestOptions,
+            response: e.response,
+            type: DioExceptionType.badResponse,
+            error: 'Session expired. Please log in again.'));
+      }
+      if (e.response?.statusCode == 429) {
+        // Rate limit exceeded
+        return handler.reject(DioException(
+            requestOptions: e.requestOptions,
+            response: e.response,
+            type: DioExceptionType.badResponse,
+            error: 'Too many requests. Please wait a moment before trying again.'));
+      }
+      return handler.next(e);
+    },
   ));
 
   if (kDebugMode) {

@@ -32,7 +32,7 @@ class LocalChapterRepository implements ChapterRepository {
   Future<Chapter> create(Chapter chapter) async {
     await _db.into(_db.chaptersTable).insert(ChaptersTableCompanion.insert(
       id: chapter.id, storyId: chapter.storyId, title: chapter.title,
-      content: Value(chapter.content), order: Value(chapter.order),
+      content: Value(chapter.content ?? ''), order: Value(chapter.order),
       status: Value(chapter.status.name),
     ));
     return chapter;
@@ -42,7 +42,7 @@ class LocalChapterRepository implements ChapterRepository {
   Future<Chapter> update(Chapter chapter) async {
     await (_db.update(_db.chaptersTable)..where((t) => t.id.equals(chapter.id)))
         .write(ChaptersTableCompanion(
-      title: Value(chapter.title), content: Value(chapter.content),
+      title: Value(chapter.title), content: Value(chapter.content ?? ''),
       order: Value(chapter.order), status: Value(chapter.status.name),
     ));
     return chapter;

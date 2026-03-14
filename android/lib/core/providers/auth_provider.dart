@@ -52,7 +52,7 @@ class AuthNotifier extends AsyncNotifier<AuthState> {
       final response = await apiClient.login(email, password);
 
       if (response != null && response['success'] == true) {
-        final token = response['data']['access_token'] as String;
+        final token = response['data']['token'] as String;
         final storage = ref.read(secureStorageProvider);
         await storage.write(key: _tokenKey, value: token);
 

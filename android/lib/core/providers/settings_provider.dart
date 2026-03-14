@@ -16,7 +16,7 @@ class AppSettings {
     this.geminiApiKey = '',
     this.openAiApiKey = '',
     this.aiProvider = 'gemini',
-    this.backendUrl = 'http://localhost:3000/api/v1',
+    this.backendUrl = 'https://storybook-backend-sfknzwjwga-uc.a.run.app/api/v1',
     this.seedColorValue = 0xFF6366F1, // Default vibrant indigo
   });
 }
@@ -43,7 +43,7 @@ class SettingsNotifier extends AsyncNotifier<AppSettings> {
       openAiApiKey: await storage.read(key: _openAiKey) ?? '',
       aiProvider: await storage.read(key: _providerKey) ?? 'gemini',
       backendUrl: await storage.read(key: _backendUrlKey) ??
-          'http://localhost:3000/api/v1',
+          'https://storybook-backend-sfknzwjwga-uc.a.run.app/api/v1',
       seedColorValue: seedColor,
     );
   }
